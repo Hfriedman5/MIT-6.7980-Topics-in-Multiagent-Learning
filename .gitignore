@@ -1,0 +1,30 @@
+# Only the public course source directories belong in this repository.
+/*
+!/.gitignore
+!/.gitattributes
+!/AGENTS.md
+!/README.md
+!/Makefile
+!/html-export.json
+!/Typst Lectures/
+!/Syllabus/
+!/html-exporter/
+!/scripts/
+!/website/
+!/docs/
+
+# Build products, editor state, and local secrets.
+**/target/
+**/__pycache__/
+**/*.pyc
+**/.DS_Store
+**/.env
+**/.env.*
+**/*~
+**/.ipynb_checkpoints/
+Typst Lectures/.*-check/
+Syllabus/macros.pdf
+
+# Private migration records stay in the local workspace.
+/docs/migration/
+/migration/

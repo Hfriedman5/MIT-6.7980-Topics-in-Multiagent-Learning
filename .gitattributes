@@ -1,0 +1,14 @@
+# Rendered documents and media must not be interpreted as line-oriented source.
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.zip binary
+*.nnue binary
+
+# Generated vector figures are reviewed in their rendered form.
+*.svg -diff
+*.svg linguist-generated=true

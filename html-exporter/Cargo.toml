@@ -1,0 +1,16 @@
+[package]
+name = "notes-html-exporter"
+version = "0.1.0"
+edition = "2021"
+description = "Export the MIT 6.7980 notes through Typst HTML plus postprocessing."
+license = "MIT"
+
+[dependencies]
+argopt = "0.3"
+regex = "1"
+scraper = "0.25"
+serde = { version = "1", features = ["derive"] }
+serde_yaml = "0.9"
+typst = "0.15.1"
+typst-html = "0.15.1"
+typst-kit = { version = "0.15.1", features = ["embedded-fonts", "scan-fonts", "system-files", "system-packages", "system-downloader", "datetime"] }

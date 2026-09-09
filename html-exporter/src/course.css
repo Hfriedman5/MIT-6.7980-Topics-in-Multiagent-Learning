@@ -1,0 +1,158 @@
+/* An academic course page, using the same type and colors as the lecture notes. */
+.course-home { font-family: var(--serif); font-size: 1.0625rem; line-height: 1.6; }
+.course-home * { box-sizing: border-box; }
+.course-home :is(h1, h2, h3, h4, p) { margin: 0; }
+.course-home a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.home-width { width: min(1152px, calc(100% - 96px)); margin-inline: auto; }
+.skip-link { position: fixed; left: 24px; top: -100px; z-index: 10; padding: 10px 16px; background: white; }
+.skip-link:focus { top: 12px; }
+.course-header { padding-top: 34px; padding-bottom: 26px; }
+.course-term { font: 700 1.1875rem/1.5 var(--sans); color: var(--brown); }
+.course-header h1 { width: fit-content; max-width: 100%; font-size: 2.5rem; line-height: 1.2; letter-spacing: -.6px; margin-top: 14px; padding-bottom: 13px; border-bottom: 3px solid var(--ink); }
+.course-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; grid-template-areas: "overview sidebar" "schedule sidebar"; gap: 30px 38px; align-items: start; }
+.course-content { display: contents; }
+.course-overview { grid-area: overview; min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) 133px; gap: 26px; align-items: start; }
+.course-schedule { grid-area: schedule; min-width: 0; }
+.course-sidebar { grid-area: sidebar; border-left: 1px solid var(--rule); padding-left: 24px; font-size: 0.875rem; line-height: 1.55; }
+.overview-copy > p { font-size: 1.1875rem; line-height: 1.55; }
+.overview-copy > p + p { margin-top: 15px; }
+.course-links { display: flex; flex-wrap: wrap; gap: 8px 24px; font: 700 0.875rem/1.6 var(--sans); margin-top: 20px; }
+.course-links a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.course-home h2 { font-size: 1.625rem; line-height: 1.3; }
+.course-home h3 { font-size: 1.1875rem; line-height: 1.4; }
+.course-image { margin: 0; }
+.course-image img { display: block; width: 133px; max-width: none; height: auto; margin-left: auto; }
+.course-schedule { border-top: 1px solid var(--rule); padding-top: 28px; }
+.section-intro { margin-top: 12px !important; color: var(--muted); font-size: 1rem; }
+.reading-edition { font-size: 0.875rem; line-height: 1.55; color: var(--muted); margin-top: 12px !important; }
+.schedule-module, .schedule-standalone { margin-top: 28px; }
+.course-home .schedule-module h3 { font-size: 1.3125rem; padding: 8px 0; border-bottom: 2px solid var(--rule); }
+.schedule-table { width: 100%; border-collapse: collapse; table-layout: fixed; text-align: left; }
+.number-column { width: 38px; }
+.date-column { width: 78px; }
+.materials-column { width: 106px; }
+.schedule-table thead th { padding: 8px 12px 8px 0; font: 700 0.875rem/1.5 var(--sans); color: var(--muted); border-bottom: 1px solid var(--rule); }
+.schedule-table tbody :is(th, td) { padding: 12px 16px 12px 0; vertical-align: top; border-bottom: 1px solid var(--rule); }
+.schedule-table :is(th, td):last-child { padding-right: 0; }
+.schedule-table .session-number { font: 700 0.9375rem/1.65 var(--sans); color: var(--muted); font-variant-numeric: tabular-nums; }
+.session-date { font: 0.9375rem/1.65 var(--sans); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.session-date time { color: var(--ink); }
+.session-topic h4 { font-size: 1.125rem; line-height: 1.35; }
+.session-topic p { margin-top: 4px; font-size: 1rem; line-height: 1.45; color: var(--muted); }
+.session-instructor { display: block; margin-top: 4px; text-align: left; font: 0.875rem/1.4 var(--sans); color: var(--muted); }
+.session-links { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; padding-top: 1px; font-family: var(--sans); }
+.reading-link { font-size: 0.875rem; font-weight: 700; white-space: nowrap; text-decoration: underline; text-underline-offset: 3px; }
+.course-home .pdf-link { font: 0.8125rem/1.5 var(--sans); color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.reading-kind { flex-basis: 100%; font-size: 0.8125rem; color: var(--muted); }
+.notes-pending { font-size: 0.8125rem; line-height: 1.5; color: var(--muted); }
+.schedule-break { background: var(--soft); color: var(--muted); font-size: 0.9375rem; }
+.schedule-table .schedule-break :is(th, td) { padding-block: 8px; }
+.break-topic span { margin-left: 10px; }
+.supplementary-section { margin-top: 36px; }
+.supplementary-section > p { font-size: 0.9375rem; color: var(--muted); margin-top: 10px; }
+.supplementary-list { list-style: none; padding: 0; margin: 12px 0 0; }
+.supplementary-list li { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; border-bottom: 1px solid var(--rule); padding-block: 10px; }
+.supplementary-list li > a:first-child { font: 700 1.0625rem/1.5 var(--sans); }
+.improving-material, .course-project { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--rule); }
+.improving-material > p, .course-project > p { margin-top: 14px; }
+.html-notes-preview { margin: 20px 0; }
+.html-notes-preview > a { display: block; }
+.html-notes-preview img { display: block; width: 100%; height: auto; }
+.html-notes-preview figcaption { margin-top: 8px; font-size: 0.875rem; line-height: 1.45; color: var(--muted); }
+.course-sidebar section + section { margin-top: 25px; }
+.course-sidebar h2 { font-size: 1.0625rem; margin-bottom: 10px; }
+.course-sidebar p + p { margin-top: 10px; }
+.course-details dl { margin: 0; }
+.course-details dl > div { display: grid; grid-template-columns: 52px 1fr; gap: 8px; margin-top: 7px; }
+.course-details dt { color: var(--muted); }
+.course-details dd { margin: 0; }
+.lecture-time { white-space: nowrap; }
+.instructor-list, .ta-list { list-style: none; margin: 0; padding: 0; font-size: 0.8125rem; }
+.instructor-list li, .ta-list li { padding-left: 12px; }
+.instructor-list li + li { margin-top: 12px; }
+.instructor-list li > *, .ta-list li > * { display: block; }
+.course-home .person-name { position: relative; font: 700 0.9375rem/1.4 var(--sans); }
+.course-home .person-name::before { content: ""; position: absolute; left: -12px; top: .45em; width: 0; height: 0; border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent; border-left: 6px solid #000; }
+.instructor-list .person-name { color: var(--ink); }
+.instructor-list .person-name:hover { color: var(--accent); }
+.instructor-list li > span { color: var(--muted); font-size: 0.75rem; }
+.course-home .office-hours { font-size: 0.75rem; color: var(--muted); margin-top: 8px; }
+.course-people #ta-title { margin-top: 22px; }
+.ta-list { display: grid; gap: 10px; }
+.course-prerequisites, .course-work { color: var(--muted); }
+.grade-components { list-style: disc; margin: 0 0 10px; padding-left: 18px; color: var(--ink); }
+.course-work strong { color: var(--ink); font-size: 0.8125rem; }
+.course-footer { border-top: 1px solid var(--rule); margin-top: 48px; padding-block: 20px 30px; display: flex; justify-content: space-between; gap: 20px; color: var(--muted); font: 0.75rem/1.5 var(--sans); }
+@media (max-width: 1050px) {
+  .home-width { width: calc(100% - 56px); }
+  .course-layout { grid-template-columns: minmax(0, 1fr) 250px; column-gap: 26px; }
+  .course-sidebar { padding-left: 20px; }
+  .course-header h1 { font-size: 2.25rem; }
+  .course-overview { gap: 20px; }
+  .overview-copy > p { font-size: 1.125rem; }
+  .number-column { width: 32px; }
+  .date-column { width: 72px; }
+  .materials-column { width: 98px; }
+}
+@media (max-width: 900px) {
+  .course-overview { grid-template-columns: minmax(0, 1fr); }
+  .course-image { display: none; }
+}
+@media (max-width: 760px) {
+  .home-width { width: calc(100% - 36px); }
+  .course-header { padding-block: 24px; }
+  .course-term { font-size: 1.125rem; }
+  .course-header h1 { font-size: 2rem; line-height: 1.15; }
+  .course-layout { grid-template-columns: minmax(0, 1fr); grid-template-areas: none; row-gap: 24px; }
+  .course-sidebar { display: contents; }
+  .course-sidebar section + section { margin-top: 0; }
+  .course-layout .course-details { grid-area: auto; grid-row: 1; }
+  .course-layout .course-people { grid-area: auto; grid-row: 2; }
+  .course-layout .course-overview { grid-area: auto; grid-row: 3; border-top: 1px solid var(--rule); padding-top: 24px; }
+  .course-layout .course-schedule { grid-area: auto; grid-row: 4; }
+  .course-layout .course-prerequisites { grid-area: auto; grid-row: 5; }
+  .course-layout .course-work { grid-area: auto; grid-row: 6; }
+  .course-details dl > div { grid-template-columns: 60px 1fr; }
+  .course-people { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 22px; align-items: start; }
+  .course-people > h2:first-child { grid-column: 1; grid-row: 1; }
+  .course-people .instructor-list { grid-column: 1; grid-row: 2; }
+  .course-people .instructor-list + .office-hours { grid-column: 1; grid-row: 3; }
+  .course-people #ta-title { grid-column: 2; grid-row: 1; margin-top: 0; }
+  .course-people .ta-list { grid-column: 2; grid-row: 2; }
+  .course-people .ta-list + .office-hours { grid-column: 2; grid-row: 3; }
+  .course-home .person-name { font-size: 0.875rem; }
+  .instructor-list, .ta-list { font-size: 0.75rem; overflow-wrap: anywhere; }
+  .course-home .course-sidebar h2 { font-size: 1rem; }
+  .overview-copy > p { font-size: 1.0625rem; }
+  .course-links { gap: 8px 18px; font-size: 0.8125rem; }
+  .course-home h2 { font-size: 1.5rem; }
+  .course-home h3 { font-size: 1.125rem; }
+  .schedule-table, .schedule-table tbody { display: block; }
+  .schedule-table colgroup { display: none; }
+  .schedule-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .schedule-table tbody tr { display: grid; grid-template-columns: 53px minmax(0, 1fr); grid-template-rows: 24px auto auto; gap: 2px 14px; padding-block: 12px; border-bottom: 1px solid var(--rule); }
+  .schedule-table tbody :is(th, td) { padding: 0; border: 0; }
+  .schedule-table .session-number { grid-column: 1; grid-row: 1; font-size: 1rem; }
+  .schedule-table .session-date { grid-column: 1; grid-row: 2; font-size: 0.8125rem; }
+  .schedule-table .session-topic { grid-column: 2; grid-row: 1 / span 2; }
+  .schedule-table .materials-cell { grid-column: 2; grid-row: 3; margin-top: 4px; }
+  .session-topic h4 { font-size: 1.125rem; }
+  .session-topic p { font-size: 1rem; }
+  .session-instructor { font-size: 0.875rem; }
+  .schedule-table .schedule-break :is(th, td) { padding: 0; }
+  .schedule-table .break-topic { grid-column: 2; grid-row: 1 / span 2; }
+  .break-topic span { display: block; margin-left: 0; }
+  .course-footer { margin-top: 28px; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+@media print {
+  .home-width { width: 100%; }
+  .skip-link, .course-links, .course-footer a { display: none; }
+  .course-header { padding-top: 0; }
+  .course-header h1 { font-size: 1.75rem; }
+  .course-layout { display: block; }
+  .course-sidebar { border: 0; padding: 24px 0 0; }
+  .course-overview { margin-bottom: 24px; }
+  .schedule-row, .course-image, .course-sidebar section { break-inside: avoid; }
+  .schedule-module h3 { break-after: avoid; }
+}
