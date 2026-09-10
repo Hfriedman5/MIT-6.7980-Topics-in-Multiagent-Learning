@@ -216,14 +216,23 @@ def probe_url(url, timeout=10):
     return 'unverified: no successful response'
 
 
-def check_external(links, *, timeout=10):
-    issues = []
+@dataclass
+class ExternalAudit:
+    issues: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+
+
+def check_external(links, *, timeout=10, doi_warnings=False):
+    audit = ExternalAudit()
     urls = sorted(links)
     with ThreadPoolExecutor(max_workers=4) as pool:
         for url, result in zip(urls, pool.map(lambda value: probe_url(value, timeout), urls)):
             if result:
-                issues.append(f'{", ".join(sorted(links[url]))}: {result}: {url}')
-    return issues
+                destination = audit.issues
+                if doi_warnings and urlsplit(url).hostname in ('doi.org', 'dx.doi.org'):
+                    destination = audit.warnings
+                destination.append(f'{", ".join(sorted(links[url]))}: {result}: {url}')
+    return audit
 
 
 def skip_separate_sites(audit, config, paths, *, base_url=None, aliases=()):
@@ -254,6 +263,8 @@ def main(argv=None):
     parser.add_argument('--skip-separate-site', action='append', default=[], metavar='PATH/',
                         help='skip an explicitly configured independently deployed directory')
     parser.add_argument('--online', action='store_true', help='also check external HTTP(S) links; failures block deployment')
+    parser.add_argument('--doi-warnings', action='store_true',
+                        help='report failed doi.org and dx.doi.org checks as non-blocking warnings')
     args = parser.parse_args(argv)
     config = json.loads(args.config.read_text())
     audit = audit_site(Path(args.folder), config,
@@ -268,11 +279,18 @@ def main(argv=None):
         return 1
     if args.online:
         print(f'Checking {len(audit.external)} distinct external URLs…', flush=True)
-        if issues := check_external(audit.external):
-            print('\n'.join(issues), file=sys.stderr)
-            print('External verification failed; broken and unverified links both block deployment.', file=sys.stderr)
+        external = check_external(audit.external, doi_warnings=args.doi_warnings)
+        for warning in external.warnings:
+            print(f'Non-blocking DOI warning: {warning}', file=sys.stderr)
+        if external.issues:
+            print('\n'.join(external.issues), file=sys.stderr)
+            print('External verification failed; links listed as errors block deployment.', file=sys.stderr)
             return 1
-        print(f'All {len(audit.external)} external URLs responded successfully.')
+        if external.warnings:
+            print(f'{len(audit.external) - len(external.warnings)} external URLs responded successfully; '
+                  f'{len(external.warnings)} non-blocking DOI warning(s).')
+        else:
+            print(f'All {len(audit.external)} external URLs responded successfully.')
     else:
         print(f'{len(audit.external)} external URLs require --online for live verification.')
     return 0

@@ -111,6 +111,10 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
                             f'<span>{escape(row["description"])}</span></td></tr>')
                 continue
             notes = [c for c in config['lectures'] if number in c.get('syllabus_numbers', [])]
+            title_html = escape(row['title'])
+            if notes:
+                title_href = escape(Path(notes[0]['source']).stem + '.html', quote=True)
+                title_html = f'<a class="lecture-title-link" href="{title_href}">{title_html}</a>'
             links = ''.join(
                 (f'<span class="reading-kind">{escape(c["reading_label"])}</span>' if c.get('reading_label') else '') +
                 f'<a class="reading-link" href="{Path(c["source"]).stem}.html" '
@@ -123,7 +127,7 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
             rows.append(f'''<tr class="schedule-row">
   <th scope="row" class="session-number">{number:02}</th>
   <td class="session-date"><time datetime="{row['iso_date']}">{escape(row['date'])}</time>{badge_html}</td>
-  <td class="session-topic"><h4>{escape(row['title'])}</h4><p>{escape(row['description'])}</p></td>
+  <td class="session-topic"><h4>{title_html}</h4><p>{escape(row['description'])}</p></td>
   <td class="materials-cell"><div class="session-links">{links}</div></td>
 </tr>''')
         title = re.sub(r' \(\d+ lectures\)$', '', module['title'])

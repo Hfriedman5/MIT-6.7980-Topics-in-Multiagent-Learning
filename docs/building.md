@@ -131,6 +131,9 @@ lecture page, and checks every KaTeX expression. Absolute URLs under
 including CSS assets and HTML/SVG anchors. For a live check of external links,
 run `python3 scripts/check_links.py html --online`; blocked or unreachable
 destinations are reported as unverified, separately from HTTP 404/410 failures.
+Add `--doi-warnings` to report failed checks of `doi.org` and `dx.doi.org`
+links as non-blocking warnings. Those URLs are still checked, including their
+redirects; other external failures and all local/citation errors remain blocking.
 `site.separate_paths` lists directories deployed independently of the course
 bundle (currently `fow/`); links into those directories are checked online unless
 explicitly excluded with `--skip-separate-site fow/`.

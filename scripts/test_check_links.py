@@ -1,5 +1,6 @@
 """Regressions for deployment URLs, citations, and HTTP verification failures."""
 from email.message import Message
+from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
 from pathlib import Path
@@ -133,6 +134,31 @@ class LinkTests(unittest.TestCase):
         result = self.audit()
         self.assertEqual(list(result.external), ['https://example.edu/paper?id=2&version=3'])
 
+    def test_doi_warnings_allow_deployment_but_other_failures_still_block(self):
+        config_path = self.folder / 'config.json'
+        config_path.write_text(json.dumps(self.config))
+        for url, extra_args, expected in (
+                ('https://doi.org/10.1234/paper', [], 1),
+                ('https://doi.org/10.1234/paper', ['--doi-warnings'], 0),
+                ('https://publisher.example/paper', ['--doi-warnings'], 1)):
+            with self.subTest(url=url, extra_args=extra_args):
+                self.write('index.html', f'<a href="{url}">Paper</a>')
+                output, errors = io.StringIO(), io.StringIO()
+                with patch.object(links, 'probe_url', return_value='unverified: HTTP 403'), \
+                        redirect_stdout(output), redirect_stderr(errors):
+                    status = links.main([str(self.folder), '--config', str(config_path),
+                                         '--online', *extra_args])
+                self.assertEqual(status, expected)
+                if expected == 0:
+                    self.assertIn('Non-blocking DOI warning:', errors.getvalue())
+                    self.assertIn('0 external URLs responded successfully', output.getvalue())
+        self.lecture(BASE + 'missing.html')
+        with patch.object(links, 'probe_url') as probe, \
+                redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            self.assertEqual(links.main([str(self.folder), '--config', str(config_path),
+                                         '--online', '--doi-warnings']), 1)
+        probe.assert_not_called()
+
 
 class Response(io.BytesIO):
     def __init__(self, body=b'', content_type='text/html'):
@@ -173,9 +199,21 @@ class OnlineTests(unittest.TestCase):
 
     def test_failures_include_every_referring_page_and_urls_are_checked_once(self):
         with patch.object(links, 'probe_url', return_value='unverified: HTTP 403') as probe:
-            issues = links.check_external({'https://example.edu/': {'index.html', 'lecture.html'}})
+            result = links.check_external({'https://example.edu/': {'index.html', 'lecture.html'}})
         probe.assert_called_once()
-        self.assertEqual(issues, ['index.html, lecture.html: unverified: HTTP 403: https://example.edu/'])
+        self.assertEqual(result.issues, ['index.html, lecture.html: unverified: HTTP 403: https://example.edu/'])
+        self.assertEqual(result.warnings, [])
+
+    def test_doi_exception_is_limited_to_resolver_hosts_and_reports_all_failures(self):
+        urls = {f'https://{host}/10.1234/paper': {'lecture.html'} for host in
+                ('doi.org', 'dx.doi.org', 'doi.org.example', 'example.org', 'publisher.example')}
+        for failure in ('unverified: HTTP 403', 'broken: HTTP 404', 'unverified: timed out'):
+            with self.subTest(failure=failure), patch.object(links, 'probe_url', return_value=failure) as probe:
+                result = links.check_external(urls, doi_warnings=True)
+            self.assertEqual(probe.call_count, len(urls))
+            self.assertEqual(len(result.warnings), 2)
+            self.assertEqual(len(result.issues), 3)
+            self.assertTrue(all(failure in item for item in result.warnings + result.issues))
 
 
 if __name__ == '__main__':

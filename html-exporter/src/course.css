@@ -42,6 +42,8 @@
 .schedule-badge[data-badge="project"] { background: #0074d9; }
 .schedule-badge[data-badge="break"] { background: #7855a6; }
 .session-topic h4 { font-size: 1.125rem; line-height: 1.35; }
+.lecture-title-link { color: inherit; text-decoration: none; text-underline-offset: .16em; text-decoration-thickness: 1px; }
+.lecture-title-link:is(:hover, :focus-visible) { color: var(--accent); text-decoration: none; }
 .session-topic p { margin-top: 4px; font-size: 1rem; line-height: 1.45; color: var(--muted); }
 .session-instructor { display: block; margin-top: 4px; text-align: left; font: 0.875rem/1.4 var(--sans); color: var(--muted); }
 .session-links { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; padding-top: 1px; font-family: var(--sans); }
