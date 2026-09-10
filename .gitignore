@@ -6,8 +6,8 @@
 !/README.md
 !/Makefile
 !/html-export.json
-!/Typst Lectures/
-!/Syllabus/
+!/content/
+!/syllabus/
 !/html-exporter/
 !/scripts/
 !/website/
@@ -22,9 +22,12 @@
 **/.env.*
 **/*~
 **/.ipynb_checkpoints/
-Typst Lectures/.*-check/
-Syllabus/macros.pdf
+content/.*-check/
+syllabus/macros.pdf
 
 # Private migration records stay in the local workspace.
 /docs/migration/
 /migration/
+
+# Local MIT locker deployment tooling and notes.
+/deploy/

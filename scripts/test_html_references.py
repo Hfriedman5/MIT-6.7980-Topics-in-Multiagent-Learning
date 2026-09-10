@@ -9,7 +9,7 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-HELPER = ROOT / 'Typst Lectures/meta/gabri_notes_html.typ'
+HELPER = ROOT / 'content/meta/gabri_notes_html.typ'
 
 
 class ReferencePage(HTMLParser):

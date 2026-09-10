@@ -74,6 +74,21 @@ class ImageInventoryTests(unittest.TestCase):
             '#image("../figures/game.svg")',
             '<span data-image-source="&quot;/course/figures/game.svg&quot;"></span>'), [])
 
+    def test_relocated_input_uses_typst_project_root_paths(self):
+        page = Page('<span data-image-source="&quot;/figures/game.svg&quot;"></span>')
+        self.assertEqual(image_inventory_issues(
+            self.source, '#image("../figures/game.svg")', page, 'lecture.html',
+            root=Path('/course')), [])
+
+    def test_project_root_paths_still_detect_wrong_images(self):
+        page = Page('<span data-image-source="&quot;/figures/wrong.svg&quot;"></span>')
+        issues = image_inventory_issues(
+            self.source, '#image("../figures/game.svg")', page, 'lecture.html',
+            root=Path('/course'))
+        self.assertEqual(len(issues), 2)
+        self.assertTrue(any('/course/figures/game.svg' in issue for issue in issues))
+        self.assertTrue(any('/course/figures/wrong.svg' in issue for issue in issues))
+
     def test_invalid_marker_does_not_crash_validation(self):
         issues = self.issues('', '<span data-image-source="not a string"></span>')
         self.assertEqual(len(issues), 1)

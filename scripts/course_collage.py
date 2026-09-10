@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-ASSETS = ROOT / 'Syllabus/assets'
+ASSETS = ROOT / 'syllabus/assets'
 
 
 def panel(name, original_size, crop, position, size, angle):

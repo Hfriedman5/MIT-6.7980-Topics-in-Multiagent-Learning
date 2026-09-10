@@ -37,6 +37,10 @@
 .schedule-table .session-number { font: 700 0.9375rem/1.65 var(--sans); color: var(--muted); font-variant-numeric: tabular-nums; }
 .session-date { font: 0.9375rem/1.65 var(--sans); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .session-date time { color: var(--ink); }
+/* Center Frutiger's uppercase letterforms, compensating for its font metrics. */
+.schedule-badge { display: flex; align-items: center; justify-content: center; width: fit-content; height: 1.25rem; box-sizing: border-box; margin-top: 4px; padding: .164em 4px 0; border-radius: 3px; background: #999999; color: white; font: 700 0.6875rem/1 var(--sans); text-transform: uppercase; }
+.schedule-badge[data-badge="project"] { background: #0074d9; }
+.schedule-badge[data-badge="break"] { background: #7855a6; }
 .session-topic h4 { font-size: 1.125rem; line-height: 1.35; }
 .session-topic p { margin-top: 4px; font-size: 1rem; line-height: 1.45; color: var(--muted); }
 .session-instructor { display: block; margin-top: 4px; text-align: left; font: 0.875rem/1.4 var(--sans); color: var(--muted); }
@@ -59,6 +63,8 @@
 .html-notes-preview > a { display: block; }
 .html-notes-preview img { display: block; width: 100%; height: auto; }
 .html-notes-preview figcaption { margin-top: 8px; font-size: 0.875rem; line-height: 1.45; color: var(--muted); }
+.fow-preview { width: 100%; box-sizing: border-box; margin: 20px 0; border: 1px solid var(--rule); border-radius: 1.125% / 1.42%; overflow: hidden; }
+.fow-preview img { display: block; width: 100%; height: auto; }
 .course-sidebar section + section { margin-top: 25px; }
 .course-sidebar h2 { font-size: 1.0625rem; margin-bottom: 10px; }
 .course-sidebar p + p { margin-top: 10px; }

@@ -9,8 +9,8 @@ from pathlib import Path
 from PIL import Image, ImageChops, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / 'Typst Lectures/figures/L10/kuhn_alternatives.png'
-OUTPUT = ROOT / 'Typst Lectures/figures/L10/kuhn_alternatives-transparent.png'
+SOURCE = ROOT / 'content/figures/L10/kuhn_alternatives.png'
+OUTPUT = ROOT / 'content/figures/L10/kuhn_alternatives-transparent.png'
 
 # Inclusive interior bounds of observation nodes and terminal nodes, including
 # their legend symbols. The surrounding page and large legend remain transparent.

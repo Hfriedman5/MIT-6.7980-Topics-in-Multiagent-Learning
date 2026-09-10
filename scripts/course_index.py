@@ -1,5 +1,8 @@
 """Course landing page, with the schedule read from the current Typst syllabus."""
-from datetime import datetime
+from datetime import date
+import copy
+import json
+import subprocess
 from html import escape
 from pathlib import Path
 import re
@@ -8,43 +11,62 @@ import re
 # Course illustrations copied into the portable site.
 COURSE_FIGURES = {
     'course-image-transparent.svg': 'website/thumbnail-transparent.svg',
-    'html-notes-collage.svg': 'Syllabus/assets/html-notes-collage.svg',
+    'html-notes-collage.svg': 'syllabus/assets/html-notes-collage.svg',
+    'fog-of-war-challenge.png': 'syllabus/assets/fog-of-war-challenge.png',
 }
 
 
-def read_schedule(source: str, year: int) -> list[dict]:
-    # This deliberately recognizes the syllabus's module/row vocabulary. Fail
-    # visibly if that vocabulary changes instead of silently dropping classes.
-    source = re.sub(r'//[^\n]*', '', source)
-    tokens = re.findall(r'module\[([^\]]+)\]|\.\.row\((.*?)\),', source, re.S)
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def read_schedule(syllabus: Path, year: int) -> list[dict]:
+    """Read the exact schedule evaluated by Typst, including assigned dates."""
+    result = subprocess.run([
+        'typst', 'eval', '--in', str(syllabus.resolve()), '--root', str(ROOT),
+        '--font-path', str(ROOT / 'html-exporter/assets/fonts'),
+        'query(<course-schedule>).map(e => e.value)',
+    ], cwd=ROOT, text=True, capture_output=True)
+    if result.returncode:
+        raise ValueError('Cannot evaluate syllabus schedule:\n' + result.stderr)
+    schedules = json.loads(result.stdout)
+    if len(schedules) != 1:
+        raise ValueError('Expected exactly one course-schedule metadata element.')
     modules = []
-    for title, row in tokens:
-        if title:
-            modules.append({'title': title, 'rows': []})
+    for entry in schedules[0]:
+        if entry['kind'] == 'module':
+            modules.append({'title': entry['title'], 'rows': []})
             continue
-        match = re.match(r'\s*(\d+|\[\])\s*,\s*"([^"]+)"\s*,\s*\[([^\]]+)\]', row)
-        if not match:
-            raise ValueError(f'Cannot read syllabus row: {row}')
-        if not modules or re.search(r'\bstandalone:\s*true\b', row):
-            # Lectures can stand on their own before or between parts.
+        if date.fromisoformat(entry['iso_date']).year != year:
+            raise ValueError('Schedule date is outside the configured academic year.')
+        if not modules or entry['standalone']:
             modules.append({'title': '', 'rows': []})
-        number, date, title = match.groups()
-        fields = dict(re.findall(r'(description|instructor):\s*\[([^\]]*)\]', row))
-        modules[-1]['rows'].append({
-            'number': int(number) if number != '[]' else None,
-            'date': date,
-            'iso_date': datetime.strptime(f'{date} {year}', '%b %d %Y').date().isoformat(),
-            'title': title,
-            'description': fields.get('description', ''),
-            'instructor': fields.get('instructor', '').replace('\\', ''),
-        })
-    rows = [row for module in modules for row in module['rows']]
-    numbers = [row['number'] for row in rows if row['number'] is not None]
-    if not numbers or numbers != list(range(len(numbers))):
-        raise ValueError('Syllabus lecture numbers must be consecutive and start at zero.')
-    if len(rows) != len(re.findall(r'\.\.row\(', source)):
-        raise ValueError('A syllabus row was not parsed; update the schedule reader.')
+        modules[-1]['rows'].append(entry)
     return modules
+
+
+def resolve_readings(config: dict, modules: list[dict]) -> dict:
+    """Resolve stable lecture IDs to current session numbers and note dates."""
+    resolved = copy.deepcopy(config)
+    rows = {r['id']: r for m in modules for r in m['rows'] if r['kind'] == 'lecture'}
+    for chapter in resolved['lectures']:
+        ids = chapter.get('syllabus_ids', [])
+        if chapter.get('supplementary'):
+            if ids:
+                raise ValueError('Supplementary notes cannot claim syllabus lectures.')
+            chapter['syllabus_numbers'] = []
+            chapter['date'] = config['site']['term']
+            continue
+        if not ids or len(ids) != len(set(ids)) or not set(ids) <= rows.keys():
+            raise ValueError(f"Invalid syllabus_ids for {chapter['source']}: {ids}")
+        sessions = sorted((rows[id] for id in ids), key=lambda r: r['number'])
+        chapter['syllabus_numbers'] = [r['number'] for r in sessions]
+        chapter['number'] = sessions[0]['number']
+        day = date.fromisoformat(sessions[0]['iso_date'])
+        chapter['date'] = f'{day:%a, %b} {day.day}, {day.year}'
+    resolved['lectures'].sort(key=lambda c: (bool(c.get('supplementary')),
+        int(str(c['number'])[1:]) if c.get('supplementary') else c['number']))
+    validate_readings(resolved, modules)
+    return resolved
 
 
 def validate_readings(config: dict, modules: list[dict]) -> None:
@@ -72,16 +94,19 @@ def validate_readings(config: dict, modules: list[dict]) -> None:
 
 
 def render_index(config: dict, modules: list[dict], *, stylesheet_version: str = '') -> str:
+    config = resolve_readings(config, modules)
     site = config['site']
-    validate_readings(config, modules)
     sections = []
     for index, module in enumerate(modules):
         rows = []
         for row in module['rows']:
             number = row['number']
+            badge = row.get('badge', '')
+            badge_html = (f'<span class="schedule-badge" data-badge="{escape(badge.lower(), quote=True)}">'
+                          f'{escape(badge)}</span>') if badge else ''
             if number is None:
-                rows.append(f'<tr class="schedule-break"><td class="session-number">—</td>'
-                            f'<td class="session-date"><time datetime="{row["iso_date"]}">{escape(row["date"])}</time></td>'
+                rows.append(f'<tr class="schedule-break"><td class="session-number"></td>'
+                            f'<td class="session-date"><time datetime="{row["iso_date"]}">{escape(row["date"])}</time>{badge_html}</td>'
                             f'<td class="break-topic" colspan="2"><strong>{escape(row["title"])}</strong>'
                             f'<span>{escape(row["description"])}</span></td></tr>')
                 continue
@@ -97,7 +122,7 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
                          if number != 0 and module['title'] != 'Project work and presentations' else '')
             rows.append(f'''<tr class="schedule-row">
   <th scope="row" class="session-number">{number:02}</th>
-  <td class="session-date"><time datetime="{row['iso_date']}">{escape(row['date'])}</time></td>
+  <td class="session-date"><time datetime="{row['iso_date']}">{escape(row['date'])}</time>{badge_html}</td>
   <td class="session-topic"><h4>{escape(row['title'])}</h4><p>{escape(row['description'])}</p></td>
   <td class="materials-cell"><div class="session-links">{links}</div></td>
 </tr>''')
@@ -141,9 +166,9 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
 <div class="course-content">
 <section id="overview" class="course-overview" aria-label="Course overview">
   <div class="overview-copy">
-  <p>This course studies multiagent systems through game theory, optimization, and learning theory. We cover foundational topics such as equilibria, regret minimization, and learning dynamics in games.</p>
-  <p>We also explore modern topics, including multiagent deep reinforcement learning, calibration and alignment, and hidden-role games, connecting theory to applications and open research questions in multiagent AI.</p>
-  <nav class="course-links" aria-label="Course navigation"><a href="#schedule">Schedule &amp; notes</a><a href="syllabus.pdf">Syllabus (PDF)</a><a href="https://github.com/gabrfarina/6.7980-f26-fow-challenge">Fog of War Challenge</a></nav>
+  <p>This course studies multiagent systems through game theory, optimization, and learning theory. We cover foundational topics such as Nash equilibria, regret minimization, learning dynamics, and extensive-form games.</p>
+  <p>We also explore modern topics: multiagent deep reinforcement learning; information and mechanism design; team games and hidden-role games; alignment; high-dimensional and kernelized learning; nonconvex games; calibration; and the complexity of finding equilibria. Applications and open research questions connect the theory to multiagent AI.</p>
+  <nav class="course-links" aria-label="Course navigation"><a href="#schedule">Schedule &amp; notes</a><a href="syllabus.pdf">Syllabus (PDF)</a><a href="https://www.mit.edu/~6.7980/fow">Fog of War Challenge <span aria-hidden="true">↗</span></a></nav>
   </div>
   <figure class="course-image">
     <img src="assets/course/course-image-transparent.svg" width="200" height="409" alt="Two phase portraits of learning dynamics in two-player games, showing strategy updates and marked equilibria.">
@@ -152,23 +177,20 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
 <section id="schedule" class="course-schedule" aria-labelledby="schedule-title">
   <h2 id="schedule-title">Schedule &amp; lecture notes</h2>
   {''.join(sections)}
-  <section class="supplementary-section" aria-labelledby="supplementary-title"><h3 id="supplementary-title">Supplementary reading</h3><p>Further notes on equilibrium computation, refinements, stochastic games, and regret.</p><ul class="supplementary-list">{supplementary}</ul></section>
+  <section class="supplementary-section" aria-labelledby="supplementary-title"><h3 id="supplementary-title">Supplementary reading</h3><ul class="supplementary-list">{supplementary}</ul></section>
   <section id="improving-material" class="improving-material" aria-labelledby="improving-material-title">
     <h2 id="improving-material-title">Improving Material</h2>
     <p>We would like to make the lecture notes available to as many people as possible. You can now read them in a browser, follow links between sections and references, and move between the notes and their source. We would like everyone's help to make this a useful resource for learners around the world.</p>
-    <figure class="html-notes-preview">
-      <a href="nfgs_nash.html"><img src="assets/course/html-notes-collage.svg" width="1600" height="1100" loading="lazy" alt="Collage of four screenshots showing the course homepage, equilibrium dynamics, a Kuhn poker game tree, and the topology of Nash equilibria, including the lecture navigation sidebars."></a>
-    </figure>
     <p>We will divide the class into groups, each focusing on a different part of the material. Using the <a href="https://github.com/gabrfarina/MIT-6.7980-Topics-in-Multiagent-Learning">class GitHub repository</a>, each group can open issues to identify improvements and submit pull requests to implement them. We will improve the material together, reviewing and building on one another's contributions.</p>
     <p>Contributions can include clarifying explanations and proofs, fixing errors, adding examples and homework-style exercises for future readers, and polishing figures, organization, and presentation. If anyone is brave enough, we would also love interactive components that let readers experiment with the ideas.</p>
     <p><em>On the bright side, there is no homework! :-)</em> Improving the shared material accounts for 30% of the course grade.</p>
   </section>
   <section id="project" class="course-project" aria-labelledby="project-title">
     <h2 id="project-title">Project</h2>
-    <p>Projects may be completed individually or in groups of 2-3 students and will include a presentation. We will offer three project directions:</p>
-    <p><strong><a href="https://github.com/gabrfarina/6.7980-f26-fow-challenge">Fog of War Challenge</a>.</strong> Build and evaluate an agent that plays with partial information. Explore how it uses observations, reasons about uncertainty, and chooses strategic actions. The rules, starter code, and arena are maintained in the separate challenge repository.</p>
-    <p><strong>Modeling questions.</strong> Formulate a multiagent problem by specifying the players, objectives, information, and available actions. Study how modeling choices affect the resulting strategic behavior.</p>
-    <p><strong>Theory questions.</strong> Investigate a mathematical question about equilibria, learning dynamics, or computational complexity. Develop rigorous proofs, bounds, or counterexamples that clarify the behavior of multiagent systems.</p>
+    <p>Projects may be completed individually or in groups of 2-5 students and will include a presentation. We will offer three project directions:</p>
+    <p id="fog-of-war-challenge"><strong>Fog of War Challenge.</strong> Build and evaluate an agent that plays with partial information. Explore how it uses observations, reasons about uncertainty, and chooses strategic actions. Each bot sandbox is allocated two CPU cores and 4 GiB of memory. A dedicated document will describe the challenge, including the rules, starter code, and how to access the arena.</p>
+    <p><strong>Modeling questions.</strong> Formulate a multiagent problem by specifying the players, objectives, information, and available actions. Study how modeling choices affect the resulting strategic behavior. We will provide a separate document with possible modeling questions and leads to explore.</p>
+    <p><strong>Theory questions.</strong> Investigate a mathematical question about equilibria, learning dynamics, or computational complexity. Develop rigorous proofs, bounds, or counterexamples that clarify the behavior of multiagent systems. We will provide a separate document with possible theory questions and leads to explore.</p>
     <p>The project is the central component of the course and accounts for 50% of the final grade. We will therefore be &ldquo;robust&rdquo; in our grading: we will look carefully at the depth of your understanding, the quality and substance of your work, and how clearly you explain your results.</p>
   </section>
 </section>
@@ -195,8 +217,23 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
   <p class="office-hours">TA office hours to be announced.</p>
 </section>
 <section class="course-prerequisites" aria-labelledby="prerequisites-title"><h2 id="prerequisites-title">Prerequisites</h2><p>Advanced undergraduate discrete mathematics and algorithms, and mathematical maturity.</p></section>
-<section class="course-work" aria-labelledby="work-title"><h2 id="work-title">Coursework</h2><ul class="grade-components"><li><strong>Attendance and participation 20%</strong></li><li><strong>Improving material 30%</strong></li><li><strong>Project 50%</strong></li></ul><p>There are no assigned homework sets. Students will <a href="#improving-material">improve the shared course materials</a> and complete a theoretical or experimental <a href="#project">project</a> with a presentation. Projects may be individual or in groups of two to three students.</p><p>Attendance at at least 50% of lectures earns the attendance and participation component, assessed on a binary basis using random in-class quizzes.</p><p>Lecture notes are available as HTML and PDF. Announcements and administrative materials are posted on Canvas.</p><p>See the <a href="syllabus.pdf">syllabus</a> for collaboration and AI use policies.</p></section>
+<section class="course-work" aria-labelledby="work-title"><h2 id="work-title">Coursework</h2><ul class="grade-components"><li><strong>Attendance and participation 20%</strong></li><li><strong>Improving material 30%</strong></li><li><strong>Project 50%</strong></li></ul><p>There are no assigned homework sets. Students will <a href="#improving-material">improve the shared course materials</a> and complete a theoretical or experimental <a href="#project">project</a> with a presentation. Projects may be individual or in groups of two to five students.</p><p>Attendance at at least 50% of lectures earns the attendance and participation component, assessed on a binary basis using random in-class quizzes.</p><p>Lecture notes are available as HTML and PDF. Announcements and administrative materials are posted on Canvas.</p><p>See the <a href="syllabus.pdf">syllabus</a> for collaboration and AI use policies.</p></section>
 </aside>
 </main>
 <footer class="course-footer home-width"><p>MIT 6.7980 · {escape(site['term'])}</p><a href="#main">Back to top ↑</a></footer>
 </body></html>'''
+
+
+if __name__ == '__main__':
+    from hashlib import sha256
+    config = json.loads((ROOT / 'html-export.json').read_text())
+    modules = read_schedule(ROOT / config['site']['syllabus_source'], config['site']['year'])
+    stylesheet = ROOT / 'html/assets/course.css'
+    stylesheet.write_bytes((ROOT / 'html-exporter/src/course.css').read_bytes())
+    figure_directory = ROOT / 'html/assets/course'
+    figure_directory.mkdir(parents=True, exist_ok=True)
+    for name, source in COURSE_FIGURES.items():
+        (figure_directory / name).write_bytes((ROOT / source).read_bytes())
+    version = sha256(stylesheet.read_bytes()).hexdigest()[:12]
+    (ROOT / 'html/index.html').write_text(render_index(config, modules, stylesheet_version=version))
+    print('Updated html/index.html from the evaluated syllabus schedule.')

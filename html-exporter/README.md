@@ -22,7 +22,7 @@ For a single lecture:
 cargo run --manifest-path html-exporter/Cargo.toml -- \
   --root . \
   --config html-export.json --math katex \
-  'Typst Lectures/content/nfgs_nash.typ' \
+  'content/content/nfgs_nash.typ' \
   .build/nfgs_nash.html
 ```
 

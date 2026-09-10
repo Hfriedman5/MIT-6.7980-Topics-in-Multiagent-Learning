@@ -6,7 +6,7 @@ Lecture notes and course materials for **MIT 6.7980, Fall 2026**, taught by
 The course studies game theory, optimization, and learning in multiagent systems:
 Nash and correlated equilibria, regret minimization, extensive-form games,
 stochastic games, and the computational complexity of equilibrium computation.
-The [syllabus](Syllabus/6.7980%20Fall%202026%20Syllabus.pdf) contains the full
+The [syllabus](syllabus/6.7980%20Fall%202026%20Syllabus.pdf) contains the full
 course description, schedule, and policies.
 
 The notes are written in [Typst](https://typst.app/). This repository includes
@@ -35,11 +35,11 @@ offline reading.
 
 | Path | Contents |
 | --- | --- |
-| [`Typst Lectures/content/`](Typst%20Lectures/content/) | Current lecture notes and supplementary readings |
-| [`Typst Lectures/meta/`](Typst%20Lectures/meta/) | Shared notation, bibliography, and HTML/PDF templates |
-| [`Typst Lectures/figures/`](Typst%20Lectures/figures/) | Figures and their editable sources |
-| [`Typst Lectures/assets/`](Typst%20Lectures/assets/) | Shared rendered lecture illustrations |
-| [`Syllabus/`](Syllabus/) | Editable syllabus, schedule, and current PDF |
+| [`content/content/`](content/content/) | Current lecture notes and supplementary readings |
+| [`content/meta/`](content/meta/) | Shared notation, bibliography, and HTML/PDF templates |
+| [`content/figures/`](content/figures/) | Figures and their editable sources |
+| [`content/assets/`](content/assets/) | Shared rendered lecture illustrations |
+| [`syllabus/`](syllabus/) | Editable syllabus, schedule, and current PDF |
 | [`html-exporter/`](html-exporter/) | Rust converter, stylesheets, fonts, and KaTeX runtime |
 | [`scripts/`](scripts/) | Site generation, figure preparation, and validation |
 | [`html-export.json`](html-export.json) | Site metadata and lecture-to-schedule mapping |
@@ -50,7 +50,7 @@ offline reading.
 
 ```sh
 make html       # regenerate the course website and PDFs
-make syllabus   # rebuild the syllabus and synchronize html/syllabus.pdf
+make syllabus   # rebuild the syllabus, both PDF copies, and the index schedule
 make check      # run Python/Rust tests and validate the built site and math
 make bundle     # build, validate, and package the portable website
 ```
@@ -59,6 +59,13 @@ The syllabus is the source of truth for the schedule. When changing course
 logistics, descriptions, or policies, update both the syllabus and the index
 generator, rebuild the site, and check the resulting PDF. See
 [the build guide](docs/building.md) for figure generation and rendering details.
+
+Reorder `lecture(...)` and `module[...]` entries in the syllabus's `outline`;
+`schedule(class-dates, outline)` assigns dates and zero-based lecture numbers.
+The verified Tuesday/Thursday dates and fixed MIT calendar exceptions live in
+[`syllabus/fall-2026-calendar.typ`](syllabus/fall-2026-calendar.typ).
+`no-class(...)` entries consume a date but no lecture number. Keep each lecture's
+stable ID with its topic so its notes remain linked after reordering.
 
 ## Contributing
 

@@ -10,8 +10,8 @@ import unittest
 
 
 ROOT = Path(__file__).resolve().parents[1]
-LIBRARY = ROOT / 'Typst Lectures/meta/lovelace_html.typ'
-HELPER = ROOT / 'Typst Lectures/meta/gabri_notes_html.typ'
+LIBRARY = ROOT / 'content/meta/lovelace_html.typ'
+HELPER = ROOT / 'content/meta/gabri_notes_html.typ'
 
 
 class Element:

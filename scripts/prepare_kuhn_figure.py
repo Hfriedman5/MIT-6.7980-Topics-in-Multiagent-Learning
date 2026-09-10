@@ -9,7 +9,7 @@ from pathlib import Path
 from PIL import Image, ImageChops, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / 'Typst Lectures/figures/L11/image.png'
+SOURCE = ROOT / 'content/figures/L11/image.png'
 OUTPUT = SOURCE.with_name('image-transparent.png')
 
 # Inclusive interior bounds of the four crossed nodes and twelve leaf nodes.

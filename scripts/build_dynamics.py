@@ -11,9 +11,9 @@ FIGURES = (('L05', 'ogd_mwu'), ('L06', 'optimistic'))
 def build_dynamics(root: Path = ROOT) -> None:
     """Keep the website assets and standalone figures in sync with dyns.typ."""
     for lecture, name in FIGURES:
-        source = root / 'Typst Lectures' / 'figures' / lecture / (name + '.typ')
-        svg = root / 'Typst Lectures' / 'assets' / f'{lecture}-{name}.svg'
-        duplicate = root / 'Typst Lectures' / 'figures' / lecture / (name + '.svg')
+        source = root / 'content' / 'figures' / lecture / (name + '.typ')
+        svg = root / 'content' / 'assets' / f'{lecture}-{name}.svg'
+        duplicate = root / 'content' / 'figures' / lecture / (name + '.svg')
         svg.parent.mkdir(parents=True, exist_ok=True)
         duplicate.parent.mkdir(parents=True, exist_ok=True)
         for output in (svg, source.with_suffix('.pdf')):

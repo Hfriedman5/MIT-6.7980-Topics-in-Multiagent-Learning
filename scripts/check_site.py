@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 import re
 import sys
-from urllib.parse import unquote, urlsplit
+from check_links import audit_site
 
 
 class Page(HTMLParser):
@@ -109,9 +109,16 @@ def source_image_paths(text):
     return paths
 
 
-def image_inventory_issues(source, source_text, page, page_name):
+def image_inventory_issues(source, source_text, page, page_name, *, root=None):
     """Compare paths and multiplicities, not merely the number of <img> tags."""
-    expected = Counter((source.parent / path).resolve()
+    def resolve_image(path):
+        candidate = Path(path)
+        if root is not None and candidate.is_absolute() and not candidate.is_relative_to(root):
+            # Relocated build inputs use Typst's project-root absolute paths.
+            candidate = root / path.lstrip('/')
+        return (source.parent / candidate).resolve()
+
+    expected = Counter(resolve_image(path)
                        for path in source_image_paths(source_text))
     actual = Counter()
     issues = [f'{page_name}: {issue}' for issue in page.image_rendering_issues]
@@ -120,7 +127,7 @@ def image_inventory_issues(source, source_text, page, page_name):
             path = typst_string(value)
             if not isinstance(path, str):
                 raise ValueError('image source is not a string')
-            actual[(source.parent / path).resolve()] += 1
+            actual[resolve_image(path)] += 1
         except (ValueError, TypeError):
             issues.append(f'{page_name}: invalid data-image-source marker: {value!r}')
     for path in sorted(expected.keys() | actual.keys()):
@@ -175,33 +182,20 @@ def main():
         source_text = source.read_text()
         image_count += len(source_image_paths(source_text))
         if page := pages.get(folder / name):
-            issues.extend(image_inventory_issues(source, source_text, page, name))
+            issues.extend(image_inventory_issues(source, source_text, page, name, root=root))
     for log in sorted((root / '.build/logs').glob('*.log')):
         issues.extend(f'{log.relative_to(root)}: dropped content: {warning}'
                       for warning in dropped_content_warnings(log.read_text()))
-    for path, page in pages.items():
-        for link in page.links:
-            url = urlsplit(link)
-            if url.scheme or url.netloc:
-                continue
-            target = (path.parent / unquote(url.path)).resolve() if url.path else path
-            if target.is_dir():
-                target = (target / 'index.html').resolve()
-            if not target.is_relative_to(folder):
-                issues.append(f'{path.name}: link escapes the site: {link}')
-                continue
-            if not target.is_file():
-                issues.append(f'{path.name}: missing file: {link}')
-            elif url.fragment and target.suffix == '.html':
-                target_page = pages.get(target)
-                if target_page and unquote(url.fragment) not in target_page.ids:
-                    issues.append(f'{path.name}: missing anchor: {link}')
+    link_audit = audit_site(folder, config)
+    issues.extend(link_audit.issues)
     if issues:
         print('\n'.join(sorted(set(issues))), file=sys.stderr)
         raise SystemExit(1)
     print(f'Checked {len(pages)} pages and {image_count} source image occurrences: '
           'local files, anchors, rendered math, and image inventories are present; '
           'no zero-size images or dropped-content warnings.')
+    print(f'Checked {link_audit.citation_count} How to cite URLs against the generated pages; '
+          f'{len(link_audit.external)} external URLs require online deployment verification.')
 
 
 if __name__ == '__main__':

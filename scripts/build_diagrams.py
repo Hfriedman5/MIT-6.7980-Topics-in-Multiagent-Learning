@@ -9,16 +9,16 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def build_diagrams(root: Path = ROOT) -> None:
     for lecture, name in (('L04', 'self_play'), ('L07', 'bandit')):
-        source = root / 'Typst Lectures/figures' / lecture / (name + '.typ')
-        svg = root / 'Typst Lectures/assets' / f'{lecture}-{name}.svg'
+        source = root / 'content/figures' / lecture / (name + '.typ')
+        svg = root / 'content/assets' / f'{lecture}-{name}.svg'
         for output in (svg, source.with_suffix('.pdf')):
             subprocess.run([
                 'typst', 'compile', '--root', str(root), str(source), str(output),
             ], cwd=root, check=True)
-        shutil.copy2(svg, root / 'Typst Lectures/figures' / lecture / (name + '.svg'))
+        shutil.copy2(svg, root / 'content/figures' / lecture / (name + '.svg'))
         print(f'Diagram: {lecture}/{name}', flush=True)
 
-    directory = root / 'Typst Lectures/figures/ppad'
+    directory = root / 'content/figures/ppad'
     for gate in ('assignment', 'constant', 'addition', 'subtraction',
                  'multiplication', 'comparison'):
         subprocess.run([
