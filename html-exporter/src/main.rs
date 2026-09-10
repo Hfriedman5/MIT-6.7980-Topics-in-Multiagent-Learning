@@ -1127,7 +1127,7 @@ fn render_chapter_rail(
     headings: &[Heading],
     config: &Config,
 ) -> String {
-    let mut out = String::from("<nav class=\"lecture-rail\" aria-label=\"Lectures\">\n");
+    let mut out = String::from("<nav class=\"lecture-rail\" aria-label=\"Lecture notes\">\n");
     let event = export_config
         .site
         .event
@@ -1188,31 +1188,47 @@ fn render_chapter_rail(
         escape_html(authors)
     )
     .unwrap();
-    out.push_str("<div class=\"lecture-rail-heading\">Lectures</div>\n");
-    for (idx, chapter) in export_config.chapters.iter().enumerate() {
-        if chapter.supplementary {
+    for (supplementary, label) in [(false, "Lectures"), (true, "Supplementary readings")] {
+        if !export_config
+            .chapters
+            .iter()
+            .any(|chapter| chapter.supplementary == supplementary)
+        {
             continue;
         }
-        let class = if idx == current {
-            "lecture-rail-link is-current"
+        let heading_class = if supplementary {
+            "lecture-rail-heading lecture-rail-section-heading"
         } else {
-            "lecture-rail-link"
+            "lecture-rail-heading"
         };
-        let aria = if idx == current {
-            " aria-current=\"page\""
-        } else {
-            ""
-        };
-        write!(
-            out,
-            "<a class=\"{}\" href=\"{}\"{}><span>{}</span>{}</a>\n",
-            class,
-            escape_attr(&chapter.href().expect("lecture href was validated")),
-            aria,
-            chapter.navigation_number(),
-            escape_html(&chapter.short_title)
-        )
-        .unwrap();
+        writeln!(out, "<div class=\"{heading_class}\">{label}</div>").unwrap();
+        for (idx, chapter) in export_config
+            .chapters
+            .iter()
+            .enumerate()
+            .filter(|(_, chapter)| chapter.supplementary == supplementary)
+        {
+            let class = if idx == current {
+                "lecture-rail-link is-current"
+            } else {
+                "lecture-rail-link"
+            };
+            let aria = if idx == current {
+                " aria-current=\"page\""
+            } else {
+                ""
+            };
+            write!(
+                out,
+                "<a class=\"{}\" href=\"{}\"{}><span>{}</span>{}</a>\n",
+                class,
+                escape_attr(&chapter.href().expect("lecture href was validated")),
+                aria,
+                chapter.navigation_number(),
+                escape_html(&chapter.short_title)
+            )
+            .unwrap();
+        }
     }
     if !headings.is_empty() {
         out.push_str(
