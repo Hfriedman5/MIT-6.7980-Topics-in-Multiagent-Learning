@@ -8,17 +8,17 @@ from pathlib import Path
 import unittest
 
 from check_site import Page
-from course_index import read_schedule, render_index, resolve_readings, validate_readings
+from course_index import load_course, read_schedule, render_index, resolve_readings, validate_readings
+from course_data import read_course_data, with_course_data, rich_html
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class CourseIndexTests(unittest.TestCase):
     def setUp(self):
-        self.config = json.loads((ROOT / 'html-export.json').read_text())
+        self.config, self.modules = load_course()
         self.path = ROOT / self.config['site']['syllabus_source']
         self.syllabus = self.path.read_text()
-        self.modules = read_schedule(self.path, self.config['site']['year'])
 
     def evaluate(self, source):
         with tempfile.NamedTemporaryFile(mode='w', suffix='.typ', dir=self.path.parent) as file:
@@ -82,7 +82,7 @@ class CourseIndexTests(unittest.TestCase):
         self.assertEqual([r['iso_date'] for m in modules for r in m['rows'] if r['title'] == 'No class'],
                          ['2026-10-13', '2026-11-24', '2026-11-26'])
         resolved = resolve_readings(self.config, modules)
-        nash = next(c for c in resolved['lectures'] if c['syllabus_ids'] == ['nash'])
+        nash = next(c for c in resolved['notes'] if c['syllabus_ids'] == ['nash'])
         self.assertEqual((nash['number'], nash['date']), (8, 'Thu, Oct 8, 2026'))
         page = render_index(self.config, modules)
         row = re.search(r'<tr class="schedule-row">\s*<th[^>]*>08</th>.*?</tr>', page, re.S).group()
@@ -103,7 +103,7 @@ class CourseIndexTests(unittest.TestCase):
     def test_every_note_and_pdf_remains_reachable_with_no_placeholder_links(self):
         html = render_index(self.config, self.modules)
         page = Page(html)
-        for chapter in self.config['lectures']:
+        for chapter in self.config['notes']:
             stem = Path(chapter['source']).stem
             self.assertIn(stem + '.html', page.links)
             self.assertIn('pdf/' + stem + '.pdf', page.links)
@@ -113,7 +113,7 @@ class CourseIndexTests(unittest.TestCase):
 
     def test_note_numbers_match_the_current_syllabus(self):
         resolved = resolve_readings(self.config, self.modules)
-        chapters = {Path(c['source']).stem: c for c in resolved['lectures']}
+        chapters = {Path(c['source']).stem: c for c in resolved['notes']}
         self.assertEqual(chapters['nfgs_nash']['syllabus_numbers'], [1])
         self.assertEqual(chapters['nfgs_nash']['number'], 1)
         self.assertEqual(chapters['bandit']['syllabus_numbers'], [6])
@@ -122,21 +122,69 @@ class CourseIndexTests(unittest.TestCase):
         self.assertTrue(chapters['learning2']['supplementary'])
         self.assertEqual(chapters['learning2']['number'], 'S3')
         config = copy.deepcopy(resolved)
-        config['lectures'][0], config['lectures'][1] = config['lectures'][1], config['lectures'][0]
+        config['notes'][0], config['notes'][1] = config['notes'][1], config['notes'][0]
         with self.assertRaisesRegex(ValueError, 'out of syllabus order'):
             validate_readings(config, self.modules)
 
     def test_note_mapping_rejects_missing_lecture_ids(self):
         config = copy.deepcopy(self.config)
-        config['lectures'][0]['syllabus_ids'] = ['missing-topic']
+        config['notes'][0]['syllabus_ids'] = ['missing-topic']
         with self.assertRaisesRegex(ValueError, 'Invalid syllabus_ids'):
             resolve_readings(config, self.modules)
 
-    def test_course_overview_has_no_notes_or_pending_label(self):
+    def test_course_overview_has_slides_but_no_notes_or_pending_label(self):
         html = render_index(self.config, self.modules)
         overview = re.search(r'<tr class="schedule-row">\s*<th[^>]*>00</th>.*?</tr>', html, re.S).group()
-        self.assertNotIn('<a ', overview)
+        self.assertIn('href="slides/L00_course_intro.pdf"', overview)
+        self.assertIn('>Slides (PDF)</a>', overview)
+        self.assertNotIn('class="reading-link"', overview)
+        self.assertNotIn('class="lecture-title-link"', overview)
         self.assertNotIn('Not yet posted', overview)
+
+    def test_authored_config_contains_no_generated_numbers_or_course_facts(self):
+        authored = json.loads((ROOT / 'html-export.json').read_text())
+        self.assertNotIn('lectures', authored)
+        self.assertNotIn('year', authored['site'])
+        for note in authored['notes']:
+            self.assertFalse({'number', 'syllabus_numbers', 'date'} & note.keys())
+        ppad = next(n for n in self.config['notes'] if n['syllabus_ids'] == ['ppad'])
+        self.assertEqual(ppad['number'], 19)
+        self.assertEqual(ppad['date'], 'Thu, Nov 19, 2026')
+
+    def test_syllabus_fact_and_prose_edits_flow_into_the_index_and_citations(self):
+        source = self.syllabus.replace('room: "E25-111"', 'room: "TEST-ROOM"')
+        source = source.replace('time: "11:00 am–12:30 pm"', 'time: "10:00–11:30"')
+        source = source.replace('grading: (attendance: 20, material: 30, project: 50)',
+                                'grading: (attendance: 20, material: 35, project: 45)')
+        source = source.replace('title: "Topics in Multiagent Learning"', 'title: "Updated course title"')
+        source = source.replace('Projects may be completed individually',
+                                'Projects showcase *student research* and may be completed individually')
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.typ', dir=self.path.parent) as file:
+            file.write(source)
+            file.flush()
+            data = read_course_data(Path(file.name), ROOT)
+        config = with_course_data(self.config, data)
+        html = render_index(config, self.modules)
+        for expected in ('TEST-ROOM', '10:00–11:30', 'Improving material 35%',
+                         'accounts for 35%', 'Project 45%', 'accounts for 45%',
+                         'Updated course title', '<strong>student research</strong>'):
+            self.assertIn(expected, html)
+        self.assertEqual(config['how_to_cite']['booktitle'], 'MIT Updated course title Lecture Notes')
+        self.assertNotIn('assets/course/html-notes-collage.svg', html)
+        self.assertNotIn('assets/course/fog-of-war-challenge.png', html)
+
+    def test_slides_follow_their_stable_id_when_lectures_move(self):
+        first, second = self.lecture_block('nash'), self.lecture_block('efg-learning')
+        modules = self.evaluate(self.syllabus.replace(first, 'MARKER').replace(second, first).replace('MARKER', second))
+        config = copy.deepcopy(self.config)
+        config['slides'] = {'nash': 'slides/L00_course_intro.pdf'}
+        page = render_index(config, modules)
+        row = re.search(r'<tr class="schedule-row">\s*<th[^>]*>08</th>.*?</tr>', page, re.S).group()
+        self.assertIn('slides/L00_course_intro.pdf', row)
+
+    def test_new_unsupported_prose_does_not_silently_disappear(self):
+        with self.assertRaisesRegex(ValueError, 'Unsupported course prose element'):
+            rich_html({'func': 'equation', 'body': {'func': 'text', 'text': 'x'}})
 
 
 if __name__ == '__main__':

@@ -12,6 +12,10 @@
 !/scripts/
 !/website/
 !/docs/
+!/slides/
+# Publish configured course slide PDFs, while keeping editable decks private.
+/slides/*
+!/slides/L00_course_intro.pdf
 
 # Build products, editor state, and local secrets.
 **/target/

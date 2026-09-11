@@ -19,12 +19,18 @@ See the [course README](../README.md) and [build guide](../docs/building.md).
 For a single lecture:
 
 ```sh
+python3 scripts/course_index.py --resolve-only
 cargo run --manifest-path html-exporter/Cargo.toml -- \
   --root . \
-  --config html-export.json --math katex \
+  --config .build/html-export.json --math katex \
   'content/content/nfgs_nash.typ' \
   .build/nfgs_nash.html
 ```
+
+The Rust exporter reads the resolved `notes` configuration in `.build/`, whose
+numbers, dates, course facts, and citation metadata come from the syllabus.
+Use `make html` for publishing: it also updates the Typst note headers, compiles
+PDFs, copies slide attachments, and synchronizes the index and syllabus PDF.
 
 Useful options:
 

@@ -158,7 +158,7 @@ def main():
     root = Path(__file__).resolve().parents[1]
     folder = (root / (sys.argv[1] if len(sys.argv) > 1 else 'html')).resolve()
     config = json.loads((root / 'html-export.json').read_text())
-    expected = ['index.html'] + [Path(c['source']).stem + '.html' for c in config['lectures']]
+    expected = ['index.html'] + [Path(c['source']).stem + '.html' for c in config['notes']]
     issues = []
     pages = {}
     image_count = 0
@@ -173,7 +173,7 @@ def main():
         pages[path] = Page(text)
         if name != 'index.html' and pages[path].math == 0:
             issues.append(f'No rendered mathematics: {name}')
-    for chapter in config['lectures']:
+    for chapter in config['notes']:
         source = root / chapter['source']
         name = source.stem + '.html'
         if not source.is_file():

@@ -16,7 +16,8 @@ lecture PDFs, and a downloadable website bundle from the same sources.
 ## Getting started
 
 Install Typst **0.15.1**, a current stable Rust toolchain with Cargo, Python
-**3.9 or later**, Node.js **22 or later**, and Make. Initial builds download
+**3.10 or later**, Node.js **22 or later**, Make, and Poppler (`pdfinfo`, used to
+validate slide PDFs). Initial builds download
 Cargo dependencies and the Typst packages referenced by the notes.
 
 ```sh
@@ -42,7 +43,7 @@ offline reading.
 | [`syllabus/`](syllabus/) | Editable syllabus, schedule, and current PDF |
 | [`html-exporter/`](html-exporter/) | Rust converter, stylesheets, fonts, and KaTeX runtime |
 | [`scripts/`](scripts/) | Site generation, figure preparation, and validation |
-| [`html-export.json`](html-export.json) | Site metadata and lecture-to-schedule mapping |
+| [`html-export.json`](html-export.json) | Notes, stable lecture mappings, slide attachments, and export settings |
 | [`website/`](website/) | Course homepage illustration |
 | [`docs/`](docs/) | Build details and source provenance |
 
@@ -55,9 +56,11 @@ make check      # run Python/Rust tests and validate the built site and math
 make bundle     # build, validate, and package the portable website
 ```
 
-The syllabus is the source of truth for the schedule. When changing course
-logistics, descriptions, or policies, update both the syllabus and the index
-generator, rebuild the site, and check the resulting PDF. See
+The syllabus is the source of truth for course facts, prose, and the schedule.
+Edit its `course` dictionary for logistics and staff, and its existing Typst
+paragraphs for descriptions and policies. The index reads the same metadata;
+there is no second copy of course prose to maintain in Python. Rebuild the site
+and check the resulting PDF. See
 [the build guide](docs/building.md) for figure generation and rendering details.
 
 Reorder `lecture(...)` and `module[...]` entries in the syllabus's `outline`;
@@ -66,6 +69,14 @@ The verified Tuesday/Thursday dates and fixed MIT calendar exceptions live in
 [`syllabus/fall-2026-calendar.typ`](syllabus/fall-2026-calendar.typ).
 `no-class(...)` entries consume a date but no lecture number. Keep each lecture's
 stable ID with its topic so its notes remain linked after reordering.
+
+`html-export.json` has a `notes` list (one entry per note document) and a separate
+`slides` map from stable lecture ID to PDF path. Scheduled note numbers and dates
+are generated from `syllabus_ids`; supplementary notes receive S1, S2, … in their
+listed order. Do not author `number`, `syllabus_numbers`, or `date` in this JSON.
+The generated `.build/html-export.json` is the configuration read by the Rust
+exporter. Use `python3 scripts/course_index.py --resolve-only` to refresh it
+without rebuilding pages.
 
 ## Contributing
 

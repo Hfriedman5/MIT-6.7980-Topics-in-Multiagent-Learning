@@ -118,8 +118,9 @@
   .course-layout .course-people { grid-area: auto; grid-row: 2; }
   .course-layout .course-overview { grid-area: auto; grid-row: 3; border-top: 1px solid var(--rule); padding-top: 24px; }
   .course-layout .course-schedule { grid-area: auto; grid-row: 4; }
-  .course-layout .course-prerequisites { grid-area: auto; grid-row: 5; }
-  .course-layout .course-work { grid-area: auto; grid-row: 6; }
+  .course-layout .course-repository { grid-area: auto; grid-row: 5; }
+  .course-layout .course-prerequisites { grid-area: auto; grid-row: 6; }
+  .course-layout .course-work { grid-area: auto; grid-row: 7; }
   .course-details dl > div { grid-template-columns: 60px 1fr; }
   .course-people { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 22px; align-items: start; }
   .course-people > h2:first-child { grid-column: 1; grid-row: 1; }

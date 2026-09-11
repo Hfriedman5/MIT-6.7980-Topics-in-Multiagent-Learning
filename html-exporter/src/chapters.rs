@@ -8,7 +8,7 @@ pub(crate) struct ExportConfig {
     #[serde(default)]
     pub(crate) site: SiteConfig,
     pub(crate) how_to_cite: CitationConfig,
-    #[serde(alias = "lectures")]
+    #[serde(rename = "notes")]
     pub(crate) chapters: Vec<ChapterNav>,
 }
 

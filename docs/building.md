@@ -29,10 +29,10 @@ Compiler diagnostics are saved under `.build/logs/`. Build products in `.build/`
 ## Source files
 
 - Edit `content/content/*.typ` for explanations, equations, and proofs.
-- Edit `html-export.json` for reading order, syllabus mappings, and site metadata.
-- Edit `syllabus/6.7980 F26 Syllabus.typ` for the ordered lecture/module outline and instructors.
+- Edit `html-export.json` for note documents, supplementary reading order, stable syllabus mappings, slides, and export settings.
+- Edit `syllabus/6.7980 F26 Syllabus.typ` for course facts, formatted prose, and the ordered lecture/module outline.
 - Edit `syllabus/fall-2026-calendar.typ` for verified class dates and fixed academic-calendar exceptions.
-- Edit `scripts/course_index.py` for course-home content and markup.
+- Edit `scripts/course_index.py` for course-home markup, not a duplicate of syllabus content.
 - Edit `html-exporter/src/course.css` for the homepage layout.
 - Edit `html-exporter/src/gabri-notes.css` for the lecture layout.
 - Edit `content/meta/gabri_notes_html.typ` for semantic HTML components.
@@ -75,15 +75,63 @@ The website reads `<course-schedule>` metadata evaluated by Typst, so it uses
 the same assigned dates as the PDF and supports nested Typst text without a
 second schedule parser. `html-export.json` maps notes to stable `syllabus_ids`.
 The build derives their current numbers, dates, and ordering, and writes a
-resolved exporter configuration to `.build/html-export.json`; numeric fields
-in the authored config are only defaults for standalone note exports.
+resolved exporter configuration to `.build/html-export.json`. The authored
+`notes` list contains no `number`, `syllabus_numbers`, or `date` fields; these
+fields are generated and should not be edited in `.build/` either.
 Generated HTML/PDF note sources receive the derived header metadata without
-rewriting the authored lecture files. Supplementary readings retain S1, S2,
-and so on, with the term in place of a class date.
+rewriting the authored lecture files. Supplementary readings receive S1, S2,
+and so on in their listed order, with the term in place of a class date.
+
+For example, a scheduled note and an independent slide attachment are configured as:
+
+```json
+{
+  "notes": [
+    {
+      "source": "content/content/nfgs_nash.typ",
+      "short_title": "Setting and equilibria: the Nash equilibrium",
+      "syllabus_ids": ["nash"]
+    }
+  ],
+  "slides": {"overview": "slides/L00_course_intro.pdf"}
+}
+```
+
+A note can reference several lecture IDs; its header uses the first scheduled
+session and the index links it from every referenced session. Slides do not need
+a corresponding note document. They follow the stable lecture ID when the
+outline is reordered. Files are copied to `slides/<filename>.pdf`, so two
+different source files cannot use the same output filename (including case-only
+differences). Multiple lectures may intentionally share the same source PDF.
+Unknown IDs, missing files, corrupt PDFs, and output collisions fail before the
+build clears staging. Poppler's `pdfinfo` checks PDF validity.
+
+Course facts live in the syllabus's `course` dictionary. Its `item(...)` and
+`course-text("key")[...]` blocks expose formatted prose via Typst metadata.
+`scripts/course_data.py` reads this alongside the schedule and preserves
+paragraphs, emphasis, bold text, code, and links for the index. New unsupported
+prose constructs fail explicitly instead of disappearing. The lecture-note
+exporter remains responsible for mathematical content. PDF-only course figures
+remain outside these shared prose blocks and stay hidden on the homepage.
+Course title, authors, term, and citation metadata are also derived from the
+syllabus. The JSON retains deployment URLs and exporter-specific settings.
+
+`scripts/public_files.py` defines note output paths, copied course illustrations,
+slide output paths, required files, and permitted public asset types. Index links,
+the site build, and the local deployment tool use that same contract. Deployment
+still checks staged bytes, rejects private paths and symlinks, and excludes stray
+files from the payload. A configured slide PDF needs no additional deployment
+allowlist entry.
+The source repository explicitly includes the configured lecture 0 PDF in
+`.gitignore`; editable slide decks remain excluded. When adding another public
+slide PDF, also make sure its source is included in version control so clean
+checkouts can build it.
 
 Use `make syllabus` after outline changes to rebuild both syllabus PDF copies
 and regenerate the current index. Use `make html` to also regenerate lecture
 notes and their navigation with the new session numbers and dates.
+For exporter development, `python3 scripts/course_index.py --resolve-only`
+refreshes the generated configuration without rewriting the website or PDFs.
 
 ## Figures
 
