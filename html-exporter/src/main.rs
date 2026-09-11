@@ -944,12 +944,24 @@ fn render_document(
     export_config: Option<&ExportConfig>,
 ) -> String {
     let current = export_config.and_then(|export_config| current_chapter(config, export_config));
+    let browser_title = if let (Some(export_config), Some(current)) = (export_config, current) {
+        format!(
+            "{} · {} · {}",
+            export_config.site.event.as_deref().unwrap_or(DEFAULT_EVENT_NAME),
+            export_config.chapters[current].course_label(),
+            title
+        )
+    } else if let Some(number) = &document.meta.lecture_number {
+        format!("{DEFAULT_EVENT_NAME} · Lecture {number} · {title}")
+    } else {
+        title.to_owned()
+    };
     let mut html = String::new();
     html.push_str("<!doctype html>\n<html lang=\"en\">\n<head>\n");
     html.push_str("  <meta charset=\"utf-8\">\n");
     html.push_str("  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n");
     html.push_str(math::katex_head_assets(config.math_mode));
-    write!(html, "  <title>{}</title>\n", escape_html(title)).unwrap();
+    write!(html, "  <title>{}</title>\n", escape_html(&browser_title)).unwrap();
     html.push_str("  <style>\n");
     html.push_str(PAGE_CSS);
     html.push_str("\n  </style>\n");
