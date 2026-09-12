@@ -1,11 +1,12 @@
 // Port of Lectures/content/brouwer.tex; Fall 2025 source.
 #import "meta/gabri_notes.typ": *
-#show: gabri_notes.with(
+#let lecture = (
   lec_num: 2,
   date: [Thu, Sep 17, 2026],
   title: "Brouwer and Sperner",
   instructor: [Prof. Constantinos Daskalakis],
 )
+#show: gabri_notes.with(..lecture)
 
 In this lecture, we will do a deep dive into the proof of Brouwer's fixed point theorem, the main theorem that we invoked in the previous lecture to show the existence of Nash equilibrium. We will provide an elementary proof of Brouwer's theorem, one of several in the literature, with the goal of distilling Brouwer's existence-of-fixed-points result into a pure, combinatorial form. In particular, we seek to provide an answer to the following question:
 

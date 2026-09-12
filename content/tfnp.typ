@@ -1,12 +1,13 @@
 // Total search, End-of-Line, and PPAD.
 #import "meta/gabri_notes.typ": *
 
-#show: gabri_notes.with(
+#let lecture = (
   lec_num: 18,
   date: [Tue, Nov 17, 2026],
   title: "Total search and TFNP",
   instructor: [Prof. Constantinos Daskalakis],
 )
+#show: gabri_notes.with(..lecture)
 
 Nash's theorem guarantees an equilibrium, but its existence proof does not give a polynomial-time algorithm. We have already met a similar distinction in Sperner's lemma: a fully labeled simplex exists, yet the path certifying existence can be exponentially long. Today we formalize search problems whose solutions are guaranteed to exist, and isolate the directed parity argument underlying PPAD #citep(<papadimitriou1994parity>).
 

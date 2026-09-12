@@ -39,7 +39,12 @@ fn main() {
 fn run() -> Result<(), String> {
     let config = options::parse()?;
     let export_config = load_export_config(&config)?;
-    let raw_html = compile_typst_html(&config)?;
+    let raw_html = if let Some(path) = &config.from_html {
+        fs::read_to_string(path)
+            .map_err(|err| format!("could not read native HTML {}: {err}", path.display()))?
+    } else {
+        compile_typst_html(&config)?
+    };
     let mut document = HtmlParts::parse(&raw_html);
     let title = config
         .title
@@ -319,7 +324,6 @@ impl HtmlParts {
     fn rewrite_statement_ids(&mut self) {
         let anchors = collect_statement_anchors(&self.body_html);
         let mut statement_idx = 0usize;
-        let mut href_targets = HashMap::new();
         self.body_html = re_html_section()
             .replace_all(&self.body_html, |captures: &Captures| {
                 let whole = captures.get(0).map_or("", |m| m.as_str());
@@ -331,15 +335,16 @@ impl HtmlParts {
                     return whole.to_owned();
                 };
                 statement_idx += 1;
-                if let Some(raw_id) = &anchor.raw_id {
-                    if raw_id != &anchor.id {
-                        href_targets.insert(raw_id.clone(), format!("#{}", anchor.id));
-                    }
+                // Native bundle links in other pages already point at raw_id.
+                // Preserve it; retain the old numbered URL as a local alias.
+                let id = anchor.raw_id.as_ref().unwrap_or(&anchor.id);
+                let mut start = format!("<section{}>", set_id_attr(attrs, id));
+                if id != &anchor.id {
+                    write!(start, "<span id=\"{}\"></span>", escape_attr(&anchor.id)).unwrap();
                 }
-                format!("<section{}>", set_id_attr(attrs, &anchor.id))
+                start
             })
             .to_string();
-        self.rewrite_local_links(&href_targets);
     }
 
     fn rewrite_local_links(&mut self, targets: &HashMap<String, String>) {
@@ -658,7 +663,10 @@ fn unwrap_generated_biblioref_links(body: String) -> String {
         .replace_all(&body, |captures: &Captures| {
             let whole = captures.get(0).map_or("", |m| m.as_str());
             let attrs = captures.name("attrs").map_or("", |m| m.as_str());
-            if !attrs.contains(r#"role="doc-biblioref""#) || attrs.contains("citation") {
+            if !attrs.contains(r#"role="doc-biblioref""#)
+                || attrs.contains("citation")
+                || !extract_href_attr(attrs).is_some_and(|href| href.starts_with('#'))
+            {
                 whole.to_owned()
             } else {
                 let inner = captures.name("inner").map_or("", |m| m.as_str());
@@ -1818,6 +1826,7 @@ mod tests {
             index_href: None,
             pdf_href: None,
             export_config: None,
+            from_html: None,
             math_mode: MathMode::Katex,
         };
         (book, config)
@@ -1875,7 +1884,6 @@ mod tests {
         assert!(!rail.contains("<svg>"));
     }
 
-
     #[test]
     fn lecture_metadata_moves_below_title_and_before_toc_once() {
         let raw = r#"<html><body><div class="lecture-metadata">
@@ -1896,6 +1904,7 @@ mod tests {
             index_href: None,
             pdf_href: None,
             export_config: None,
+            from_html: None,
             math_mode: MathMode::Katex,
         };
         let html = render_document(&config, "Existence proofs", &parts, None);
@@ -1960,6 +1969,25 @@ mod tests {
     }
 
     #[test]
+    fn statement_ids_preserve_native_links_and_legacy_numbered_urls() {
+        let mut parts = HtmlParts::parse(
+            r##"<html><body>
+<section class="env statement" id="thm-regret-gap"><div class="env-head"><span class="env-kind">Theorem</span> <span class="env-number">L4.9</span></div><p>Statement.</p></section>
+<section class="env statement"><div class="env-head"><span class="env-kind">Example</span> <span class="env-number">L4.10</span></div><p>Example.</p></section>
+<a href="#thm-regret-gap">Local reference</a>
+<a href="other.html#native-label">Cross-document reference</a>
+</body></html>"##,
+        );
+        parts.rewrite_statement_ids();
+        let dom = Html::parse_fragment(&parts.body_html);
+        for selector in ["section#thm-regret-gap", "#theorem-l4-9", "section#example-l4-10"] {
+            assert_eq!(dom.select(&Selector::parse(selector).unwrap()).count(), 1);
+        }
+        assert!(parts.body_html.contains(r##"href="#thm-regret-gap""##));
+        assert!(parts.body_html.contains(r#"href="other.html#native-label""#));
+    }
+
+    #[test]
     fn heading_math_is_preserved_in_rendered_toc() {
         let raw = r#"
 <!doctype html>
@@ -2008,6 +2036,7 @@ mod tests {
 <p>See <a href="#loc-1">Section 1.1</a>, <a href="#loc-2">Theorem 1.2</a>, and <a href="#loc-3">(3)</a>.</p>
 <p>Generated citation <a href="#bib-old" role="doc-biblioref">[OLD]OLD</a> is unwrapped.</p>
 <p>Custom citation <a class="citation" href="#bib-new" role="doc-biblioref">NEW</a> is preserved.</p>
+<p>External citation <a href="https://doi.org/10.1/example" role="doc-biblioref">DOI</a> is preserved.</p>
 "##
         .to_owned();
 
@@ -2021,6 +2050,7 @@ mod tests {
         assert!(
             body.contains(r##"<a class="citation" href="#bib-new" role="doc-biblioref">NEW</a>"##)
         );
+        assert!(body.contains(r#"<a href="https://doi.org/10.1/example" role="doc-biblioref">DOI</a>"#));
     }
 
     #[test]

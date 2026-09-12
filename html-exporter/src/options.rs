@@ -16,6 +16,7 @@ pub(crate) struct Config {
     pub(crate) index_href: Option<String>,
     pub(crate) pdf_href: Option<String>,
     pub(crate) export_config: Option<PathBuf>,
+    pub(crate) from_html: Option<PathBuf>,
     pub(crate) math_mode: MathMode,
 }
 
@@ -47,6 +48,9 @@ pub(crate) fn parse(
     /// YAML file containing lecture and citation metadata.
     #[opt(long = "config")]
     export_config: Option<PathBuf>,
+    /// Postprocess this HTML from a native Typst bundle instead of compiling input.
+    #[opt(long = "from-html")]
+    from_html: Option<PathBuf>,
     /// Math rendering backend: svg or katex. Defaults to katex.
     #[opt(long)]
     math: Option<String>,
@@ -79,6 +83,7 @@ pub(crate) fn parse(
         index_href,
         pdf_href: pdf,
         export_config,
+        from_html,
         math_mode,
     })
 }

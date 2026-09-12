@@ -33,14 +33,79 @@ The old nested source layout, numbered figure paths, and `gabri_notes_bk.typ`
 and `gabri_notes_pdf.typ` imports are rejected by the build. The former `web`,
 `html`, and `combined` compiler inputs are rejected by both styles. Combined
 document cross-reference injection and the exporter's old source-rewriting
-shims have been removed; each note is compiled independently.
+shims have been removed. Standalone previews compile one note; the site build
+uses native Typst document bundles for cross-lecture references.
+
+## Links between lectures
+
+Link a specific result or section using its stable label:
+
+```typst
+// In content/learning_intro.typ:
+== Learning a Nash equilibrium in two-player zero-sum games <sec-learning-zero-sum>
+
+// In another lecture:
+See #lecture-link("learning_intro", <sec-learning-zero-sum>)[the self-play proof].
+// Renders: the self-play proof (Section L4.2.2).
+
+// Use an empty body when the numbered reference fits the sentence directly:
+By #lecture-link("learning_intro", <thm-regret-gap>)[], the saddle-point gap vanishes.
+// Renders: By Theorem L4.9, ...
+
+// Use none to refer to a whole lecture, including its number and title:
+#lecture-link("kernelized", none)[] develops this construction.
+// Renders: Lecture 16, “High-dimensional games” develops this construction.
+```
+
+Both styles export `lecture-link` from `content/meta/lecture-links.typ`.
+Use the source basename and an authored destination label consisting of letters,
+digits, hyphens, or underscores, starting with a letter. Keep the label with its
+topic when moving a section or result. The helper adds the numbered reference
+to descriptive text; prefer an exact theorem, definition, or other environment
+over its surrounding section when that is what the sentence invokes. Never
+hardcode the number in the prose. Whole-note references use the scheduled title
+and lecture number, or “Supplementary Reading S3” for a supplement. Within the
+same lecture, use native `@label`, `ref`, or `link` as before. The HTML style
+exports safe heading and environment labels even without a local reference.
+Environment labels coexist with the exporter's numbered IDs for older links.
+
+The site build uses Typst 0.15's [native cross-document references and links](https://typst.app/docs/reference/model/link/#links-in-bundle-export).
+`content/bundle.typ` creates one `document(...)` per note. `lecture-link` delegates
+to native `ref` and `link`, so labels, numbers, and destinations resolve together
+in the compilation. HTML links point to the other HTML files; PDF links point
+to the other PDFs with named destinations. Keep the PDF directory together to
+follow these links offline. Each format is compiled in its own bundle.
+
+Each note exports its existing header as a `lecture` dictionary and applies it
+with `#show: gabri_notes.with(..lecture)`. In a standalone preview, the helper
+imports the destination's header and displays its lecture number and title,
+linking to the corresponding public HTML section. Exact environment and section
+numbers require the bundle, where Typst can introspect every destination. This
+fallback needs no generated files. A standalone PDF's website base can be
+overridden with `--input course-url=https://example.org/course/`.
+
+`scripts/lecture_links.py` checks literal link calls against published sources
+and unique labels before the build. Typst validates the actual reference targets
+and computes their counters; there is no reference index or cache to refresh.
+
+The final site audit checks rendered fragments. Rendering tests cover section
+and environment insertions, lecture renumbering, appendices, supplementary notes,
+incoming-only anchors, local references, numbered link text, and PDF link actions.
+
+Typst's [bundle introspection](https://typst.app/docs/reference/bundle/#introspection)
+shares labels, counters, and states across documents. Labels must therefore be
+unique across the notes. The shared styles reset counters for each lecture,
+scope native bibliographies to their own document bodies, and keep HTML citation
+state separate by lecture. The HTML postprocessor preserves native destination
+IDs and supplies the old numbered statement IDs as aliases.
 
 ## Build pipeline
 
 `make html` builds the Rust converter, regenerates the editable dynamics and
-diagram figures, compiles each lecture to HTML and PDF, generates the course
-index from the syllabus, and assembles `html/` using Typst's experimental bundle
-target. `make bundle` also produces `dist/6.7980-notes.zip`.
+diagram figures, compiles native HTML and PDF bundles, postprocesses the HTML,
+generates the course index and syllabus PDF, and assembles `html/`. The bundle
+target requires Typst 0.15.1 and currently uses its experimental feature flag.
+`make bundle` also produces `dist/6.7980-notes.zip`.
 
 The generated website has a schedule, 18 lecture and supplementary pages,
 PDF downloads, downloadable chapter sources, a syllabus, and local browser

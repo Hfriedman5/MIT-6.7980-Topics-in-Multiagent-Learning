@@ -1,6 +1,7 @@
 // Port of Lectures/content/stochastic_games.tex; authoritative Fall 2025 source.
 #import "meta/gabri_notes.typ": *
-#show: gabri_notes.with(lec_num: "S5", date: [Fall 2026], title: "Markov (aka stochastic) games", instructor: [Prof. Constantinos Daskalakis (#raw("costis@mit.edu"))])
+#let lecture = (lec_num: "S5", date: [Fall 2026], title: "Markov (aka stochastic) games", instructor: [Prof. Constantinos Daskalakis (#raw("costis@mit.edu"))])
+#show: gabri_notes.with(..lecture)
 
 In this lecture, we turn our attention to #emph[Markov games], also known as #emph[stochastic games]. These are an expressive family of games which has become especially popular recently as a mathematical model underlying multi-agent reinforcement learning. Markov games capture strategic interactions that take place over a number of rounds or perhaps an infinite number of rounds, in some environment whose state is influenced by the actions taken by players, and which in turn influences the players' rewards. 
 

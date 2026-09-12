@@ -1,6 +1,7 @@
 // Port of Lectures/content/nfgs_nash.tex; Fall 2025 source.
 #import "meta/gabri_notes.typ": *
-#show: gabri_notes.with(lec_num: 1, date: [Tue, Sep 15, 2026], title: "Setting and equilibria: the Nash equilibrium", instructor: [Prof. Constantinos Daskalakis])
+#let lecture = (lec_num: 1, date: [Tue, Sep 15, 2026], title: "Setting and equilibria: the Nash equilibrium", instructor: [Prof. Constantinos Daskalakis])
+#show: gabri_notes.with(..lecture)
 
 Normal-form games model simultaneous-move interactions with a single move (think about rock-paper-scissors). Despite their simplicity, normal-form games will provide a natural ground for looking into important concepts in multiagent settings, such as notions of equilibria (Nash, maxmin, correlated, $dots.h$), and learning from repeated play. In the second part of the course, we will move on to notions of games that explicitly capture more complex phenomena, such as sequential moves and imperfect information.
 

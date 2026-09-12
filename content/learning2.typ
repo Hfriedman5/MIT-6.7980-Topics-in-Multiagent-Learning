@@ -1,11 +1,12 @@
 #import "meta/gabri_notes.typ": *
 
-#show: gabri_notes.with(
+#let lecture = (
   instructor: [Prof. Gabriele Farina (gfarina\@mit.edu)],
   lec_num: "S3",
   date: [Fall 2026],
   title: "Learning algorithms (II)",
 )
+#show: gabri_notes.with(..lecture)
 
 #let va = $a$
 #let vb = $b$

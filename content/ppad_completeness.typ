@@ -3,13 +3,14 @@
 
 #let eps = math.epsilon.alt
 
-#show: gabri_notes.with(
+#let lecture = (
   lec_num: 20,
   date: [Tue, Nov 24, 2026],
   title: "PPAD-hardness of Nash equilibrium",
   instructor: [Prof. Constantinos Daskalakis],
   extrathanks: [Some of the content of the lecture was adapted from material from Costis Daskalakis.],
 )
+#show: gabri_notes.with(..lecture)
 
 We continue the discussion from the lecture on total search and TFNP by giving a glimpse of how the PPAD-hardness of finding $eps$-approximate Nash equilibria was shown by #citet(<dgp09>).
 

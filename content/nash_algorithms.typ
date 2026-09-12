@@ -1,6 +1,7 @@
 // Port of Lectures/content/L06-Nash algorithms.tex; Fall 2025 source.
 #import "meta/gabri_notes.typ": *
-#show: gabri_notes.with(lec_num: "S2", date: [Fall 2026], title: "Centralized algorithms for Nash equilibrium computation", instructor: [Prof. Constantinos Daskalakis])
+#let lecture = (lec_num: "S2", date: [Fall 2026], title: "Centralized algorithms for Nash equilibrium computation", instructor: [Prof. Constantinos Daskalakis])
+#show: gabri_notes.with(..lecture)
 
 In previous lectures, we saw the basic game theory formalism, and some of the most fundamental equilibrium concepts, and their existence proofs. Nash's proof that a Nash equilibrium in randomized strategies exists in every finite game makes use of Brouwer's fixed point theorem, which does not immediately suggest an algorithm for computing Nash equilibria. On the other hand, we saw that the existence of Nash equilibrium in two-player zero-sum games can also be established using strong linear programming duality, which suggests a polynomial-time algorithm for computing Nash equilibria in these games.
 

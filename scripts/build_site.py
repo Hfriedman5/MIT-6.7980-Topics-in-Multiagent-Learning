@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build current Typst chapters, then assemble a native Typst asset bundle."""
+"""Compile native Typst document bundles and postprocess the course website."""
 from __future__ import annotations
 
 import argparse
@@ -16,6 +16,7 @@ import zipfile
 from build_dynamics import build_dynamics
 from build_diagrams import build_diagrams
 from course_index import load_course, render_index
+from lecture_links import validate_lecture_links
 from public_files import copy_public_files, note_outputs, required_files, validate_public_path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -74,8 +75,6 @@ def prepare_pdf_source(source: Path, chapter: dict | None = None) -> Path:
 
 def prepare_html_source(source: Path, chapter: dict) -> Path:
     content = chapter_source_text(source, chapter)
-    if content == source.read_text():
-        return source
     content = relocate_source_paths(source, content)
     content = content.replace('/content/meta/gabri_notes.typ',
                               '/content/meta/gabri_notes_html.typ')
@@ -85,27 +84,40 @@ def prepare_html_source(source: Path, chapter: dict) -> Path:
     return target
 
 
-def build_chapter(chapter: dict) -> str:
-    source = ROOT / chapter['source']
-    outputs = note_outputs(chapter)
-    output = STAGE / outputs['html']
-    pdf = STAGE / outputs['pdf']
-    pdf_log = ROOT / '.build' / 'logs' / (source.stem + '.pdf.log')
-    with pdf_log.open('w') as stream:
+def compile_note_bundle(format: str) -> Path:
+    """Resolve cross-document refs natively, without exporting reference data."""
+    output = ROOT / '.build' / ('native-' + format)
+    log = ROOT / '.build/logs' / ('bundle-' + format + '.log')
+    if output.exists():
+        shutil.rmtree(output)
+    with log.open('w') as stream:
         result = subprocess.run([
             'typst', 'compile', '--root', str(ROOT),
             '--font-path', str(ROOT / 'html-exporter/assets/fonts'),
-            str(prepare_pdf_source(source, chapter)), str(pdf),
+            '--features', 'bundle,html', '--format', 'bundle',
+            '--input', 'course-bundle=true', '--input', 'notes-format=' + format,
+            '--input', 'html-math=katex', str(ROOT / 'content/bundle.typ'), str(output),
         ], cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT)
     if result.returncode:
-        raise RuntimeError(f"Lecture {chapter['number']} PDF failed:\n{pdf_log.read_text()}")
+        raise RuntimeError(f'Native {format} bundle failed:\n{log.read_text()}')
+    return output
+
+
+def build_chapter(chapter: dict) -> str:
+    """Style native bundle HTML while preserving its cross-document anchors."""
+    source = ROOT / chapter['source']
+    outputs = note_outputs(chapter)
+    output = STAGE / outputs['html']
+    if not (STAGE / outputs['pdf']).is_file():
+        raise RuntimeError(f"Native PDF missing for {source.name}")
     log = ROOT / '.build' / 'logs' / (source.stem + '.log')
     with log.open('w') as stream:
         result = subprocess.run([
             str(ROOT / 'html-exporter/target/release/notes-html-exporter'),
             '--root', str(ROOT), '--config', str(RESOLVED_CONFIG), '--math', 'katex',
             '--pdf', outputs['pdf'],
-            str(prepare_html_source(source, chapter)), str(output),
+            '--from-html', str(ROOT / '.build/native-html' / outputs['html']),
+            str(source), str(output),
         ], cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT)
     if result.returncode:
         raise RuntimeError(f"Lecture {chapter['number']} failed:\n{log.read_text()}")
@@ -142,6 +154,7 @@ def main() -> None:
     parser.add_argument('--skip-build', action='store_true', help='reuse the existing Rust binary')
     args = parser.parse_args()
     config, schedule = load_course(CONFIG)
+    print(f"Validated {validate_lecture_links(ROOT, config)} inter-lecture links.", flush=True)
     RESOLVED_CONFIG.parent.mkdir(exist_ok=True)
     RESOLVED_CONFIG.write_text(json.dumps(config, indent=2) + "\n")
     version = subprocess.check_output(['typst', '--version'], text=True)
@@ -161,6 +174,12 @@ def main() -> None:
     shutil.copy2(ROOT / 'html-exporter/src/course.css', STAGE / 'assets/course.css')
     build_dynamics(ROOT)
     build_diagrams(ROOT)
+    for chapter in config['notes']:
+        prepare_pdf_source(ROOT / chapter['source'], chapter)
+        prepare_html_source(ROOT / chapter['source'], chapter)
+    pdf_bundle = compile_note_bundle('pdf')
+    shutil.copytree(pdf_bundle / 'pdf', STAGE / 'pdf', dirs_exist_ok=True)
+    compile_note_bundle('html')
     with ThreadPoolExecutor(max_workers=3) as pool:
         for message in pool.map(build_chapter, config['notes']):
             print(message, flush=True)
@@ -172,9 +191,7 @@ def main() -> None:
         validate_public_path(entry['output'], required)
     if missing := required - {entry['output'] for entry in entries}:
         raise ValueError('Incomplete site: ' + ', '.join(sorted(missing)))
-    (ROOT / '.build/bundle-files.json').write_text(json.dumps(entries, indent=2) + '\n')
-    run('typst', 'compile', '--root', '.', '--features', 'bundle', '--format', 'bundle',
-        'content/bundle.typ', 'html')
+    shutil.copytree(STAGE, ROOT / 'html', dirs_exist_ok=True)
     run(sys.executable, 'scripts/check_site.py', 'html')
     run('node', 'scripts/check_katex.cjs', 'html')
     if args.zip:

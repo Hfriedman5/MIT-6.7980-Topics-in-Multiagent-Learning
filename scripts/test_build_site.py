@@ -1,4 +1,4 @@
-"""Guard the per-lecture PDF build and its advertised download link."""
+"""Guard native bundle failures and the exported lecture downloads."""
 from pathlib import Path
 import subprocess
 import tempfile
@@ -45,33 +45,39 @@ Lecture prose.
                 with self.assertRaisesRegex(ValueError, 'obsolete source layout'):
                     build_site.chapter_source_text(self.source)
 
-    def test_pdf_is_compiled_before_its_link_is_exported(self):
+    def test_native_output_is_postprocessed_with_its_pdf_download(self):
         calls = []
+        (self.stage / 'pdf/lecture.pdf').write_bytes(b'%PDF-1.7\n')
 
-        def compile(args, **kwargs):
+        def export(args, **kwargs):
             calls.append(args)
             output = Path(args[-1])
-            if args[0] == 'typst':
-                output.write_bytes(b'%PDF-1.7\n')
-            else:
-                self.assertTrue((self.stage / 'pdf/lecture.pdf').is_file())
-                self.assertEqual(args[args.index('--pdf') + 1], 'pdf/lecture.pdf')
-                output.write_text('<style>body {}</style><p>Lecture prose.</p>')
+            self.assertEqual(args[args.index('--pdf') + 1], 'pdf/lecture.pdf')
+            self.assertEqual(Path(args[args.index('--from-html') + 1]),
+                             self.root / '.build/native-html/lecture.html')
+            output.write_text('<style>body {}</style><p>Lecture prose.</p>')
             return subprocess.CompletedProcess(args, 0)
 
-        with patch.object(build_site.subprocess, 'run', side_effect=compile):
+        with patch.object(build_site.subprocess, 'run', side_effect=export):
             build_site.build_chapter(self.chapter)
-        self.assertEqual(calls[0][:2], ['typst', 'compile'])
-        self.assertEqual(Path(calls[0][-1]), self.stage / 'pdf/lecture.pdf')
-        self.assertEqual(len(calls), 2)
+        self.assertEqual(len(calls), 1)
         self.assertEqual((self.stage / 'source/lecture.typ').read_text(), self.original)
 
-    def test_pdf_failure_stops_before_exporting_a_dead_link(self):
-        with patch.object(build_site.subprocess, 'run',
-                          return_value=subprocess.CompletedProcess([], 1)) as run:
-            with self.assertRaisesRegex(RuntimeError, 'Lecture 3 PDF failed'):
+    def test_missing_pdf_stops_before_exporting_a_dead_link(self):
+        with patch.object(build_site.subprocess, 'run') as run:
+            with self.assertRaisesRegex(RuntimeError, 'Native PDF missing'):
                 build_site.build_chapter(self.chapter)
-        self.assertEqual(run.call_count, 1)
+        run.assert_not_called()
+
+    def test_bundle_failure_preserves_typst_diagnostics(self):
+        def fail(args, **kwargs):
+            kwargs['stdout'].write('label <missing-theorem> does not exist\n')
+            return subprocess.CompletedProcess(args, 1)
+
+        with patch.object(build_site.subprocess, 'run', side_effect=fail):
+            with self.assertRaisesRegex(RuntimeError,
+                    'Native pdf bundle failed:.*\nlabel <missing-theorem> does not exist'):
+                build_site.compile_note_bundle('pdf')
 
     def test_schedule_controls_generated_note_headers_without_editing_source(self):
         self.source.write_text('#import "meta/gabri_notes.typ": *\n'

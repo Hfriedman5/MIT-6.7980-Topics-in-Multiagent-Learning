@@ -8,6 +8,7 @@
 #import "lovelace.typ": *
 #import "notation.typ": *
 #import "markers.typ": paragraph-marker
+#import "lecture-links.typ": lecture-link, lecture-title
 
 #let lecnum = state("lecnum", none)
 #let lecture-number-label(value) = if str(value).starts-with("S") { str(value) } else { "L" + str(value) }
@@ -82,7 +83,7 @@
   show_outline: false,
   extrathanks: none,
 ) = {
-  set document(title: lecture-label(lec_num) + ": " + plain-text(title), author: plain-text(instructor))
+  set document(title: lecture-title(lec_num, title), author: plain-text(instructor))
   set page(
     width: 8.27in,
     height: 11.69in,
@@ -108,6 +109,15 @@
   set math.equation(supplement: none)
   set cite(style: "alphanum.csl")
   show cite: set text(fill: blue.darken(40%))
+  show ref: it => {
+    if it.element != none and it.element.func() == figure and it.element.kind == "lecture-environment" {
+      let target = it.element
+      let supplement = if it.supplement == auto { target.supplement } else { it.supplement }
+      let number = lecture-number-label(lecnum.at(target.location()))
+      let n = counter(figure.where(kind: "lecture-environment")).at(target.location()).first()
+      link(target.location())[#if supplement not in (none, [], "", text("")) { [#supplement~] }#number.#n]
+    } else { it }
+  }
   show strong: set text(font: "Frutiger", weight: "bold")
   show heading: it => {
     // More space above than below connects each heading to its following text.
@@ -130,6 +140,13 @@
     left,
   )[#h(-1em)*#caption.supplement #numbering(caption.numbering, ..caption.counter.get())*#caption.separator#caption.body])
   show figure.where(kind: "lecture-environment"): it => it.body
+  // Bundle counters are global except for page; each note starts afresh.
+  counter(heading).update(0)
+  counter(math.equation).update(0)
+  counter(footnote).update(0)
+  for kind in ("lecture-environment", "algorithm", image, table) {
+    counter(figure.where(kind: kind)).update(0)
+  }
   lecnum.update(str(lec_num))
   box(stroke: .5pt, inset: 3mm, width: 100%, radius: 0mm)[
     #text(size: 9pt)[
@@ -151,7 +168,10 @@
   ]
   v(1cm)
   if show_outline { outline() }
-  body
+  context {
+    set bibliography(target: selector(cite).within(here()), group: none)
+    body
+  }
 }
 
 #let appendix(body) = context {

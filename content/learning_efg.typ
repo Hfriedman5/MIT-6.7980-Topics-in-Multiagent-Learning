@@ -1,6 +1,12 @@
 // Port of Lectures/content/learning_efg.tex; authoritative Fall 2025 source.
 #import "meta/gabri_notes.typ": *
-#show: gabri_notes.with(lec_num: 8, date: [Thu, Oct 8, 2026], title: "Learning in extensive-form games", instructor: [Prof. Gabriele Farina (#raw("gfarina@mit.edu"))])
+#let lecture = (
+  lec_num: 8,
+  date: [Thu, Oct 8, 2026],
+  title: "Learning in extensive-form games",
+  instructor: [Prof. Gabriele Farina (#raw("gfarina@mit.edu"))],
+)
+#show: gabri_notes.with(..lecture)
 
 Several approaches for constructing no-regret algorithms for extensive-form games have been proposed. For one, extensive-form games are a particular instance of combinatorial games for which the multiplicative weights update algorithm can be implemented efficiently in the reduced normal form of the game, despite the exponential size. We will see more details about this in a later class.
 

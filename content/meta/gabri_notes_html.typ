@@ -8,6 +8,7 @@
 #import "citations.typ": *
 #import "notation.typ": *
 #import "markers.typ": paragraph-marker
+#import "lecture-links.typ": lecture-link, lecture-title
 
 #let eps = math.epsilon.alt
 #let thmcounters = state("thmcounters", (:))
@@ -25,8 +26,9 @@
 #let bpar(body) = {
   [#paragraph-marker() #strong(body + ".")~~]
 }
-#let lecture-bib = state("lecture-bib", ())
+#let lecture-bib = state("lecture-bib", (:))
 #let lecnum = state("lecnum", none)
+#let citation-keys() = lecture-bib.final().at(str(lecnum.get()), default: ())
 #let html-footnote-counter = counter("html-footnote")
 #let html-footnote-id-counter = counter("html-footnote-id")
 #let html-heading-tag(level) = ("h1", "h2", "h3", "h4", "h5", "h6").at(calc.min(level - 1, 5))
@@ -133,9 +135,14 @@
   extrathanks: none,
   instructor: none,
 ) = {
-  lecture-bib.update(())
+  set document(title: lecture-title(lec_num, title))
+  lecture-bib.update(it => { it.insert(str(lec_num), ()); it })
   html-footnote-counter.update(0)
   counter(heading).update(0)
+  counter(math.equation).update(0)
+  for kind in ("shared", "algorithm", image, table) {
+    counter(figure.where(kind: kind)).update(0)
+  }
   set text(font: "Georgia", size: 9.5pt)
   set par(justify: true)
   set list(indent: 4.05mm)
@@ -154,12 +161,18 @@
   show strong: set text(font: "Frutiger", weight: "bold")
   show heading: it => {
     let tag = html-heading-tag(it.level)
+    // Export authored safe labels even without a reference in this document.
+    // Other lectures can then link here without depending on heading numbers.
+    let anchor = if it.has("label") and str(it.label).match(regex("^[a-zA-Z][a-zA-Z0-9_-]*$")) != none {
+      (id: str(it.label))
+    } else { (:) }
     if it.numbering != none {
       let number = html-text(counter(heading).display())
       html.elem(tag, attrs: (
         class: "notes-heading",
         "data-level": str(it.level),
         "data-number": number,
+        ..anchor,
       ))[
         #html.elem("span", attrs: (class: "secno"))[#counter(heading).display()]
         #it.body
@@ -168,6 +181,7 @@
       html.elem(tag, attrs: (
         class: "notes-heading notes-heading-unnumbered",
         "data-level": str(it.level),
+        ..anchor,
       ))[
         #it.body
       ]
@@ -201,12 +215,6 @@
     },
   )
 
-  let ref-lecture-prefix = target-lecture => {
-    if target-lecture != none and str(target-lecture) != str(lec_num) {
-      [Lecture #target-lecture, ]
-    }
-  }
-
   let ref-label(supplement, number) = {
     // A suppressed label must not leave a leading separator in the link.
     if supplement not in (none, [], "", text("")) { [#supplement~] }
@@ -239,20 +247,19 @@
       let number = lecture-number-label(target-lecture) + "." + str(counters.at(it.element.kind, default: 0) + 1)
       link(
         it.element.location(),
-      )[#ref-lecture-prefix(target-lecture)#ref-label(supplement, number)]
+      )[#ref-label(supplement, number)]
     } else if (
       it.element != none and it.element.func() == heading and it.element.at("numbering", default: none) != none
     ) {
       let numbering-fn = it.element.at("numbering")
       let numbers = counter(heading).at(it.element.location())
       let number = str(numbering(numbering-fn, ..numbers))
-      let target-lecture = number.split(".").first().replace(regex("^L"), "")
       let supplement = if it.supplement == auto {
         [Section]
       } else {
         it.supplement
       }
-      link(it.element.location())[#ref-lecture-prefix(target-lecture)#ref-label(supplement, number)]
+      link(it.element.location())[#ref-label(supplement, number)]
     } else {
       it
     }
@@ -377,6 +384,7 @@
   }
   context {
     let scope = here()
+    set bibliography(target: selector(cite).within(scope), group: none)
     body
     context {
       for entry in query(selector(<notes-html-footnote>).after(scope).before(here())) {
@@ -392,27 +400,46 @@
 }
 
 #let citation_register(key) = {
+  let number = str(lecnum.get())
   lecture-bib.update(it => {
-    if key not in it {
-      it.push(key)
+    let keys = it.at(number, default: ())
+    if key not in keys {
+      keys.push(key)
     }
+    it.insert(number, keys)
     it
   })
 }
 
-#let citation-noted = state("citation-noted", ())
+#let citation-noted = state("citation-noted", (:))
+
+// HTML supplies its own citation key in the table column and margin note.
+// Omit the CSL bibliography key when rendering the entry itself.
+#let full-citation-style = bytes(read("alphanum.csl").replace(
+  regex("<text display=\"left-margin\"[^>]*variable=\"citation-label\"/>"), "",
+))
+
+#let full-citation(key) = {
+  // Citation links are supplied by citation_link; full entries need only their
+  // external URLs, not native backlinks to the hidden bibliography.
+  show link: it => if type(it.dest) == str { it } else { html.span(it.body) }
+  cite(key, form: "full", style: full-citation-style)
+}
 
 #let citation_note(key) = context {
   let key_name = citation_key_name(key)
-  let noted = citation-noted.get()
+  let number = str(lecnum.get())
+  let noted = citation-noted.get().at(number, default: ())
   if key_name in noted {
     []
   } else {
     citation-noted.update(it => {
-      it.push(key_name)
+      let keys = it.at(number, default: ())
+      keys.push(key_name)
+      it.insert(number, keys)
       it
     })
-    let cite_label = citation_label_text(key, cited_keys: lecture-bib.final())
+    let cite_label = citation_label_text(key, cited_keys: citation-keys())
     let cite_open = html.elem("span", attrs: (class: "citation-note-bracket"))[#text("[")]
     let cite_key = html.elem("span", attrs: (class: "citation-note-key cite_key"))[#cite_label]
     let cite_close = html.elem("span", attrs: (class: "citation-note-bracket"))[#text("]")]
@@ -437,7 +464,7 @@
         }
       }
       #cite_open#cite_key#cite_close#cite_authors
-      #cite(key, form: "full")
+      #full-citation(key)
     ]
   }
 }
@@ -464,7 +491,7 @@
     if i > 0 {
       [; ]
     }
-    citation_link(key, text(fill: blue.darken(40%), citation_label_text(key, cited_keys: lecture-bib.final())))
+    citation_link(key, text(fill: blue.darken(40%), citation_label_text(key, cited_keys: citation-keys())))
   }
   if supplement != none { [, #supplement] }
   [\]]
@@ -475,7 +502,7 @@
   let author_part = html.elem("span", attrs: (class: "citation-author cite-authors"))[
     #citation_author_text(key)
   ]
-  let label = text(fill: blue.darken(40%), citation_label_text(key, cited_keys: lecture-bib.final(), ..supplement))
+  let label = text(fill: blue.darken(40%), citation_label_text(key, cited_keys: citation-keys(), ..supplement))
   html.elem("span", attrs: (class: "citation-text"))[
     #author_part#text(" [")#citation_link(key, label)#text("]")
   ]
@@ -506,22 +533,25 @@
     }
     #context {
       html.elem("table", attrs: (class: "bibliography-table"))[
-        #for item in lecture-bib.final() [
+        #for item in citation-keys() [
           #html.elem("tr", attrs: (
             class: "bibliography-row",
             id: citation_html_id(item),
           ))[
             #html.elem("td", attrs: (class: "bib-key"))[
-              #text("[")#citation_label_text(item, cited_keys: lecture-bib.final())#text("]")
+              #text("[")#citation_label_text(item, cited_keys: citation-keys())#text("]")
             ]
-            #html.elem("td", attrs: (class: "bib-entry"))[#cite(item, form: "full")]
+            #html.elem("td", attrs: (class: "bib-entry"))[#full-citation(item)]
           ]
         ]
       ]
     }
   ]
 
-  html.div(hidden: true, bibliography("refs.bib", title: none))
+  html.div(hidden: true, {
+    show link: it => it.body
+    bibliography("refs.bib", title: none)
+  })
 }
 
 #let appendix(body) = (

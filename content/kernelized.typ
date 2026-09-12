@@ -1,11 +1,12 @@
 #import "meta/gabri_notes.typ": *
 
-#show: gabri_notes.with(
+#let lecture = (
   lec_num: 16,
   date: [Tue, Nov 10, 2026],
   title: "High-dimensional games",
   instructor: [Prof. Constantinos Daskalakis],
 )
+#show: gabri_notes.with(..lecture)
 
 Extensive-form games belong to a larger class of games that we will call _combinatorial games_. Two properties characterize the representation we use:
 

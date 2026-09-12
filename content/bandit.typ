@@ -1,11 +1,12 @@
 #import "meta/gabri_notes.typ": *
 
-#show: gabri_notes.with(
+#let lecture = (
   instructor: [Prof. Constantinos Daskalakis (costis\@mit.edu)],
   lec_num: 6,
   date: [Thu, Oct 1, 2026],
   title: "Learning with bandit feedback",
 )
+#show: gabri_notes.with(..lecture)
 
 #let va = $a$
 #let vb = $b$

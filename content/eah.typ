@@ -1,6 +1,7 @@
 // Port of Lectures/content/eah.tex; Fall 2025 source.
 #import "meta/gabri_notes.typ": *
-#show: gabri_notes.with(lec_num: "S1", date: [Fall 2026], title: "A second look at the minimax theorem", instructor: [Prof. Gabriele Farina])
+#let lecture = (lec_num: "S1", date: [Fall 2026], title: "A second look at the minimax theorem", instructor: [Prof. Gabriele Farina])
+#show: gabri_notes.with(..lecture)
 
 In Lecture 3, we introduced the notion of coarse correlated equilibria. As we discussed, coarse correlated equilibria sidestep various difficulties (including topological and related to use of irrational numbers) that come with Nash equilibria. In this lecture, we show a powerful centralized algorithm for computing coarse correlated equilibria. (Soon in this course, we will also see that coarse correlated equilibria can also be #emph[learned] efficiently in a multi-agent setting, in a distributed fashion.)
 

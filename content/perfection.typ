@@ -1,10 +1,11 @@
 #import "meta/gabri_notes.typ": *
-#show: gabri_notes.with(
+#let lecture = (
   lec_num: "S4",
   date: [Fall 2026],
   title: "Sequential irrationality and perfect equilibria",
   instructor: [Prof. Gabriele Farina (#raw("gfarina@mit.edu"))],
 )
+#show: gabri_notes.with(..lecture)
 
 As we discussed on multiple occasions, Nash equilibrium strategies encode the idea of playing optimally against the strongest possible opponent. Even when the opponent is only close to optimal (for example, in the poker competitions where the opponent were top professional poker players), playing a Nash equilibrium is often the safe choice, as professional players are very quick at exploiting suboptimal strategies, making opponent modeling risky. However, as we reveal today, not all Nash equilibria are equally strong in extensive-form games when playing against players that might make mistakes.
 

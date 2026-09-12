@@ -2,12 +2,13 @@
 // The CCE motivation also draws on Fall 2024 Lectures/L15/L15.typ.
 #import "meta/gabri_notes.typ": *
 
-#show: gabri_notes.with(
+#let lecture = (
   lec_num: "S7",
   date: [Fall 2026],
   title: "Fast computation via the minimax theorem",
   instructor: [Prof. Gabriele Farina],
 )
+#show: gabri_notes.with(..lecture)
 
 The minimax theorem converts a response to each opponent strategy into a single strategy that works against every opponent. How many responses must we compute to carry out this conversion? This lecture follows #citet(<farina2026defense>), with particular attention to computing $Phi$-equilibria. The central tool is a generalization of Ellipsoid-Against-Hope: select a small collection of responses, then compute a suitable mixture of them.
 

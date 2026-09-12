@@ -1,6 +1,12 @@
 // Port of Lectures/content/efg_intro.tex; authoritative Fall 2025 source.
 #import "meta/gabri_notes.typ": *
-#show: gabri_notes.with(lec_num: 7, date: [Tue, Oct 6, 2026], title: "Modeling extensive-form games", instructor: [Prof. Gabriele Farina (#raw("gfarina@mit.edu"))])
+#let lecture = (
+  lec_num: 7,
+  date: [Tue, Oct 6, 2026],
+  title: "Modeling extensive-form games",
+  instructor: [Prof. Gabriele Farina (#raw("gfarina@mit.edu"))],
+)
+#show: gabri_notes.with(..lecture)
 
 Imperfect-information extensive-form games  model tree-form strategic interactions in which not all actions might be observed by all players. They represent an ample majority of strategic interactions encountered in the real world, ranging from recreational games such as poker, to negotiation, and auctions.
 

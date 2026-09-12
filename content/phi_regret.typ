@@ -1,11 +1,12 @@
 #import "meta/gabri_notes.typ": *
 
-#show: gabri_notes.with(
+#let lecture = (
   instructor: [Max Fishelson (maxfish\@mit.edu)],
   lec_num: "S6",
   date: [Fall 2026],
   title: "Phi-regret minimization",
 )
+#show: gabri_notes.with(..lecture)
 
 #let va = $a$
 #let vb = $b$

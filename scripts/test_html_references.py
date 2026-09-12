@@ -97,7 +97,7 @@ class HtmlReferenceTests(unittest.TestCase):
                 self.assertEqual(''.join(reference['text']), label)
         self.assert_local_targets_exist(page)
 
-    def test_cross_lecture_prefix_and_formatted_supplements_are_preserved(self):
+    def test_cross_lecture_numbers_and_formatted_supplements_are_preserved(self):
         page = self.compile('''
 #gabri_notes(lec_num: 4, title: [Referenced lecture])[
 = Target section <target-section>
@@ -114,12 +114,12 @@ class HtmlReferenceTests(unittest.TestCase):
 ]
 ''')
         self.assertEqual([''.join(ref['text']) for ref in page.references], [
-            'Lecture 4, Theorem\u00a0L4.1',
-            'Lecture 4, L4.1',
-            'Lecture 4, Result\u00a0L4.1',
-            'Lecture 4, Section\u00a0L4.1',
-            'Lecture 4, L4.1',
-            'Lecture 4, Part\u00a0L4.1',
+            'Theorem\u00a0L4.1',
+            'L4.1',
+            'Result\u00a0L4.1',
+            'Section\u00a0L4.1',
+            'L4.1',
+            'Part\u00a0L4.1',
         ])
         for index in (2, 5):
             self.assertIn('em', page.references[index]['tags'])
