@@ -159,4 +159,3 @@ This also illustrates why approximate comparisons need a gap. In an $epsilon.alt
 These local arguments explain the gate simulation. They do not by themselves prove the full hardness theorem: composing all gadgets while preserving their incentives, controlling approximation errors, and converting the graphical construction to a fixed number of players require the remaining reductions in the cited papers.
 
 #lec_bibliography("meta/refs.bib")
-

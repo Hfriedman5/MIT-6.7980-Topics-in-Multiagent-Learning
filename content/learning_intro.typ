@@ -44,8 +44,8 @@ We have thus arrived at the following formalization.
 
 #definition[$Phi$-regret minimizer][
   Given the convex and compact strategy set $cX$ and a set $Phi$ of linear transformations $phi.alt:cX->cX$, a _$Phi$-regret minimizer for the set $cX$_ is a model for a decision maker that repeatedly interacts with a black-box environment. At each time $t$, the regret minimizer interacts with the environment through two operations:
-  - `NextStrategy()` takes no input, and has the effect that the regret minimizer will output an element $vx ^((t)) in cX$.
-  - `ObserveUtility`$(u^((t)))$ provides the environment's feedback to the regret minimizer, in the form of a linear utility function $u^((t)) : cX -> RR$ that evaluates how good the last-output point $vx ^((t))$ was.
+  - `NextStrategy()` takes no input, and has the effect that the regret minimizer will output an element $vx^((t)) in cX$.
+  - `ObserveUtility`$(u^((t)))$ provides the environment's feedback to the regret minimizer, in the form of a linear utility function $u^((t)) : cX -> RR$ that evaluates how good the last-output point $vx^((t))$ was.
     The utility function can depend adversarially on the outputs $vx^((1)), ..., vx^((t))$.
 
   Its quality metric is its cumulative _$Phi$-regret_, defined as the quantity
@@ -55,14 +55,14 @@ We have thus arrived at the following formalization.
   The goal for a $Phi$-regret minimizer is to guarantee that its $Phi$-regret grows asymptotically sublinearly as time $T$ increases, no matter the sequence of utility functions $u^((t))$.
 ]<defphirm>
 
-Calls to `NextStrategy` and `ObserveUtility` keep alternating to each other: first, the regret minimizer will output a point $vx^((1))$, then it will received feedback $u^((1))$ from the environment, then it will output a new point $vx ^((2))$, and so on.
-The decision making encoded by the regret minimizer is _online_, in the sense that at each time $t$, the output of the regret minimizer can depend on the prior outputs $vx^((1)), ...,vx ^((t-1))$ and corresponding observed utility functions $u^((1)),...,u^((t-1))$, but no information about future utilities is available.
+Calls to `NextStrategy` and `ObserveUtility` keep alternating to each other: first, the regret minimizer will output a point $vx^((1))$, then it will received feedback $u^((1))$ from the environment, then it will output a new point $vx^((2))$, and so on.
+The decision making encoded by the regret minimizer is _online_, in the sense that at each time $t$, the output of the regret minimizer can depend on the prior outputs $vx^((1)), ...,vx^((t-1))$ and corresponding observed utility functions $u^((1)),...,u^((t-1))$, but no information about future utilities is available.
 
 == Notable choices of transformations $Phi$
 The size of the set of transformations $Phi$ considered by the player defines
 a natural notion of how "rational" the agent is. There are several choices of interest for $Phi$ for a normal-form strategy space $cX = Delta(A)$.
 - $Phi = $ set of _all_ stochastic matrices, mapping $Delta(A) -> Delta(A)$. This notion of $Phi$-regret is known under the name _swap regret_. This notion is related to convergence to the set of correlated equilibria.
-- $Phi = $ set of all "probability mass transport" on $cX$, defined as
+- $Phi =$ set of all "probability mass transport" on $cX$, defined as
   $Phi = {phi.alt_(a-> b)}_(a, b in A)$, where
   $
     (
@@ -78,12 +78,12 @@ a natural notion of how "rational" the agent is. There are several choices of in
     When all agents in a multiplayer general-sum normal-form game play so that their internal or swap regret grows sublinearly, their average correlated distribution of play converges to the set of _correlated equilibria_ of the game.
   ] <thmce-informal>
 
-  In sequential games, the above concept extends to $Phi = $ a particular set of linear transformations called _trigger deviation functions_. It is known that in this case the $Phi$-regret can be efficiently bounded with a polynomial dependence on the size of the game tree. The reason why this choice of deviation functions is important is given by the following fact.
+  In sequential games, the above concept extends to $Phi =$ a particular set of linear transformations called _trigger deviation functions_. It is known that in this case the $Phi$-regret can be efficiently bounded with a polynomial dependence on the size of the game tree. The reason why this choice of deviation functions is important is given by the following fact.
   #theorem[Informal][
     When all agents in a multiplayer general-sum extensive-form game play so that their $Phi$-regret relative to trigger deviation functions grows sublinearly, their average correlated distribution of play converges to the set of _extensive-form correlated equilibria_ of the game.
   ]
 
-- $Phi = $ constant transformations. In this case, we are only requiring that the player not regret substituting _all_ of the strategies they played with the _same_ strategy $hat(vx) in Delta(A)$. $Phi$-regret according to this set of transformations $Phi$ is usually called _external_ regret, or more simply just _regret_. While this seems like an extremely restricted notion of rationality, it actually turns out to be already extremely powerful. We will spend the rest of this class to see why.
+- $Phi =$ constant transformations. In this case, we are only requiring that the player not regret substituting _all_ of the strategies they played with the _same_ strategy $hat(vx) in Delta(A)$. $Phi$-regret according to this set of transformations $Phi$ is usually called _external_ regret, or more simply just _regret_. While this seems like an extremely restricted notion of rationality, it actually turns out to be already extremely powerful. We will spend the rest of this class to see why.
   #theorem[Informal; formal version in @thmce-formal][
     When all agents in a multiplayer general-sum normal-form game play so that their external regret grows sublinearly, their average correlated distribution of play converges to the set of _coarse correlated equilibrium_ of the game.
   ] <thmcce-informal>
@@ -100,7 +100,7 @@ The special case where $Phi$ is chosen to be the set of constant transformations
   $
     Phi^"const" := {phi.alt_xhat: vx |-> xhat}_(xhat in cX).
   $
-  Its corresponding $Phi^"const"$-regret is called "_external regret_" or simply "_regret_", and it is indicated with 
+  Its corresponding $Phi^"const"$-regret is called "_external regret_" or simply "_regret_", and it is indicated with
   $
     "Reg"^((T)) := max_(xhat in cX) {sum_(t=1)^T u^((t))(xhat) - u^((t))(vx^((t)))}.
   $
@@ -126,7 +126,7 @@ in games, we check that regret minimizing and $Phi$-regret minimizing dynamics i
 
 == Learning a best response against stochastic opponents
 
-As a first smoke test, let's verify that over time a regret minimizer would learn how to best respond to static, stochastic opponents. Specifically, consider this scenario. We are playing a repeated $n$-player general-sum game with multilinear utilities (this captures normal-form game and extensive-form games alike), where Players $i = 1, ..., n-1$ play stochastically, that is, at each $t$ they independently sample a strategy $vx _i^((t)) in cX_(i)$ from the same fixed distribution (which is unknown to any other player). Formally, this means that
+As a first smoke test, let's verify that over time a regret minimizer would learn how to best respond to static, stochastic opponents. Specifically, consider this scenario. We are playing a repeated $n$-player general-sum game with multilinear utilities (this captures normal-form game and extensive-form games alike), where Players $i = 1, ..., n-1$ play stochastically, that is, at each $t$ they independently sample a strategy $vx_i^((t)) in cX_(i)$ from the same fixed distribution (which is unknown to any other player). Formally, this means that
 $
   EE \[vx_i^((t))\] = overline(vx)_i qquad forall i =1,...,n -1, quad t = 1,2,....
 $
@@ -154,7 +154,7 @@ $ <bspp>
 #set math.equation(numbering: none)
 where $cX$ and $cY$ are convex compact sets and $U$ is a matrix. These types of optimization problems are pervasive in game-theory. The canonical prototype of bilinear saddle point problem is the computation of Nash equilibria in two-player zero-sum games (either normal-form or extensive-form). There, a Nash equilibrium is the solution to (@bspp) where $cX$ and $cY$ are the strategy spaces of Player~$1$ and Player~$2$ respectively (probability simplexes for normal-form games or sequence-form polytopes for extensive-form games), and $U$ is the payoff matrix for Player~$1$. Other examples include social-welfare-maximizing correlated equilibria and optimal strategies in two-team zero-sum adversarial team games.
 
-The idea behind using regret minimization to converge to bilinear saddle-point problems is to use _self play_. We instantiate two regret minimization algorithms, $cR_cX$ and $cR_cY$, for the domains of the maximization and minimization problem, respectively. At each time $t$ the two regret minimizers output strategies $vx ^((t))$ and $vy^((t))$, respectively. Then, they receive feedback $u_cX^((t)), u_cY^((t))$ defined as
+The idea behind using regret minimization to converge to bilinear saddle-point problems is to use _self play_. We instantiate two regret minimization algorithms, $cR_cX$ and $cR_cY$, for the domains of the maximization and minimization problem, respectively. At each time $t$ the two regret minimizers output strategies $vx^((t))$ and $vy^((t))$, respectively. Then, they receive feedback $u_cX^((t)), u_cY^((t))$ defined as
 $
   u^((t))_cX : vx |-> (U vy^((t)))^top vx ,qquad quad
   u^((t))_cY : vy |-> -(U^top vx^((t)))^top vy.
@@ -162,11 +162,15 @@ $
 
 We can summarize the process pictorially as follows.
 
-#align(center, image("figures/learning_intro/self_play.svg", width: 90%, alt: "Self-play flow: two regret minimizers exchange strategies and utility feedback."))
+#align(center, image(
+  "figures/learning_intro/self_play.svg",
+  width: 10cm,
+  alt: "Self-play flow: two regret minimizers exchange strategies and utility feedback.",
+))
 
 A well known folk theorem establish that the pair of average strategies produced by the regret minimizers up to any time $T$ converges to a saddle point of (@bspp), where convergence is measured via the _saddle point gap_
 $
-  0 <= gamma(vx , vy) := (max_(xhat in cX) {xhat^top U vy} - vx^top U vy) + (
+  0 <= gamma(vx, vy) := (max_(xhat in cX) {xhat^top U vy} - vx^top U vy) + (
     vx^top U vy - min_(yhat in cY) {vx^top U yhat}
   ) = max_(xhat in cX) {xhat^top U vy} - min_(yhat in cY) {vx^top U yhat}.
 $
@@ -182,17 +186,16 @@ A point $(vx , vy) in cX times cY$ has zero saddle point gap if and only if it i
   By definition of regret,
   $
     & ("Reg"_cX^((T)) + "Reg"_cY^((T))) / T \
-    &#h(5mm)  = 1 / T max_(xhat in cX) {sum_(t=1)^T u_cX^((t))(xhat) } - 1 / T sum_(t=1)^T u_cX^((t))(vx^t)
-    +
-    1 / T max_(yhat in cY) {sum_(t=1)^T u_cY^((t))(yhat) } - 1 / T sum_(t=1)^T u_cY^((t))(vy^t) \
-    &#h(5mm)  = 1 / T max_(xhat in cX) {sum_(t=1)^T u_cX^((t))(xhat)  } + 1 / T max_(yhat in cY) {sum_(t=1)^T u_cY^((t))(
-      yhat
-    )  } #h(.6cm) ("since" u^((t))_cX (vx ^((t))) + u^((t))_cY ( vy^((t))) = 0) \
-
-    &#h(5mm)  = max_(xhat in cX) { xhat^top U overline(vy)^((T))  } - min_(yhat in cY) { (
-      overline(vx)^((T))
-    )^top U yhat  } \
-    &#h(5mm) = gamma(overline(vx)^((T)) ,overline(vy)^((T))).
+    & #h(5mm) = 1 / T max_(xhat in cX) {sum_(t=1)^T u_cX^((t))(xhat) } - 1 / T sum_(t=1)^T u_cX^((t))(vx^t)
+      +
+      1 / T max_(yhat in cY) {sum_(t=1)^T u_cY^((t))(yhat) } - 1 / T sum_(t=1)^T u_cY^((t))(vy^t) \
+    & #h(5mm) = 1 / T max_(xhat in cX) {sum_(t=1)^T u_cX^((t))(xhat) } + 1 / T max_(yhat in cY) {sum_(t=1)^T u_cY^((t))(
+          yhat
+        ) } #h(.6cm) ("since" u^((t))_cX (vx^((t))) + u^((t))_cY ( vy^((t))) = 0) \
+    & #h(5mm) = max_(xhat in cX) { xhat^top U overline(vy)^((T)) } - min_(yhat in cY) { (
+          overline(vx)^((T))
+        )^top U yhat } \
+    & #h(5mm) = gamma(overline(vx)^((T)), overline(vy)^((T))).
   $
   Letting $T -> oo$ and using the sublinearity of regret, we obtain the statement.
 ]
@@ -212,15 +215,15 @@ The very _existence_ of regret minimizers is a powerful enough fact to imply the
   $
   follows from definition (this is often called _weak duality_).
 
-  To show the reverse inequality, we will interpret the bilinear saddle point $ min_(vy in cY) max_(vx in cX) vx^ top  U  vy$ as a repeated game. At each time $t$, we will let a regret minimizer $ cR_ cX$ pick actions $vx^((t))  in cX$, whereas we will always assume that $vy^((t))  in cY$ is chosen by the environment to best respond to $vx^((t))$, that is,
+  To show the reverse inequality, we will interpret the bilinear saddle point $min_(vy in cY) max_(vx in cX) vx^top U vy$ as a repeated game. At each time $t$, we will let a regret minimizer $cR_cX$ pick actions $vx^((t)) in cX$, whereas we will always assume that $vy^((t)) in cY$ is chosen by the environment to best respond to $vx^((t))$, that is,
   $
     vy^((t)) in argmin_(vy in cY) (vx^((t)))^top U vy.
   $
-  The utility function observed by $ cR_ cX$ at each time $t$ is set to the linear function
+  The utility function observed by $cR_cX$ at each time $t$ is set to the linear function
   $
     u^((t))_cX (vx) = vx^top U vy^((t)).
   $
-  Letting $ overline(vx)^((T))  in  cX$ and $ overline(vy)^((T))  in  cY$ be the average strategies output up to time $T$, that is,
+  Letting $overline(vx)^((T)) in cX$ and $overline(vy)^((T)) in cY$ be the average strategies output up to time $T$, that is,
   $
     overline(vx)^((T)) := 1 / T sum_(t=1)^T vx^((t)) qquad overline(vy)^((T)) := 1 / T sum_(t=1)^T vy^((t)),
   $
@@ -232,14 +235,13 @@ The very _existence_ of regret minimizers is a powerful enough fact to imply the
   $
   The important insight is that the right-hand side can be related to the regret incurred on $cX$: by definition,
   $
-    1 / T sum_(t=1)^T (vx^((t)))^top U vy^((t)) &= -"Reg"_cX^((T)) / T + 1 / T max_(vx in cX) {
-      sum_(t=1)^T vx^top U vy^((t))
-    } \
-    &= -"Reg"_cX^((T)) / T+ max_(vx in cX)
-    vx^top U overline(vy)^((T))
-    \
-    &>= -"Reg"_cX^((T)) / T + min_(vy in cY) max_(vx in cX)
-    vx^top U vy
+    1 / T sum_(t=1)^T (vx^((t)))^top U vy^((t)) & = -"Reg"_cX^((T)) / T + 1 / T max_(vx in cX) {
+                                                    sum_(t=1)^T vx^top U vy^((t))
+                                                  } \
+                                                & = -"Reg"_cX^((T)) / T+ max_(vx in cX)
+                                                  vx^top U overline(vy)^((T)) \
+                                                & >= -"Reg"_cX^((T)) / T + min_(vy in cY) max_(vx in cX)
+                                                  vx^top U vy
   $
   Combining the expressions, we obtain
   $
@@ -253,7 +255,7 @@ The very _existence_ of regret minimizers is a powerful enough fact to imply the
 The previous result is in fact a direct corollary of the more general connection between $Phi$-regret minimization and the set of coarse-correlated equilibria in multiplayer general-sum games. We present a general form of this connection in the next theorem.
 
 #theorem[Formal version of #ref(<thmce-informal>, supplement: "Theorems") and#ref(<thmcce-informal>, supplement: "")][
-  Let $vx ^((t))_1, ..., vx ^((t))_n$ the strategies played by the players at any time $t$, and let $Phi"-Reg"_i^((t))$ denote the internal regret incurred by Player $i$ up to time $t$. Consider now the average correlated distribution of play up to any time $T$, that is, the distribution $mu^((T))$ that selects a time $overline(t)$ uniformly at random from the set $ {1,...,T }$, and selects actions $(a_1,..., a_n)$ independendently according to the $vx _i^((overline(t)))$, that is,
+  Let $vx^((t))_1, ..., vx^((t))_n$ the strategies played by the players at any time $t$, and let $Phi"-Reg"_i^((t))$ denote the internal regret incurred by Player $i$ up to time $t$. Consider now the average correlated distribution of play up to any time $T$, that is, the distribution $mu^((T))$ that selects a time $overline(t)$ uniformly at random from the set ${1,...,T }$, and selects actions $(a_1,..., a_n)$ independendently according to the $vx_i^((overline(t)))$, that is,
   $
     mu^((T)) := 1 / T sum_(t=1)^T vx_1^((t))⊗...⊗ vx_n^((t)).
   $
@@ -268,31 +270,30 @@ The previous result is in fact a direct corollary of the more general connection
     EE_(a ~ mu^((T))) [u_i (phi.alt(a_i), a_(-i)) - u_i (a_i, a_(-i))]
   $
   as
-  $ &EE_(a ~ mu^((T))) [u_i (phi.alt(a_i), a_(-i)) - u_i (a_i, a_(-i))] \
-    &qquad = 1 / T sum_(t=1)^T EE_(a ~ vx_1^((t))⊗...⊗ vx_n^((t))) [
-      (u_i (phi.alt(a_i), a_(-i)) - u_i (a_i, a_(-i)))
-    ]
-    \ &qquad =
-    1 / T sum_(t=1)^T
-    (
-      u_i (EE_(a_i ~ vx_i^((t))) [phi.alt(a_i)], EE_(a_(-i) ~ ⊗ vx_(-i)^((t)))[a_(-i)]) - u_i (
-        EE_(a_i ~ vx_i^((t)))[ a_i ], EE_(a_(-i) ~ ⊗ vx_(-i)^((t))) [a_(-i)]
-      )
-    )
-    \ &qquad =
-    1 / T sum_(t=1)^T
-    (
-      u_i (phi.alt(EE_(a_i ~ vx_i^((t))) [a_i]), EE_(a_(-i) ~ ⊗ vx_(-i)^((t))) [a_(-i)]) - u_i (
-        EE_(a_i ~ vx_i^((t))) [a_i], EE_(a_(-i) ~ ⊗ vx_(-i)^((t))) [a_(-i)]
-      )
-    )
-    \ &qquad =
-    1 / T sum_(t=1)^T
-    (u_i (phi.alt(vx^((t))_i), vx^((t))_(-i)) - u_i (vx^((t))_i, vx^((t))_(-i)))
-
+  $
+    & EE_(a ~ mu^((T))) [u_i (phi.alt(a_i), a_(-i)) - u_i (a_i, a_(-i))] \
+    & qquad = 1 / T sum_(t=1)^T EE_(a ~ vx_1^((t))⊗...⊗ vx_n^((t))) [
+        (u_i (phi.alt(a_i), a_(-i)) - u_i (a_i, a_(-i)))
+      ] \
+    & qquad =
+      1 / T sum_(t=1)^T
+      (
+        u_i (EE_(a_i ~ vx_i^((t))) [phi.alt(a_i)], EE_(a_(-i) ~ ⊗ vx_(-i)^((t)))[a_(-i)]) - u_i (
+          EE_(a_i ~ vx_i^((t)))[ a_i ], EE_(a_(-i) ~ ⊗ vx_(-i)^((t))) [a_(-i)]
+        )
+      ) \
+    & qquad =
+      1 / T sum_(t=1)^T
+      (
+        u_i (phi.alt(EE_(a_i ~ vx_i^((t))) [a_i]), EE_(a_(-i) ~ ⊗ vx_(-i)^((t))) [a_(-i)]) - u_i (
+          EE_(a_i ~ vx_i^((t))) [a_i], EE_(a_(-i) ~ ⊗ vx_(-i)^((t))) [a_(-i)]
+        )
+      ) \
+    & qquad =
+      1 / T sum_(t=1)^T
+      (u_i (phi.alt(vx^((t))_i), vx^((t))_(-i)) - u_i (vx^((t))_i, vx^((t))_(-i)))
   $
   where the second equality follows by linearity of $phi.alt$ and $u_i$. Taking now a maximum over $phi.alt in Phi$, and recognizing the definition of $Phi$-regret on the right-hand side, we obtain the desired inequality.
 ]
 
 Note that @thmce-formal holds for any set $Phi$. The approximate equilibria found this way are sometimes called approximate $Phi$-equilibria. In the special cases of $Phi =$ all constant transformations, it is clear that the previous result implies convergence to the set of coarse correlated equilibria. For correlated equilibria, we need to convince ourselves that any arbitrary mapping $A -> A$ can be represented via a stochastic matrix. This is indeed the case, by constructing the matrix whose columns indicate what action is assigned to each action in $A$ by the mapping. (You should convince yourself!) Finally, for the case of $Phi =$ all probability mass transportations, it is enough to note that the $Phi$-regret of any stochastic matrix transformations is at most $|A|$ times larger than the worst possible regret of a probability mass transportation between two actions.
-

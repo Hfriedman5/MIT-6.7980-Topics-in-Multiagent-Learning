@@ -30,16 +30,16 @@ To construct an external regret minimizer that outputs sequence-form strategies,
 The idea of the CFR algorithm is simple: construct a regret minimizer for the whole tree-form problem starting from #emph[local] regret minimizers at each decision point, each learning what actions to play at that decision point.
 
 #example[
-#wrapped-figure(
-  [
+  #wrapped-figure(
+    [
 As an example, consider the TFDP faced by Player~1 in the game of Kuhn poker~#citep(label("Kuhn50:Simplified")), which we already introduced in Lecture 7. The black nodes are the #emph[decision points] of the player, and the white nodes are the #emph[observation points].
 
-  Since the player has six decision points---denoted $j_1 \, dots.h \, j_6$ in the figure---the CFR algorithm will use six local regret minimizers, which we denote $R_1 \, dots.h \, R_6$. Each regret minimizer $R_j$ will be responsible for outputting a local strategy $b_j in Delta (A_j)$ for the decision point $j$.
-  ],
-  [#image("figures/learning_efg/kuhn_tfdp-transparent.png", width: 340pt)],
-  side: right,
-  text-width: 50%,
-)
+      Since the player has six decision points---denoted $j_1 \, dots.h \, j_6$ in the figure---the CFR algorithm will use six local regret minimizers, which we denote $R_1 \, dots.h \, R_6$. Each regret minimizer $R_j$ will be responsible for outputting a local strategy $b_j in Delta (A_j)$ for the decision point $j$.
+    ],
+    [#image("figures/learning_efg/kuhn_tfdp-transparent.png", width: 340pt)],
+    side: right,
+    text-width: 50%,
+  )
 ]#label("ex:cfr-kuhn")
 
 The local distributions output by the different local regret minimizers is then combined to form a #emph[sequence-form strategy] that plays according to the local distributions at each decision point.
@@ -53,9 +53,9 @@ Remember that in the sequence form representation, the dimensionality of the str
 It can be shown that the regret cumulated by the CFR algorithm satisfies the following bound.
 
 #theorem[
-Let $upright(R e g)_j^(\( T \))$, for $j in cal(J)$, denote the regret cumulated up to time $T$ by each of the regret minimizers $R_j$. Then, the regret $upright(R e g)^(\( T \))$ cumulated by #ref(label("algo:cfr")) up to time $T$ satisfies
+  Let $upright(R e g)_j^(\( T \))$, for $j in cal(J)$, denote the regret cumulated up to time $T$ by each of the regret minimizers $R_j$. Then, the regret $upright(R e g)^(\( T \))$ cumulated by #ref(label("algo:cfr")) up to time $T$ satisfies
 
-$ upright(R e g)^(\( T \)) lt.eq sum_(j in cal(J)) max {0 \, upright(R e g)_j^(\( T \))} . $
+  $ upright(R e g)^(\( T \)) lt.eq sum_(j in cal(J)) max {0 \, upright(R e g)_j^(\( T \))} . $
 ]
 
 It is then immediate to see that if each $upright(R e g)_j^(\( T \))$ grows sublinearly in $T$, then so does $upright(R e g)^(\( T \))$.
@@ -65,63 +65,71 @@ In order to formally introduce counterfactual utility, we recall a bit of notati
 #strong[Notation for tree-form decision processes]  We recall the following notation for dealing with tree-form decision processes (TFDPs), which we introduced in Lecture 7. The notation is also summarized in #ref(label("tab:notation")).
 
 #list(
-[
-We denote the set of decision points in the TFDP as $cal(J)$, and the set of observation points as $cal(K)$. At each decision point $j in cal(J)$, the agent selects an action from the set $A_j$ of available actions. At each observation point $k in cal(K)$, the agent observes a signal $s_k$ from the environment out of a set of possible signals $S_k$.
-],
-[
-We denote by $rho$ the transition function of the process. Picking action $a in A_j$ at decision point $j in cal(J)$ results in the process transitioning to $rho (j \, a) in cal(J) union cal(K) union {tack.t}$, where $tack.t$ denotes the end of the decision process. Similarly, the process transitions to $rho (k \, s) in cal(J) union cal(K) union {tack.t}$ after the agent observes signal $s in S_k$ at observation point $k in cal(K)$.
-],
-[
-A pair $(j \, a)$ where $j in cal(J)$ and $a in A_j$ is called a #emph[sequence]. The set of all sequences is denoted as $Sigma colon.eq {(j \, a) : j in cal(J) \, a in A_j}$. For notational convenience, we will often denote an element $(j \, a)$ in $Sigma$ as $j a$ without using parentheses.
-],
-[
-Given a decision point $j in cal(J)$, we denote by $p_j$ its #emph[parent sequence], defined as the last sequence (that is, decision point-action pair) encountered on the path from the root of the decision process to $j$. If the agent does not act before $j$ (that is, $j$ is the root of the process or only observation points are encountered on the path from the root to $j$), we let $p_j = ∅$.
-]
+  [
+    We denote the set of decision points in the TFDP as $cal(J)$, and the set of observation points as $cal(K)$. At each decision point $j in cal(J)$, the agent selects an action from the set $A_j$ of available actions. At each observation point $k in cal(K)$, the agent observes a signal $s_k$ from the environment out of a set of possible signals $S_k$.
+  ],
+  [
+    We denote by $rho$ the transition function of the process. Picking action $a in A_j$ at decision point $j in cal(J)$ results in the process transitioning to $rho (j \, a) in cal(J) union cal(K) union {tack.t}$, where $tack.t$ denotes the end of the decision process. Similarly, the process transitions to $rho (k \, s) in cal(J) union cal(K) union {tack.t}$ after the agent observes signal $s in S_k$ at observation point $k in cal(K)$.
+  ],
+  [
+    A pair $(j \, a)$ where $j in cal(J)$ and $a in A_j$ is called a #emph[sequence]. The set of all sequences is denoted as $Sigma colon.eq {(j \, a) : j in cal(J) \, a in A_j}$. For notational convenience, we will often denote an element $(j \, a)$ in $Sigma$ as $j a$ without using parentheses.
+  ],
+  [
+    Given a decision point $j in cal(J)$, we denote by $p_j$ its #emph[parent sequence], defined as the last sequence (that is, decision point-action pair) encountered on the path from the root of the decision process to $j$. If the agent does not act before $j$ (that is, $j$ is the root of the process or only observation points are encountered on the path from the root to $j$), we let $p_j = ∅$.
+  ],
 )
 
 #example[
-As an example, consider again the TFDP faced by Player~1 in the game of Kuhn poker~#citep(label("Kuhn50:Simplified")), which was also recalled above in #ref(label("ex:cfr-kuhn")). We have that $J = {j_1 \, dots.h \, j_6}$ and $K = {k_1 \, dots.h \, k_4}$. We have:
+  As an example, consider again the TFDP faced by Player~1 in the game of Kuhn poker~#citep(label("Kuhn50:Simplified")), which was also recalled above in #ref(label("ex:cfr-kuhn")). We have that $J = {j_1 \, dots.h \, j_6}$ and $K = {k_1 \, dots.h \, k_4}$. We have:
 
-$ A_(j_1) = S_(k_4) & = {sans(c h e c k) \, sans(r a i s e)} \, #h(2em) & A_(j_5) & = {sans(f o l d) \, sans(c a l l)} \, #h(2em) & S_(k_1) & = {sans(j a c k) \, sans(q u e e n) \, sans(k i n g)}\
-p_(j_4) & = (j_1 \, sans(c h e c k)) \, #h(2em) & p_(j_6) & = (j_3 \, sans(c h e c k)) \, #h(2em) & p_(j_1) & = p_(j_2) = p_(j_3) = ∅ . $
+  $
+    A_(j_1) = S_(k_4) & = {sans(c h e c k) \, sans(r a i s e)} \, #h(2em) & A_(j_5) & = {sans(f o l d) \, sans(c a l l)} \, #h(2em) & S_(k_1) & = {sans(j a c k) \, sans(q u e e n) \, sans(k i n g)}\
+    p_(j_4) & = (j_1 \, sans(c h e c k)) \, #h(2em) & p_(j_6) & = (j_3 \, sans(c h e c k)) \, #h(2em) & p_(j_1) & = p_(j_2) = p_(j_3) = ∅ .
+  $
 
   Furthermore,
 
-$ rho (k_3 \, sans(c h e c k)) & = rho (j_2 \, sans(r a i s e)) = tack.t \, #h(2em) & rho (k_1 \, sans(k i n g)) & = j_3 \, #h(2em) rho (j_2 \, sans(c h e c k)) = k_3 . $
+  $
+    rho (k_3 \, sans(c h e c k)) & = rho (j_2 \, sans(r a i s e)) = tack.t \, #h(2em) & rho (k_1 \, sans(k i n g)) & = j_3 \, #h(2em) rho (j_2 \, sans(c h e c k)) = k_3 .
+  $
 ]
 
 #strong[Notation for the components of vectors]  Any vector $x in bb(R)^Sigma$ has, by definition, as many components as sequences $Sigma$. The component corresponding to a specific sequence $j a in Sigma$ is denoted as $x [j a]$. Similarly, given any decision point $j in cal(J)$, any vector $x in bb(R)^(A_j)$ has as many components as the number of actions at $j$. The component corresponding to a specific action $a in A_j$ is denoted $x \[ a \]$.
 
-#figure(kind: table, supplement: [Table], )[
+#figure(
+  kind: table,
+  supplement: [Table],
+  caption: [Notation for tree-form decision processes used in the CFR algorithm.],
+)[
 
-#table(stroke: none, columns: (auto, 1fr), align: (col, row) => if col == 0 { center + top } else { left + top }, inset: .7em,
-table.header([#strong[Symbol]], [#strong[Description]]),
-[$cal(J)$],
-[Set of decision points],
-[$A_j$],
-[Set of legal actions at decision point $j in cal(J)$],
-[$cal(K)$],
-[Set of observation points],
-[$S_k$],
-[Set of possible signals at observation point $k in cal(K)$],
-[$rho$],
-[Transition function:
+  #table(
+    stroke: none,
+    columns: (auto, 1fr),
+    align: (col, row) => if col == 0 { center + top } else { left + top },
+    inset: .7em,
+    table.header([#strong[Symbol]], [#strong[Description]]),
+    [$cal(J)$], [Set of decision points],
+    [$A_j$], [Set of legal actions at decision point $j in cal(J)$],
+    [$cal(K)$], [Set of observation points],
+    [$S_k$], [Set of possible signals at observation point $k in cal(K)$],
+    [$rho$],
+    [Transition function:
 
-#list(
-[
-given $j in cal(J)$ and $a in A_j$, $rho \( j \, a \)$ returns the next decision or observation point $v$ in $cal(J) union cal(K)$ in the decision tree that is reached after selecting legal action $a in j$, or $tack.t$ if the decision process ends;
-],
-[
-given $k in cal(K)$ and $s in S_k$ , $rho \( k \, s \)$ returns the next decision or observation point $v in cal(J) union K$ in the decision tree that is reached after observing signal $s$ at $k$, or $tack.t$ if the decision process ends
-]
-)],
-[$Sigma$],
-[Set of sequences, defined as $Sigma := { \( j \, a \) : j in cal(J) \, a in A_j }$],
-[$p_j$],
-[Parent sequence of decision point $j in cal(J)$, defined as the last sequence (decision point-action
-    pair) on the path from the root of the TFDP to decision point $j$; if the agent does not act
-    before $j$, $p_j = ∅$.]
-)
+      #list(
+        [
+          given $j in cal(J)$ and $a in A_j$, $rho \( j \, a \)$ returns the next decision or observation point $v$ in $cal(J) union cal(K)$ in the decision tree that is reached after selecting legal action $a in j$, or $tack.t$ if the decision process ends;
+        ],
+        [
+          given $k in cal(K)$ and $s in S_k$ , $rho \( k \, s \)$ returns the next decision or observation point $v in cal(J) union K$ in the decision tree that is reached after observing signal $s$ at $k$, or $tack.t$ if the decision process ends
+        ],
+      )],
+
+    [$Sigma$], [Set of sequences, defined as $Sigma := { \( j \, a \) : j in cal(J) \, a in A_j }$],
+    [$p_j$],
+    [Parent sequence of decision point $j in cal(J)$, defined as the last sequence (decision point-action
+      pair) on the path from the root of the TFDP to decision point $j$; if the agent does not act
+      before $j$, $p_j = ∅$.],
+  )
 ]#label("tab:notation")
 
 == Pseudocode for CFR
