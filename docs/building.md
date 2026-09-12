@@ -251,10 +251,17 @@ refreshes the generated configuration without rewriting the website or PDFs.
 ## Permalinks
 
 Lecture HTML exposes anchor icons on sections (including unnumbered
-headings), figures, tables, algorithms, theorem-style statements, and numbered
-equations. Icons appear on hover or keyboard focus. Section and environment
-icons sit in the left margin; figure and table icons sit beside their caption
-labels. Click an icon to navigate to its anchor, or use the browser's
+headings), figures, tables, algorithms, theorem-style statements, footnotes, and
+numbered equations. Icons appear on hover or keyboard focus. Section and environment
+icons sit in the left margin. Figures, tables, and algorithms with captions place
+their icons immediately to the left of the caption label. Captionless algorithms
+keep the icon beside their title. The shared side-column gutter is 32 pixels.
+Footnote anchors sit to the left of the note. Equation anchors align to the left
+edge of the right gutter, level with their numbered rows and outside the formula's
+horizontal scroll area.
+A footnote URL opens its margin copy
+on desktop or its endnote on narrow screens; without JavaScript, it opens the endnote.
+Click an icon to navigate to its anchor, or use the browser's
 “Copy link address” action to share it. These are ordinary links and work
 without JavaScript.
 

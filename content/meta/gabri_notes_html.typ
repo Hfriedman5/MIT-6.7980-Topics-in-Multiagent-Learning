@@ -432,10 +432,33 @@
   regex("<text display=\"left-margin\"[^>]*variable=\"citation-label\"/>"), "",
 ))
 
-#let full-citation(key) = {
+#let full-citation(key, full-doi: false) = {
   // Citation links are supplied by citation_link; full entries need only their
   // external URLs, not native backlinks to the hidden bibliography.
-  show link: it => if type(it.dest) == str { it } else { html.span(it.body) }
+  show link: it => {
+    if type(it.dest) != str {
+      html.span(it.body)
+    } else if full-doi and it.dest.match(regex("^https?://(dx\.)?doi\.org/")) != none {
+      html.elem("a", attrs: (
+        class: "bibliography-link bibliography-link-doi",
+        href: it.dest,
+        title: it.dest,
+      ))[#raw(it.dest)]
+    } else if (
+      it.body.func() != raw
+        and it.body.has("text")
+        and (
+          it.body.text.starts-with("http://")
+            or it.body.text.starts-with("https://")
+            or it.body.text == "DOI"
+            or it.body.text.match(regex("^10.\d{4,9}/[-._;()/:a-zA-Z0-9]+$")) != none
+        )
+    ) {
+      html.elem("a", attrs: (class: "bibliography-link", href: it.dest, title: it.dest))[link]
+    } else {
+      it
+    }
+  }
   cite(key, form: "full", style: full-citation-style)
 }
 
@@ -460,22 +483,6 @@
       #citation_author_text(key)
     ]
     html.elem("span", attrs: (class: "citation-note"))[
-      #show "https://doi.org/": []
-      #show link: it => {
-        if (
-          it.body.func() != raw
-            and it.body.has("text")
-            and (
-              it.body.text.starts-with("http://")
-                or it.body.text.starts-with("https://")
-                or it.body.text.match(regex("^10.\d{4,9}/[-._;()/:a-zA-Z0-9]+$")) != none
-            )
-        ) {
-          link(it.dest, [link])
-        } else {
-          it
-        }
-      }
       #cite_open#cite_key#cite_close#cite_authors
       #full-citation(key)
     ]
@@ -554,7 +561,7 @@
             #html.elem("td", attrs: (class: "bib-key"))[
               #text("[")#citation_label_text(item, cited_keys: citation-keys())#text("]")
             ]
-            #html.elem("td", attrs: (class: "bib-entry"))[#full-citation(item)]
+            #html.elem("td", attrs: (class: "bib-entry"))[#full-citation(item, full-doi: true)]
           ]
         ]
       ]

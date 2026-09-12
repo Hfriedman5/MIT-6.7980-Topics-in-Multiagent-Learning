@@ -334,9 +334,3 @@ The project is the central component of the course and accounts for #course.grad
 )
 
 #schedule(class-dates, outline, hide-instructors: true)
-
-#v(3mm)
-
-#course-text("supplementary-minimax")[
-*Supplementary lecture: Fast computation via the minimax theorem.* Based on #link("https://www.sigecom.org/exchanges/volume_23/2/FARINA.pdf")[Farina's SIGecom Exchanges article]. Defense oracles, the ellipsoid construction, logarithmic dependence on inverse accuracy, and Phi-equilibrium computation via fixed points of deviations.
-]

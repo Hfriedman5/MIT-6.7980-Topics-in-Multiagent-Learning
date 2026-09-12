@@ -34,6 +34,9 @@
     --rail-gutter: 2cm;
     --rail-left: max(24px, calc((100vw - var(--page-total))/2 - var(--rail-width) - var(--rail-gutter)));
     --page-top: 32px;
+    --sidenote-width: 210px;
+    --sidenote-gap: 32px;
+    --sidenote-offset: calc(var(--sidenote-width) + var(--sidenote-gap));
     --anchor-offset: 32px
 }
 
@@ -138,8 +141,8 @@ a:hover {
 .citation-note {
     float: right;
     clear: right;
-    width: 210px;
-    margin: .2rem calc(-234px - var(--sidenote-inset, 0px) - var(--sidenote-quote-inset, 0px)) .7rem calc(24px + var(--sidenote-inset, 0px) + var(--sidenote-quote-inset, 0px));
+    width: var(--sidenote-width);
+    margin: .2rem calc(-1 * var(--sidenote-offset) - var(--sidenote-inset, 0px) - var(--sidenote-quote-inset, 0px)) .7rem calc(var(--sidenote-gap) + var(--sidenote-inset, 0px) + var(--sidenote-quote-inset, 0px));
     color: var(--brown);
     font-family: var(--serif);
     font-size: .78rem;
@@ -160,9 +163,28 @@ a:hover {
     font-weight: 400
 }
 
+:is(.citation-note, .bib-entry) a:is([href^="https://"], [href^="http://"]) {
+    white-space: nowrap
+}
+
+.bib-entry a.bibliography-link-doi {
+    display: inline-flex;
+    align-items: baseline;
+    max-width: 100%;
+    white-space: normal
+}
+
+.bib-entry a.bibliography-link-doi > code {
+    min-width: 0
+}
+
+.bib-entry a.bibliography-link-doi::before {
+    flex-shrink: 0;
+    transform: translateY(.13em)
+}
+
 :is(.citation-note, .bib-entry) a:is([href^="https://"], [href^="http://"])::before,
 .permalink::before {
-    --link-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.1 0l3-3a5 5 0 0 0-7.1-7.1l-1.7 1.7M14 11a5 5 0 0 0-7.1 0l-3 3a5 5 0 0 0 7.1 7.1l1.7-1.7'/%3E%3C/g%3E%3C/svg%3E");
     content: "";
     display: inline-block;
     width: .95em;
@@ -172,6 +194,13 @@ a:hover {
     background-color: currentColor;
     -webkit-mask: var(--link-icon) center / contain no-repeat;
     mask: var(--link-icon) center / contain no-repeat
+}
+
+:is(.citation-note, .bib-entry) a:is([href^="https://"], [href^="http://"])::before {
+    --link-icon: url("data:image/svg+xml,%3Csvg xmlns='http%3A//www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cellipse cx='12' cy='12' rx='4.5' ry='10'/%3E%3Cpath d='M2 12h20M4 6.5c5 2 11 2 16 0M4 17.5c5-2 11-2 16 0'/%3E%3C/g%3E%3C/svg%3E");
+    width: 1em;
+    height: 1em;
+    vertical-align: -.13em
 }
 
 .citation-note-key {
@@ -240,8 +269,8 @@ figure[id],
 .course-sidenote {
     float: right;
     clear: right;
-    width: 210px;
-    margin: .1rem -234px 1rem 24px;
+    width: var(--sidenote-width);
+    margin: .1rem calc(-1 * var(--sidenote-offset)) 1rem var(--sidenote-gap);
     color: var(--muted);
     font-size: .78rem;
     line-height: 1.35;
@@ -251,8 +280,8 @@ figure[id],
 .lecture-citation-sidenote {
     float: right;
     clear: right;
-    width: 210px;
-    margin: 0 -234px 1.2rem 24px;
+    width: var(--sidenote-width);
+    margin: 0 calc(-1 * var(--sidenote-offset)) 1.2rem var(--sidenote-gap);
     color: var(--muted);
     font-size: .72rem;
     line-height: 1.28;
@@ -1372,11 +1401,12 @@ span[role="math"].math-katex-source {
 .wrapped-figure .footnote {
     position: absolute;
     float: none;
-    left: calc(100% + 24px + var(--sidenote-inset, 0px) + var(--sidenote-quote-inset, 0px));
+    left: calc(100% + var(--sidenote-gap) + var(--sidenote-inset, 0px) + var(--sidenote-quote-inset, 0px));
     margin: 0
 }
 
 figcaption {
+    position: relative;
     margin-top: .5rem;
     color: var(--ink);
     text-align: left
@@ -1392,7 +1422,10 @@ figcaption .figcaption-label {
 .notes-heading,
 .env.statement,
 .env.algorithm .env-title,
-.eqno {
+.eqno,
+.equation-block,
+.footnote,
+.endnotes > p {
     position: relative
 }
 
@@ -1429,7 +1462,6 @@ figcaption .figcaption-label {
 .lecture-content :hover > a.permalink,
 .lecture-content .rendered-figure:hover > figcaption a.permalink,
 .lecture-content .env.algorithm:hover > .env-title > a.permalink,
-.lecture-content .equation-line:hover > .eqno > a.permalink,
 .lecture-content a.permalink:focus-visible {
     opacity: 1;
     color: var(--accent)
@@ -1463,6 +1495,35 @@ figcaption .figcaption-label {
 
 .lecture-content .env.algorithm .env-title > a.permalink-gutter {
     top: .35rem
+}
+
+.lecture-content a.permalink-caption,
+.lecture-content a.permalink-note {
+    position: absolute;
+    top: 0;
+    right: 100%;
+    margin: 0;
+    padding-right: .2rem;
+    justify-content: flex-end;
+    height: 1.35em;
+    font-size: inherit
+}
+
+.lecture-content a.permalink-caption:focus-visible,
+.lecture-content a.permalink-note:focus-visible {
+    outline-offset: -2px
+}
+
+.lecture-content a.permalink-equation {
+    position: absolute;
+    top: 0;
+    left: calc(var(--equation-right, 100%) + var(--sidenote-inset, 0px) + var(--sidenote-quote-inset, 0px));
+    transform: translateY(-50%);
+    justify-content: flex-start;
+    margin: 0;
+    padding-left: .1rem;
+    width: 1rem;
+    height: 1.35em
 }
 
 .lecture-content .permalink-corner {
@@ -1580,8 +1641,8 @@ figcaption .figcaption-label {
 .footnote {
     float: right;
     clear: right;
-    width: 210px;
-    margin: .2rem calc(-234px - var(--sidenote-inset, 0px) - var(--sidenote-quote-inset, 0px)) .7rem calc(24px + var(--sidenote-inset, 0px) + var(--sidenote-quote-inset, 0px));
+    width: var(--sidenote-width);
+    margin: .2rem calc(-1 * var(--sidenote-offset) - var(--sidenote-inset, 0px) - var(--sidenote-quote-inset, 0px)) .7rem calc(var(--sidenote-gap) + var(--sidenote-inset, 0px) + var(--sidenote-quote-inset, 0px));
     color: var(--muted);
     font-size: .78rem;
     line-height: 1.35;
@@ -1716,7 +1777,7 @@ mark {
     border-radius: 2px
 }
 
-@media(max-width:1220px) {
+@media(max-width:1279px) {
 
     .citation-note,
     .footnote,
@@ -1750,9 +1811,9 @@ mark {
     }
 }
 
-@media(min-width:1260px) {
+@media(min-width:1280px) {
     .equation.is-overwide {
-        width: calc(100% + 234px);
+        width: calc(100% + var(--sidenote-offset));
         max-width: calc(100vw - 48px);
         overflow-x: auto
     }
@@ -1764,8 +1825,8 @@ mark {
     .rendered-figure figcaption {
         position: absolute;
         top: .2rem;
-        left: calc(100% + 24px);
-        width: 210px;
+        left: calc(100% + var(--sidenote-gap));
+        width: var(--sidenote-width);
         margin-top: 0;
         color: var(--muted);
         font-family: var(--serif);
@@ -1774,16 +1835,22 @@ mark {
         text-align: left
     }
 
+    .rendered-figure figcaption > a.permalink-caption,
+    .footnote > a.permalink-note {
+        /* Keep the whole gap hoverable while moving from the figure to its link. */
+        width: calc(var(--sidenote-gap) - .2rem)
+    }
+
     .env.statement .rendered-figure figcaption,
     .env.statement figure.typst figcaption,
     .env.proof .rendered-figure figcaption,
     .env.proof figure.typst figcaption {
         top: .2rem;
-        left: calc(100% + 24px + .85rem + 1px)
+        left: calc(100% + var(--sidenote-gap) + .85rem + 1px)
     }
 }
 
-@media(max-width:1259px) {
+@media(max-width:1279px) {
     .equation.is-overwide {
         overflow-x: auto;
         padding-right: 0
@@ -1848,7 +1915,9 @@ mark {
 
 @media(max-width:900px) {
 
-    .lecture-content a.permalink-gutter {
+    .lecture-content a.permalink-gutter,
+    .lecture-content a.permalink-caption,
+    .lecture-content a.permalink-note {
         width: 1rem;
         padding-right: .1rem
     }
@@ -1858,7 +1927,15 @@ mark {
         padding-right: .1rem
     }
 
-    .lecture-content a.permalink-gutter:focus-visible {
+    .lecture-content a.permalink-caption,
+    .lecture-content a.permalink-note {
+        font-size: min(1em, 1rem)
+    }
+
+    .lecture-content a.permalink-gutter:focus-visible,
+    .lecture-content a.permalink-caption:focus-visible,
+    .lecture-content a.permalink-note:focus-visible,
+    .lecture-content a.permalink-equation:focus-visible {
         outline-offset: -2px
     }
 

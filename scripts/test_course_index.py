@@ -179,8 +179,6 @@ class CourseIndexTests(unittest.TestCase):
         source = source.replace('title: "Topics in Multiagent Learning"', 'title: "Updated course title"')
         source = source.replace('Projects may be completed individually',
                                 'Projects showcase *student research* and may be completed individually')
-        source = source.replace('Defense oracles, the ellipsoid construction',
-                                '*Updated supplementary description*, the ellipsoid construction')
         with tempfile.NamedTemporaryFile(mode='w', suffix='.typ', dir=self.path.parent) as file:
             file.write(source)
             file.flush()
@@ -189,8 +187,7 @@ class CourseIndexTests(unittest.TestCase):
         html = render_index(config, self.modules)
         for expected in ('TEST-ROOM', '10:00–11:30', 'Improving material 35%',
                          'accounts for 35%', 'Project 45%', 'accounts for 45%',
-                         'Updated course title', '<strong>student research</strong>',
-                         '<strong>Updated supplementary description</strong>'):
+                         'Updated course title', '<strong>student research</strong>'):
             self.assertIn(expected, html)
         self.assertEqual(config['how_to_cite']['booktitle'], 'MIT Updated course title Lecture Notes')
         self.assertNotIn('assets/course/html-notes-collage.svg', html)

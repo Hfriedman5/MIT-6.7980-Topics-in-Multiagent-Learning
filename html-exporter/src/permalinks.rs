@@ -34,6 +34,20 @@ pub fn add_permalinks(body: &str) -> (String, HashMap<String, String>) {
         if child(&target, ".permalink").is_some() {
             continue;
         }
+        if target
+            .value()
+            .has_class("equation-line", scraper::CaseSensitivity::CaseSensitive)
+            && target
+                .ancestors()
+                .filter_map(ElementRef::wrap)
+                .any(|element| {
+                    element
+                        .value()
+                        .has_class("equation-block", scraper::CaseSensitivity::CaseSensitive)
+                })
+        {
+            continue;
+        }
         let (kind, description, fallback, host) = if target
             .value()
             .has_class("notes-heading", scraper::CaseSensitivity::CaseSensitive)
@@ -80,13 +94,11 @@ pub fn add_permalinks(body: &str) -> (String, HashMap<String, String>) {
                 .map(str::to_owned)
                 .unwrap_or_else(|| count.to_string());
             let description = format!("{kind} {number}");
-            let host = if kind == "algorithm" {
-                child(&target, ".algorithm .env-title").unwrap_or(target)
-            } else {
-                child(&target, ".figcaption-label")
-                    .or_else(|| child(&target, "figcaption"))
-                    .unwrap_or(target)
-            };
+            let host = target
+                .child_elements()
+                .find(|element| element.value().name() == "figcaption")
+                .or_else(|| child(&target, ".algorithm .env-title"))
+                .unwrap_or(target);
             (kind, description.clone(), slugify(&description), host)
         } else {
             let host = child(&target, ".eqno").unwrap();
@@ -148,22 +160,76 @@ pub fn add_permalinks(body: &str) -> (String, HashMap<String, String>) {
             ids.insert(id.clone(), target.id());
             Some(anchor_element(&id))
         };
-        let class =
-            if kind == "section" || kind == "algorithm" || target.value().name() == "section" {
-                "permalink permalink-gutter"
-            } else if host.id() == target.id() {
-                "permalink permalink-corner"
-            } else {
-                "permalink"
-            };
+        let in_caption = host.value().name() == "figcaption";
+        let equation = if kind == "equation" {
+            target
+                .ancestors()
+                .filter_map(ElementRef::wrap)
+                .find(|element| {
+                    element
+                        .value()
+                        .has_class("equation", scraper::CaseSensitivity::CaseSensitive)
+                })
+                .map(|element| element.id())
+        } else {
+            None
+        };
+        let class = if in_caption {
+            "permalink permalink-caption"
+        } else if kind == "equation" {
+            "permalink permalink-equation"
+        } else if kind == "section" || kind == "algorithm" || target.value().name() == "section" {
+            "permalink permalink-gutter"
+        } else if host.id() == target.id() {
+            "permalink permalink-corner"
+        } else {
+            "permalink"
+        };
         let link = empty_element(&format!(
             "<a class=\"{class}\" href=\"#{}\" aria-label=\"Permalink to {}\" title=\"Permalink to {}\"></a>",
             fragment_id(&id), escape_attr(&description), escape_attr(&description)
         ));
-        changes.push((host.id(), anchor_host.id(), native_anchors, alias, link));
+        changes.push((
+            host.id(),
+            anchor_host.id(),
+            native_anchors,
+            alias,
+            link,
+            in_caption,
+            equation,
+        ));
     }
 
-    for (host, anchor_host, native_anchors, alias, link) in changes {
+    // Add these after collecting the enclosing blocks, so a nested footnote
+    // never makes its enclosing theorem look as though it already has a link.
+    for note in dom.select(&Selector::parse(".footnote[id]").unwrap()) {
+        if child(&note, ".permalink-note").is_some() {
+            continue;
+        }
+        let Some(seq) = note
+            .value()
+            .id()
+            .and_then(|id| id.strip_prefix("fn-side-"))
+            .and_then(|seq| seq.parse::<usize>().ok())
+        else {
+            continue;
+        };
+        let number = child(&note, ".footnote-num")
+            .map(|number| element_text(&number))
+            .unwrap_or_else(|| seq.to_string());
+        changes.push((
+            note.id(),
+            note.id(),
+            Vec::new(),
+            None,
+            empty_element(&footnote_link(seq, &number)),
+            true,
+            None,
+        ));
+    }
+
+    let mut equation_blocks = HashMap::new();
+    for (host, anchor_host, native_anchors, alias, link, in_caption, equation) in changes {
         for (node_id, element) in native_anchors {
             *dom.tree.get_mut(node_id).unwrap().value() = element;
             dom.tree.get_mut(anchor_host).unwrap().prepend_id(node_id);
@@ -171,9 +237,31 @@ pub fn add_permalinks(body: &str) -> (String, HashMap<String, String>) {
         if let Some(alias) = alias {
             dom.tree.get_mut(anchor_host).unwrap().prepend(alias);
         }
-        dom.tree.get_mut(host).unwrap().append(link);
+        if let Some(equation) = equation {
+            // Keep the controls outside the formula's horizontal scroll area.
+            let block = *equation_blocks.entry(equation).or_insert_with(|| {
+                let block = dom
+                    .tree
+                    .get_mut(equation)
+                    .unwrap()
+                    .insert_before(empty_element("<div class=\"equation-block\"></div>"))
+                    .id();
+                dom.tree.get_mut(block).unwrap().append_id(equation);
+                block
+            });
+            dom.tree.get_mut(block).unwrap().append(link);
+        } else if in_caption {
+            dom.tree.get_mut(host).unwrap().prepend(link);
+        } else {
+            dom.tree.get_mut(host).unwrap().append(link);
+        }
     }
     (dom.root_element().inner_html(), heading_ids)
+}
+
+pub fn footnote_link(seq: usize, number: &str) -> String {
+    let description = escape_attr(&format!("Permalink to footnote {number}"));
+    format!("<a class=\"permalink permalink-note\" href=\"#fn-end-{seq}\" aria-label=\"{description}\" title=\"{description}\"></a>")
 }
 
 fn child<'a>(element: &ElementRef<'a>, selector: &str) -> Option<ElementRef<'a>> {
@@ -270,14 +358,23 @@ mod tests {
         let body = r##"<h2 class="notes-heading" id="loc-1" data-label="sec:idea" data-number="8.2"><span class="secno">8.2</span>An <em>idea</em> <a href="#loc-2">Theorem 1</a></h2>
 <section class="env statement" id="loc-2" data-label="thm:idea"><span id="theorem-l8-1"></span><p class="env-heading"><span class="env-title"><strong class="env-kind">Theorem</strong><strong class="env-number">L8.1</strong></span></p><div class="env-body">Proof.</div></section>
 <figure class="rendered-figure" id="loc-3" data-label="tab:notation" data-figure-kind="table" data-figure-number="1"><table><tr><td>A</td></tr></table><figcaption><span class="figcaption-label">Table 1.</span>Notation.</figcaption></figure>
-<figure class="rendered-figure" data-label="algo:cfr" data-figure-kind="algorithm" data-figure-number="2"><div class="figure-body"><section class="env algorithm"><p class="env-title">CFR</p></section></div></figure>"##;
+<figure class="rendered-figure" data-label="algo:cfr" data-figure-kind="algorithm" data-figure-number="2"><div class="figure-body"><section class="env algorithm"><p class="env-title">CFR</p></section></div><figcaption><span class="figcaption-label">Algorithm 2.</span>CFR caption.</figcaption></figure>"##;
         let (html, headings) = add_permalinks(body);
         let dom = Html::parse_fragment(&html);
         let links: Vec<_> = dom
             .select(&Selector::parse("a.permalink").unwrap())
             .collect();
         assert_eq!(links.len(), 4);
-        assert_eq!(dom.select(&Selector::parse(".notes-heading > .permalink-gutter, .env.statement > .permalink-gutter, .algorithm .env-title > .permalink-gutter").unwrap()).count(), 3);
+        assert_eq!(
+            dom.select(
+                &Selector::parse(
+                    ".notes-heading > .permalink-gutter, .env.statement > .permalink-gutter"
+                )
+                .unwrap()
+            )
+            .count(),
+            2
+        );
         assert_eq!(headings["loc-1"], "sec:idea");
         for id in [
             "loc-1",
@@ -301,10 +398,8 @@ mod tests {
         assert!(html.contains("<em>idea</em>"));
         assert_eq!(
             dom.select(
-                &Selector::parse(
-                    ".figcaption-label > .permalink, .algorithm .env-title > .permalink"
-                )
-                .unwrap()
+                &Selector::parse("figcaption > .permalink-caption:first-child + .figcaption-label")
+                    .unwrap()
             )
             .count(),
             2
@@ -313,6 +408,23 @@ mod tests {
             .iter()
             .all(|link| link.value().attr("aria-label").is_some()));
         assert_eq!(add_permalinks(&html).0, html);
+    }
+
+    #[test]
+    fn captionless_algorithms_keep_a_title_permalink() {
+        let (html, _) = add_permalinks(
+            r#"<figure class="rendered-figure" data-figure-kind="algorithm"><div class="figure-body"><section class="env algorithm"><div class="env-title">CFR</div></section></div></figure>"#,
+        );
+        let dom = Html::parse_fragment(&html);
+        assert_eq!(
+            dom.select(&Selector::parse(".algorithm > .env-title > .permalink-gutter").unwrap())
+                .count(),
+            1
+        );
+        assert_eq!(
+            dom.select(&Selector::parse("a.permalink").unwrap()).count(),
+            1
+        );
     }
 
     #[test]
@@ -353,7 +465,7 @@ mod tests {
         let (html, _) = add_permalinks(body);
         let dom = Html::parse_fragment(&html);
         assert_eq!(
-            dom.select(&Selector::parse(".eqno > .permalink").unwrap())
+            dom.select(&Selector::parse(".equation-block > .permalink").unwrap())
                 .count(),
             2
         );
@@ -369,6 +481,35 @@ mod tests {
         );
         assert!(html.contains("loc-8"));
         assert!(!html.contains("hidden"));
+        assert_eq!(add_permalinks(&html).0, html);
+        assert_eq!(
+            dom.select(&Selector::parse(".equation-block > .permalink-equation").unwrap())
+                .count(),
+            2
+        );
+    }
+
+    #[test]
+    fn nested_footnotes_get_links_without_suppressing_the_enclosing_statement() {
+        let (html, _) = add_permalinks(
+            r#"<section class="env statement"><p class="env-heading"><span class="env-kind">Theorem</span><span class="env-number">1</span></p><span class="footnote" id="fn-side-1"><span class="footnote-num">*</span>Some explanation.</span></section>"#,
+        );
+        let dom = Html::parse_fragment(&html);
+        assert_eq!(
+            dom.select(&Selector::parse(".statement > .permalink-gutter").unwrap())
+                .count(),
+            1
+        );
+        let link = dom
+            .select(&Selector::parse(".footnote > .permalink-note:first-child").unwrap())
+            .next()
+            .unwrap();
+        assert_eq!(link.value().attr("href"), Some("#fn-end-1"));
+        assert_eq!(
+            link.value().attr("aria-label"),
+            Some("Permalink to footnote *")
+        );
+        assert_eq!(add_permalinks(&html).0, html);
     }
 
     #[test]

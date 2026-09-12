@@ -693,6 +693,9 @@ fn rewrite_footnote_link_labels(body: &str) -> String {
         .replace_all(body, |captures: &Captures| {
             let whole = captures.get(0).map_or("", |m| m.as_str());
             let attrs = captures.name("attrs").map_or("", |m| m.as_str());
+            if attrs.contains("bibliography-link") {
+                return whole.to_owned();
+            }
             let Some(href) = extract_href_attr(attrs) else {
                 return whole.to_owned();
             };
@@ -916,6 +919,7 @@ fn render_document(
     }
     html.push_str(&document.body_html);
     html.push_str(&render_endnotes(&document.rendered_endnotes));
+    html.push_str("<noscript><style>.endnotes { display: block }</style></noscript>\n");
     html.push_str("</article>\n</main>\n");
     if current.is_some() {
         html.push_str(chapter_nav_script());
@@ -1228,7 +1232,8 @@ fn render_endnotes(notes: &[RenderedEndnote]) -> String {
         let seq = idx + 1;
         write!(
             out,
-            "<p id=\"fn-end-{seq}\"><a class=\"footnote-backref\" href=\"#fnref-{seq}\">{}</a><span class=\"footnote-body\">{}</span></p>\n",
+            "<p id=\"fn-end-{seq}\">{}<a class=\"footnote-backref\" href=\"#fnref-{seq}\">{}</a><span class=\"footnote-body\">{}</span></p>\n",
+            permalinks::footnote_link(seq, &note.number),
             escape_html(&note.number),
             note.body_html
         )
@@ -1451,6 +1456,18 @@ fn equation_width_script() -> &'static str {
       var needed = equationNeededWidth(eq);
       if (needed > available + 2) eq.classList.add("is-overwide");
     });
+    document.querySelectorAll(".equation-block").forEach(function(block){
+      var box = block.getBoundingClientRect();
+      var equation = block.querySelector(":scope > .equation");
+      block.style.setProperty("--equation-right", `${equation.getBoundingClientRect().right - box.left}px`);
+      block.querySelectorAll(":scope > .permalink-equation").forEach(function(link){
+        var target = document.getElementById(decodeURIComponent(link.hash.slice(1)));
+        var number = target?.closest(".eqno") || block.querySelector(".eqno");
+        if (!number) return;
+        var rect = number.getBoundingClientRect();
+        link.style.top = `${rect.top + rect.height / 2 - box.top}px`;
+      });
+    });
     document.querySelectorAll(".lecture-table").forEach(function(wrapper){
       var table = wrapper.querySelector("table");
       wrapper.classList.toggle("has-overflow", !!table && table.scrollWidth > table.clientWidth + 2);
@@ -1480,6 +1497,14 @@ fn settled_hash_scroll_script() -> &'static str {
       target = document.getElementById(decodeURIComponent(raw));
     } catch (_) {
       target = document.getElementById(raw);
+    }
+    // Footnotes have a margin copy on desktop and an endnote on narrow pages.
+    // Share one URL while selecting whichever copy is currently visible.
+    if (target?.id.startsWith("fn-end-")) {
+      const side = document.getElementById(target.id.replace("fn-end-", "fn-side-"));
+      if (side?.getClientRects().length) return side;
+    } else if (target?.id.startsWith("fn-side-") && !target.getClientRects().length) {
+      return document.getElementById(target.id.replace("fn-side-", "fn-end-"));
     }
     // Native equate line labels live on hidden metadata spans. Scroll to the
     // visible equation number, including rows laid out with display:contents.
@@ -2110,6 +2135,12 @@ mod tests {
             body.contains(r##"<a class="citation" href="#bib-new" role="doc-biblioref">NEW</a>"##)
         );
         assert!(body.contains(r#"<a href="https://doi.org/10.1/example" role="doc-biblioref">DOI</a>"#));
+    }
+
+    #[test]
+    fn footnote_bibliography_links_keep_their_compact_label() {
+        let link = r#"<a class="bibliography-link" href="https://doi.org/10.1126/science.aay2400">link</a>"#;
+        assert_eq!(rewrite_footnote_link_labels(link), link);
     }
 
     #[test]

@@ -208,7 +208,7 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
 <section id="schedule" class="course-schedule" aria-labelledby="schedule-title">
   <h2 id="schedule-title">Schedule &amp; lecture notes</h2>
   {''.join(sections)}
-  <section class="supplementary-section" aria-labelledby="supplementary-title"><h3 id="supplementary-title">Supplementary reading</h3><ul class="supplementary-list">{supplementary}</ul>{paragraphs(prose['supplementary-minimax']) if 'supplementary-minimax' in prose else ''}</section>
+  <section class="supplementary-section" aria-labelledby="supplementary-title"><h3 id="supplementary-title">Supplementary reading</h3><ul class="supplementary-list">{supplementary}</ul></section>
   <section id="improving-material" class="improving-material" aria-labelledby="improving-material-title">
     <h2 id="improving-material-title">Improving Material</h2>
     {paragraphs(prose['improving-intro'])}

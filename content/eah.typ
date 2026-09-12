@@ -118,8 +118,6 @@ The above argument mostly uses ideas from convex optimization. In particular, it
 
 The Ellipsoid-Against-Hope algorithm can then be applied and has polynomial complexity in $sum_i^n d_i$, oracle costs, encoding and geometric bounds, and $log \( 1 \/ epsilon.alt \)$. Applications include polymatrix games and finite perfect-recall extensive-form games; a succinct game representation must be checked for the required oracles before applying the result. We will see some of these games later in this course.
 
-#lecture-link("fast_minimax", none)[] develops the precision guarantee and the extension to richer deviation families.
-
 = Bibliographic remarks
 
 If you are curious to read more, the following papers contains extensions and refinements of the idea of Ellipsoid-Against-Hope.

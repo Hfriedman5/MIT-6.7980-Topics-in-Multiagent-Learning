@@ -127,12 +127,6 @@
       "short_title": "Phi-regret minimization",
       "supplementary": true,
       "syllabus_ids": []
-    },
-    {
-      "source": "content/fast_minimax.typ",
-      "short_title": "Fast computation via the minimax theorem",
-      "supplementary": true,
-      "syllabus_ids": []
     }
   ]
 }
