@@ -160,7 +160,8 @@ a:hover {
     font-weight: 400
 }
 
-:is(.citation-note, .bib-entry) a:is([href^="https://"], [href^="http://"])::before {
+:is(.citation-note, .bib-entry) a:is([href^="https://"], [href^="http://"])::before,
+.permalink::before {
     --link-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 13a5 5 0 0 0 7.1 0l3-3a5 5 0 0 0-7.1-7.1l-1.7 1.7M14 11a5 5 0 0 0-7.1 0l-3 3a5 5 0 0 0 7.1 7.1l1.7-1.7'/%3E%3C/g%3E%3C/svg%3E");
     content: "";
     display: inline-block;
@@ -1387,6 +1388,95 @@ figcaption .figcaption-label {
     font-weight: var(--environment-label-weight)
 }
 
+.notes-heading,
+.env.statement,
+.env.algorithm .env-title,
+.eqno {
+    position: relative
+}
+
+.permalink-anchor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    scroll-margin-top: var(--anchor-offset)
+}
+
+.lecture-content a.permalink {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-left: .2rem;
+    vertical-align: -.2rem;
+    color: var(--muted);
+    opacity: 0;
+    font-size: .85rem;
+    line-height: 1;
+    border-radius: 3px;
+    text-decoration: none
+}
+
+.permalink::before {
+    --link-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='5' r='3'/%3E%3Cpath d='M12 8v13M8 12h8M3 12v3a9 6 0 0 0 18 0v-3M3 12l3 3M21 12l-3 3'/%3E%3C/g%3E%3C/svg%3E");
+    margin: 0
+}
+
+.lecture-content :hover > a.permalink,
+.lecture-content .rendered-figure:hover > figcaption a.permalink,
+.lecture-content .env.algorithm:hover > .env-title > a.permalink,
+.lecture-content .equation-line:hover > .eqno > a.permalink,
+.lecture-content a.permalink:focus-visible {
+    opacity: 1;
+    color: var(--accent)
+}
+
+.lecture-content a.permalink:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px
+}
+
+.lecture-content a.permalink-gutter {
+    position: absolute;
+    top: .15em;
+    right: 100%;
+    margin: 0;
+    padding-right: .25rem
+}
+
+.lecture-content .notes-heading > a.permalink-gutter {
+    font-size: .8em;
+    height: 1.5em;
+    top: 0;
+    /* Leave room for the heading's vertical marker. The padding also keeps
+       the hover area continuous while moving from the text to the icon. */
+    padding-right: 1.25rem
+}
+
+.lecture-content .env.statement > a.permalink-gutter {
+    top: .42rem
+}
+
+.lecture-content .env.algorithm .env-title > a.permalink-gutter {
+    top: .35rem
+}
+
+.lecture-content .permalink-corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: var(--paper)
+}
+
+@media print {
+    .lecture-content a.permalink {
+        display: none
+    }
+}
+
 .typst-frame {
     max-width: 100%;
     height: auto
@@ -1756,6 +1846,20 @@ mark {
 }
 
 @media(max-width:900px) {
+
+    .lecture-content a.permalink-gutter {
+        width: 1rem;
+        padding-right: .1rem
+    }
+
+    .lecture-content .notes-heading > a.permalink-gutter {
+        font-size: min(.8em, 1rem);
+        padding-right: .1rem
+    }
+
+    .lecture-content a.permalink-gutter:focus-visible {
+        outline-offset: -2px
+    }
 
     .lecture-content h1::before,
     .lecture-content h2::before,

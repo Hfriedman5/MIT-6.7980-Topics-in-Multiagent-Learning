@@ -195,13 +195,14 @@
   ]
 }
 
-#let render-equation-line(line, index, number: none, anchor: [], numbered: false, aligned: false) = {
+#let render-equation-line(line, index, number: none, anchor: [], label-name: none, numbered: false, aligned: false) = {
   let has-alignment = line.any(is-align-point)
   let class = "equation-line" + if numbered { " is-numbered" } else { " is-unnumbered" } + if has-alignment { " has-alignment" } else { "" }
   let line-body = line.join()
   html.elem("div", attrs: (
     class: class,
     "data-line": str(index + 1),
+    ..if label-name != none { ("data-label": label-name) } else { (:) },
     ..math-data-attrs(line-body, "block"),
   ))[
     #if aligned {
@@ -359,6 +360,7 @@
           i,
           number: number,
           anchor: anchor,
+          label-name: if label-name != none { label-name } else if i == 0 and it.has("label") { str(it.label) } else { none },
           numbered: sub-number != none,
           aligned: has-alignment,
         )

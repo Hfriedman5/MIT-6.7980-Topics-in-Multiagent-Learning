@@ -1,6 +1,7 @@
 mod chapters;
 mod math;
 mod options;
+mod permalinks;
 
 use chapters::{ChapterNav, ExportConfig};
 use math::MathMode;
@@ -56,7 +57,13 @@ fn run() -> Result<(), String> {
     document.rewrite_statement_ids();
     let (body_html, rendered_endnotes) =
         postprocess_body(document.body_html, &document.endnotes, config.math_mode)?;
+    let (body_html, heading_ids) = permalinks::add_permalinks(&body_html);
     document.body_html = body_html;
+    for heading in &mut document.headings {
+        if let Some(id) = heading_ids.get(&heading.id) {
+            heading.id = id.clone();
+        }
+    }
     document.rendered_endnotes = rendered_endnotes;
 
     let html = render_document(&config, &title, &document, export_config.as_ref());
@@ -1173,7 +1180,7 @@ fn render_rail_section_link(heading: &Heading, math_mode: MathMode) -> String {
     format!(
         "<a class=\"lecture-section-link lecture-section-l{}\" href=\"#{}\" data-section-link=\"{}\"><span class=\"lecture-section-no\">{}</span><span class=\"lecture-section-title\">{}</span></a>\n",
         heading.level,
-        escape_attr(&heading.id),
+        permalinks::fragment_id(&heading.id),
         escape_attr(&heading.id),
         escape_html(&heading.number),
         render_heading_title(heading, math_mode)
@@ -1187,7 +1194,7 @@ fn render_toc(headings: &[Heading], math_mode: MathMode) -> String {
             out,
             "<li class=\"toc-l{}\"><a href=\"#{}\"><span class=\"toc-no\">{}</span><span class=\"toc-title\">{}</span></a></li>\n",
             heading.level,
-            escape_attr(&heading.id),
+            permalinks::fragment_id(&heading.id),
             escape_html(&heading.number),
             render_heading_title(heading, math_mode)
         )
@@ -1283,7 +1290,7 @@ fn chapter_nav_script() -> &'static str {
     const y = window.scrollY + 130;
     let current = sections[0]?.id;
     for (const section of sections) {
-      if (section.offsetTop <= y) current = section.id;
+      if (section.getBoundingClientRect().top + window.scrollY <= y) current = section.id;
       else break;
     }
     if (current) setActive(current);
@@ -1444,11 +1451,18 @@ fn settled_hash_scroll_script() -> &'static str {
   function hashTarget(){
     const raw = window.location.hash ? window.location.hash.slice(1) : "";
     if (!raw) return null;
+    let target;
     try {
-      return document.getElementById(decodeURIComponent(raw));
+      target = document.getElementById(decodeURIComponent(raw));
     } catch (_) {
-      return document.getElementById(raw);
+      target = document.getElementById(raw);
     }
+    // Native equate line labels live on hidden metadata spans. Scroll to the
+    // visible equation number, including rows laid out with display:contents.
+    if (target?.matches(".equation-anchor[hidden]")) {
+      return target.closest(".equation-line")?.querySelector(".eqno") || target.closest(".equation");
+    }
+    return target;
   }
 
   function anchorOffset(){
@@ -1460,11 +1474,11 @@ fn settled_hash_scroll_script() -> &'static str {
     return target.getBoundingClientRect().top - anchorOffset();
   }
 
-  function scrollToTarget(target){
+  function scrollToTarget(target, behavior){
     const top = target.getBoundingClientRect().top + window.pageYOffset - anchorOffset();
     const y = Math.max(0, top);
     try {
-      window.scrollTo({ top: y, left: 0, behavior: "smooth" });
+      window.scrollTo({ top: y, left: 0, behavior });
     } catch (_) {
       window.scrollTo(0, y);
     }
@@ -1502,7 +1516,8 @@ fn settled_hash_scroll_script() -> &'static str {
     window.requestAnimationFrame(tick);
   }
 
-  function scheduleHashScroll(){
+  function scheduleHashScroll(behavior = "smooth"){
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) behavior = "instant";
     const target = hashTarget();
     if (!target) return;
     const current = ++version;
@@ -1511,19 +1526,19 @@ fn settled_hash_scroll_script() -> &'static str {
         if (current !== version) return;
         const target = hashTarget();
         if (!target) return;
-        scrollToTarget(target);
+        scrollToTarget(target, behavior);
         window.setTimeout(function(){
           if (current === version) {
             const target = hashTarget();
-            if (target && Math.abs(targetDistance(target)) > 1) scrollToTarget(target);
+            if (target && Math.abs(targetDistance(target)) > 1) scrollToTarget(target, "instant");
           }
-        }, 160);
+        }, behavior === "instant" ? 160 : 1500);
       });
     });
   }
 
-  scheduleHashScroll();
-  window.addEventListener("hashchange", scheduleHashScroll);
+  scheduleHashScroll("instant");
+  window.addEventListener("hashchange", () => scheduleHashScroll());
 })();
 </script>
 "#

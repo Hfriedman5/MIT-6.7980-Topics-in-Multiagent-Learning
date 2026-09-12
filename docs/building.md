@@ -244,6 +244,26 @@ notes and their navigation with the new session numbers and dates.
 For exporter development, `python3 scripts/course_index.py --resolve-only`
 refreshes the generated configuration without rewriting the website or PDFs.
 
+## Permalinks
+
+Lecture HTML exposes anchor icons on sections (including unnumbered
+headings), figures, tables, algorithms, theorem-style statements, and numbered
+equations. Icons appear on hover or keyboard focus. Section and environment
+icons sit in the left margin; figure and table icons sit beside their caption
+labels. Click an icon to navigate to its anchor, or use the browser's
+“Copy link address” action to share it. These are ordinary links and work
+without JavaScript.
+
+Authored Typst labels become the permalink fragment, including labels containing
+colons or Unicode: `<tab:notation>` produces `#tab:notation`. Whitespace in a
+label becomes a hyphen to keep the HTML ID valid. Labels are
+exported even when nothing references them. Keep a label unchanged when moving
+or renumbering an item to keep its permalink stable. Without a label, the
+exporter uses the heading title or the item's kind and number, adding a suffix
+for duplicates. Native Typst targets and existing numbered statement anchors
+remain available, so existing references continue to resolve. The lecture
+outline uses the same section anchors as the permalink icons.
+
 ## Figures
 
 All active figure dependencies live in `content/figures/<topic>/`, normally

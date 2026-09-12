@@ -166,6 +166,7 @@
     let anchor = if it.has("label") and str(it.label).match(regex("^[a-zA-Z][a-zA-Z0-9_-]*$")) != none {
       (id: str(it.label))
     } else { (:) }
+    let permalink = if it.has("label") { ("data-label": str(it.label)) } else { (:) }
     if it.numbering != none {
       let number = html-text(counter(heading).display())
       html.elem(tag, attrs: (
@@ -173,6 +174,7 @@
         "data-level": str(it.level),
         "data-number": number,
         ..anchor,
+        ..permalink,
       ))[
         #html.elem("span", attrs: (class: "secno"))[#counter(heading).display()]
         #it.body
@@ -182,6 +184,7 @@
         class: "notes-heading notes-heading-unnumbered",
         "data-level": str(it.level),
         ..anchor,
+        ..permalink,
       ))[
         #it.body
       ]
@@ -347,12 +350,22 @@
 
   // for styling, use `where` to assign classes for different types of figure
   show figure: it => {
+    // Preserve authored labels even when Typst has no reference that would
+    // cause it to emit an ID. The exporter also keeps every native link target.
+    let permalink = if it.has("label") { ("data-label": str(it.label)) } else { (:) }
     if it.kind == math.equation and it.body != none and it.body.func() == metadata {
       html.elem("span", attrs: (class: "equation-anchor", hidden: ""))[]
     } else if it.kind == "shared" {
-      html.elem("section", attrs: (class: "env statement"), it.body)
+      html.elem("section", attrs: (class: "env statement", ..permalink), it.body)
     } else {
-      html.elem("figure", attrs: (class: "typst"))[
+      let kind = if it.kind == "algorithm" { "algorithm" } else if it.kind == table { "table" } else { "figure" }
+      let number = if it.numbering != none { html-text(numbering(it.numbering, ..it.counter.get())) } else { "" }
+      html.elem("figure", attrs: (
+        class: "typst",
+        "data-figure-kind": kind,
+        "data-figure-number": number,
+        ..permalink,
+      ))[
         #html.elem("div", attrs: (class: "figure-body"))[
           #render-figure-body(it.body, kind: it.kind)
         ]

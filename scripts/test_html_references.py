@@ -19,11 +19,14 @@ class ReferencePage(HTMLParser):
         self.references = []
         self.current_reference = None
         self.headings = []
+        self.labeled_elements = {}
         self.current_heading = None
         self.feed(html)
 
     def handle_starttag(self, tag, attributes):
         attrs = dict(attributes)
+        if 'data-label' in attrs:
+            self.labeled_elements[attrs['data-label']] = (tag, attrs)
         if 'id' in attrs:
             self.ids.add(attrs['id'])
         if self.current_reference is not None:
@@ -140,6 +143,27 @@ The proof.
         self.assertEqual([''.join(parts) for parts in page.headings],
                          ['L5.A Appendix: Proof of Theorem\u00a0L5.1'])
         self.assert_local_targets_exist(page)
+
+    def test_unreferenced_labels_are_exported_for_permalinks(self):
+        page = self.compile('''
+#show: gabri_notes.with(lec_num: 8, title: [Permalink probe])
+= Section <sec:overview>
+#heading(numbering: none)[Further reading] <sec:reading>
+#theorem[A statement.] <thm:result>
+#figure(table(columns: 2, [A], [B]), caption: [Notation.]) <tab:notation>
+#pseudocode(numbered-title: [CFR], [Continue.]) <algo:cfr>
+$ a &= b #label("eq:first") \\
+  c &= d #label("eq:second") $
+$ x = y $ <eq:whole>
+''')
+        for label in ('sec:overview', 'sec:reading', 'thm:result',
+                      'tab:notation', 'algo:cfr', 'eq:first', 'eq:second', 'eq:whole'):
+            self.assertIn(label, page.labeled_elements)
+        for label, kind in (('tab:notation', 'table'), ('algo:cfr', 'algorithm')):
+            tag, attrs = page.labeled_elements[label]
+            self.assertEqual(tag, 'figure')
+            self.assertEqual(attrs['data-figure-kind'], kind)
+            self.assertEqual(attrs['data-figure-number'], '1')
 
 
 if __name__ == '__main__':
