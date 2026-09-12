@@ -37,7 +37,7 @@ As a reminder, constructing a regret minimizer for $Delta(A)$ means that we need
   where $vg^((t)) in  RR^n$ is the vector that defines the linear function (called with the letter $vg$ to suggest the idea of it being the "_gradient vector_") and $ip(dot, dot)$ denotes the standard _dot_ product. Since the utility in the game cannot be unbounded, we assume that the $vg^((t))$ can be arbitrary but _bounded in norm_.
 In this notation, the (external) _regret_ is defined as the quantity
 $
-  "Reg"^((T)) := max_(xhat in Delta(A)) {sum_(t=1)^T ip(vg^((t)),xhat) - ip(vg^((t)), vx^((t)))}.
+  "Reg"^((T)) := max_(xhat in Delta(A)) {sum_(t=1)^T (ip(vg^((t)),xhat) - ip(vg^((t)), vx^((t))))}.
 $
 Our goal is to make sure that the regret grows sublinearly in $T$ no matter the utility vectors $vg^((t))$ chosen by the environment.
 
@@ -134,9 +134,9 @@ side: right, text-width: 50%,
 )
 
 #theorem[Regret bound for RM][
-  The Regret Matching algorithm (@algo-rm) is an external regret minimizer, and satisfies the regret bound $"Reg"^((T)) <= Omega(sqrt(T))$, where $Omega$ is the maximum norm of $norm(vg^((t)) - ip(vg^((t)),vx^((t))) bold(1))_2$ up to time $T$.
+  The Regret Matching algorithm (@algo-rm) is an external regret minimizer, and satisfies the regret bound $"Reg"^((T)) <= Omega sqrt(T)$, where $Omega$ is the maximum norm of $norm(vg^((t)) - ip(vg^((t)),vx^((t))) bold(1))_2$ up to time $T$.
 
-  In particular, if all the gradient vectors satisfy $norm(vg^((t)))_oo <= 1$ at all times $t$ then the regret satisfies $ "Reg"^((T)) <= sqrt(T dot |A|). $
+  In particular, if all the gradient vectors satisfy $norm(vg^((t)))_oo <= 1$ at all times $t$ then the regret satisfies $ "Reg"^((T)) <= 2 sqrt(T dot |A|). $
 ]
 #proof[
   We start by observing that, at all times $t$,
@@ -173,7 +173,7 @@ side: right, text-width: 50%,
     "Reg"^((T)) = max_(a in A) vr^((T))_a <= max_(a in A) #[~]\[ vr^((T))_a \]^+ <= norm(\[vr^((T))\]^+)_2 <= Omega sqrt(T).
   $
   The proof of the first part is then complete. The second part then just follows from using the inequality
-  $ Omega <= norm(g^((t)) - ip(g^((t)), x^((t)))bold(1))_2 <= norm(g^((t)))_2 <= sqrt(|A|) dot norm(g^((t)))_oo. $
+  $ Omega = max_(t<=T) norm(g^((t)) - ip(g^((t)), x^((t)))bold(1))_2 <= 2 sqrt(|A|) max_(t<=T) norm(g^((t)))_oo. $
   #v(-6mm)
 ]
 
@@ -195,7 +195,7 @@ With a simple modification to the analysis of RM, the same bound as RM can be pr
 #theorem[Regret bound for RM#super[+]][
   The RM#super[+] algorithm (@algo-rmp) is an external regret minimizer, and satisfies the regret bound $"Reg"^((T)) <= Omega sqrt(T)$, where $Omega$ is the maximum norm $norm(vg^((t)) - ip(vg^((t)),vx^((t))) bold(1) )_2$ up to time $T$.
 
-  So again, if all the gradient vectors satisfy $norm(vg^((t)))_oo <= 1$ at all times $t$ then the regret satisfies $ "Reg"^((T)) <= sqrt(T dot |A|). $
+  So again, if all the gradient vectors satisfy $norm(vg^((t)))_oo <= 1$ at all times $t$ then the regret satisfies $ "Reg"^((T)) <= 2 sqrt(T dot |A|). $
 
 ]
 
@@ -206,7 +206,7 @@ With a simple modification to the analysis of RM, the same bound as RM can be pr
 If we replace the "hard" maximum of follow-the-leader with the "soft" maximum given by
 
 $
-  x_a^((t)) &= "softmax"_a(eta r^((t))) \
+  x_a^((t+1)) &= "softmax"_a(eta r^((t))) \
   &:= exp(eta r_a^((t))) / (sum_(j=1)^m exp(eta r^((t))[j])),
 $
 where $eta > 0$ is an inverse temperature parameter, then we obtain the _multiplicative weights update_ algorithm #citep(<freund1997decision>).
@@ -240,7 +240,7 @@ Compared to RM, MWU has a different flavor: it uses _softmax_ instead of ReLU. T
   $
   no matter the sequence of gradient vectors $g^((t))$ chosen by the environment. In particular, if all the gradient vectors satisfy $norm(g^((t)))_oo <= 1$ at all times $t$ and $eta = sqrt(log |A|\/ T)$, the regret satisfies
 
-  $ "Reg"^((T)) <= sqrt(T log |A|). $
+  $ "Reg"^((T)) <= 2 sqrt(T log |A|). $
 ]<mwu-regret-bound>
 We will see the proof of @mwu-regret-bound in the next lecture, as a reflection of a substantially more general framework.
 
@@ -251,9 +251,9 @@ For now, we remark a crucial aspect of MWU. Compared with the regret bound of RM
 Finally, we turn our attention to the third way of obtaining no-regret algorithms, that is, by considering a regularized (i.e., smoothed) version of the follow-the-leader algorithm discussed above. The idea is that, instead of playing by always putting 100% of the probability mass on the action with highest cumulated regret, we look for the distribution that maximizes the expected cumulated regret, _minus_ some regularization term that prevents us from putting all the mass on a single action.
 
 #definition[Distance-generating function for a set][
-  A differentiable function $psi : Delta(A) -> RR$ is a _distance-generating function_ for the set $cX$ if it is $1$-strongly convex on $cX$, that is,
-  $ (nabla f(vx) - nabla f(vx'))^top (vx - vx') >= norm(vx - vx')^2 qquad forall vx,vx' in cX $
-  with respect to some norm $norm(dot.c)$. For the purposes of this lecture, we will also assume that the function attains minimum is in the relative interior of $Delta(A)$.
+  A function $psi : cX -> RR$, differentiable on the relative interior, is a _distance-generating function_ if it is $1$-strongly convex with respect to a specified norm. At points where the gradients exist, this means
+  $ (nabla psi(vx) - nabla psi(vx'))^top (vx - vx') >= norm(vx - vx')^2 qquad forall vx,vx' in "ri"(cX) $
+  with respect to some norm $norm(dot.c)$. Bregman divergences below are evaluated where their second argument is differentiable. Initialize the algorithms at a minimizer of $psi$; for entropy on the simplex this is the uniform distribution.
 ]
 
 == FTRL in the normal-form case
@@ -301,13 +301,13 @@ FTRL and OMD apply well beyond the case of probability simplices. In fact, they 
   $ vx^((t)) := argmax_(xhat in cX) {ip(sum_(tau=1)^(t-1) vg^((tau)), xhat) - 1 / eta psi(xhat)}. $
 ]
 #definition[OMD, general version][
-  The OMD algorithm produces strategies $vx^((t))$ by solving the optimization problem
-  $ vx^((t)) := argmax_(xhat in cX) {ip(vg^((t-1)), xhat) - 1 / eta div(xhat, x^((t)), dgf: psi)}. $
+  For $t>=2$, after initializing $vx^((1))$ as above, the OMD algorithm produces strategies $vx^((t))$ by solving the optimization problem
+  $ vx^((t)) := argmax_(xhat in cX) {ip(vg^((t-1)), xhat) - 1 / eta div(xhat, x^((t-1)), dgf: psi)}. $
 ]
 
 We also remark the following connection between the two algorithms.
 
-#remark[When $psi$ is a Legendre regularizer (that is, the gradients of $psi$ go to infinity at the boundary of $cX$), the OMD algorithm is equivalent to the FTRL algorithm.]
+#remark[For linear utilities and a fixed learning rate, FTRL and OMD agree when the mirror updates stay in the interior of the regularizer's domain without additional active constraints. Their dual-coordinate updates then telescope. Entropy on the simplex is an example (working within its affine hull). With additional constraints, the required projections can make the two algorithms different.]
 
 We mention the following regret bound for the general case. We will mention an even more powerful result next time.
 
@@ -316,9 +316,9 @@ We mention the following regret bound for the general case. We will mention an e
   $
     "Reg"^((
       T
-    )) <= max_(x,x' in cX)( psi(x') - psi(x) ) / ( eta ) + eta sum_(t=1)^T norm(vg^((t)))_*^2 - 1 / (8 eta) sum_(t=2)^T norm(x^((t)) - x^((t-1)))^2,
+    )) <= B / eta + eta sum_(t=1)^T norm(vg^((t)))_*^2 - 1 / (8 eta) sum_(t=2)^T norm(x^((t)) - x^((t-1)))^2,
   $
-  where $norm(dot.c)_*$ is the dual norm of $norm(dot.c)$.
+  where $B=max_(x in cX) psi(x)-min_(x in cX) psi(x)$ for FTRL, and $B=max_(x in cX) div(x,x^((1)),dgf:psi)$ for OMD. The latter reduces to the former when the initial minimizer lies in the relative interior. We assume these quantities are finite. As above, $norm(dot.c)_*$ is the dual norm.
   In particular, if the norm of the gradient vectors is bounded, then by picking learning rate $eta = 1/sqrt(T)$, we obtain that $"Reg"^((T))$ is bounded as roughly $sqrt(T)$ (a sublinear function!) at all times $T$.
 ] <ftrl-omd-regret-bound>
 
@@ -355,7 +355,7 @@ In the special case in which $psi(x) := 1/2 norm(x)_2^2$, then the OMD algorithm
   The online projected gradient ascent algorithm is the special case of OMD in which the regularizer is (half) the squared Euclidean norm, that is, $psi(x) = 1/2 norm(x)_2^2$. The choice of strategy is given by
   $
     vx^((t)) = argmax_(xhat in cX) {
-      ip(vg^((t-1)), xhat) - 1 / eta norm(xhat - vx^((t-1)))_2^2
+      ip(vg^((t-1)), xhat) - 1 / (2 eta) norm(xhat - vx^((t-1)))_2^2
     } = #text(size: 14pt, $Pi$)_(cX)(vx^((t-1)) + eta vg^((t-1))).
   $
 ]
@@ -363,13 +363,10 @@ In the special case in which $psi(x) := 1/2 norm(x)_2^2$, then the OMD algorithm
 Since the squared Euclidean norm is $1$-strongly convex with respect to the $ell_2$ norm, the regret bound for OGD can be derived from the general bound for OMD (@ftrl-omd-regret-bound) and is as follows.
 
 #theorem[Regret bound for OGD][
-  The regret cumulated by the OGD algorithm can be upper bounded as
-  $
-    "Reg"^((T)) <= 1 / eta + eta sum_(t=1)^T norm(g^((t)))_2^2 - 1 / (8 eta) sum_(t=2)^T norm(x^((t)) - x^((t-1)))_2^2,
-  $
-  no matter the sequence of gradient vectors $g^((t))$ chosen by the environment. In particular, if all the gradient vectors satisfy $norm(g^((t)))_oo <= 1$ at all times $t$ and $eta = sqrt(|A|\/ T)$, the regret satisfies
-
-  $ "Reg"^((T)) <= sqrt(T |A|). $
+  Let $D$ be the Euclidean diameter of $cX$. With any initial point in $cX$, projected gradient ascent satisfies
+  $ "Reg"^((T)) <= D^2/(2 eta) + eta/2 sum_(t=1)^T norm(g^((t)))_2^2. $
+  On the simplex, $D <= sqrt(2)$. If $norm(g^((t)))_oo <= 1$, then $norm(g^((t)))_2^2 <= |A|$. Choosing $eta=sqrt(2/(T|A|))$ therefore gives
+  $ "Reg"^((T)) <= sqrt(2T|A|). $
 ]<ogd-regret-bound>
 
 The next plots illustrate the behavior of OGD and MWU in a simple $2 times 2$ game.

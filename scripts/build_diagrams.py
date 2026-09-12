@@ -15,6 +15,21 @@ def build_diagrams(root: Path = ROOT) -> None:
             ], cwd=root, check=True)
         print(f'Diagram: {topic}/{name}', flush=True)
 
+    source = root / 'content/figures/perfection/uniform_game.typ'
+    subprocess.run([
+        'typst', 'compile', '--root', str(root), str(source),
+        str(source.with_suffix('.svg')),
+    ], cwd=root, check=True)
+    print('Diagram: perfection/uniform_game', flush=True)
+
+    for name in ('kernelized/tree', 'tfnp/complexity_classes'):
+        source = root / 'content/figures' / (name + '.typ')
+        subprocess.run([
+            'typst', 'compile', '--root', str(root), str(source),
+            str(source.with_suffix('.svg')),
+        ], cwd=root, check=True)
+        print(f'Diagram: {name}', flush=True)
+
     directory = root / 'content/figures/ppad_completeness'
     for gate in ('assignment', 'constant', 'addition', 'subtraction',
                  'multiplication', 'comparison'):

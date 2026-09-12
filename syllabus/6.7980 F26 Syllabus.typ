@@ -279,7 +279,7 @@ The project is the central component of the course and accounts for #course.grad
   lecture(
     "kernelized",
     [High-dimensional games],
-    description: [Learning with large strategy spaces. Kernelized methods and multiplicative weights.],
+    description: [Combinatorial games, vertex MWU, and the 0/1-polyhedral kernel. Efficient kernels and sequence-form learning.],
     instructor: [Constantinos Daskalakis],
   ),
   lecture(
@@ -292,7 +292,7 @@ The project is the central component of the course and accounts for #course.grad
   lecture(
     "tfnp",
     [Total search and TFNP],
-    description: [Total search problems, the TFNP framework, and the PPAD complexity class.],
+    description: [Total search and polynomially verifiable witnesses. Succinct End-of-Line reductions and the PPAD complexity class.],
     instructor: [Constantinos Daskalakis],
   ),
   lecture(
@@ -334,3 +334,9 @@ The project is the central component of the course and accounts for #course.grad
 )
 
 #schedule(class-dates, outline, hide-instructors: true)
+
+#v(3mm)
+
+#course-text("supplementary-minimax")[
+*Supplementary lecture: Fast computation via the minimax theorem.* Based on #link("https://www.sigecom.org/exchanges/volume_23/2/FARINA.pdf")[Farina's SIGecom Exchanges article]. Defense oracles, the ellipsoid construction, logarithmic dependence on inverse accuracy, and Phi-equilibrium computation via fixed points of deviations.
+]

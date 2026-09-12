@@ -45,7 +45,7 @@ $ max_nu min_mu bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (
 Can we show that this value is $lt.eq 0$? The answer is yes, and constructive: given any $nu$, we can find a $mu$ in closed form---in fact, a #emph[product] distribution---such that the value is $lt.eq 0$.
 
 #theorem[#citet(label("Hart89"))][
-Given any distribution $nu$ over pairs $(i \, a'_i) : i in \[ n \] \, a'_i in A'_i$, we can explicitly and efficiently construct a product distribution $mu in Delta \( A_1 \) ⊗ dots.h ⊗ Delta \( A_n \)$ such that
+Given any distribution $nu$ over pairs $(i \, a'_i) : i in \[ n \] \, a'_i in A_i$, we can explicitly and efficiently construct a product distribution $mu in Delta \( A_1 \) ⊗ dots.h ⊗ Delta \( A_n \)$ such that
 
 $ bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 . $
 ]#label("thm:hart schmeidler")
@@ -88,25 +88,25 @@ Then, we will combine all the $mu \( nu_t \)$ we have constructed into a single 
 Combining the two steps above, we will have constructed a $mu^(*)$ that is an $epsilon.alt$-coarse correlated equilibrium, and that can be represented as a convex combination of product distributions. In other words, we have shown the following corollary.
 
 #corollary[
-There exists an algorithm that computes an $epsilon.alt$-coarse correlated equilibrium in time polynomial in the sum of the number of actions of the players and $log \( 1 \/ epsilon.alt \)$. Such a coarse correlated equilibrium is represented as a convex combination of product distributions.
+Assume rational, bounded payoffs and an oracle that evaluates expected payoffs under product distributions in polynomial time. Then an $epsilon.alt$-coarse correlated equilibrium can be computed in time polynomial in the representation size, payoff encoding length, the sum of the numbers of actions, and $log \( 1 \/ epsilon.alt \)$. Such a coarse correlated equilibrium is represented as a convex combination of product distributions.
 ]
 
 == Sketch of the Ellipsoid-Against-Hope algorithm
 
 In more detail, what #ref(label("thm:hart schmeidler")) implies is that the following open polytope must be empty:
 
-$ {nu in Delta {(i \, a'_i) : i in \[ n \] \, a_i in A_i} : bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a_i \, a_(- i)) - u_i (a_i \, a_(- i))] > 0\
+$ {nu in Delta {(i \, a'_i) : i in \[ n \] \, a_i in A_i} : bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] > 0\
 forall mu in Delta (A_1 times dots.h times A_n)} . $
 
 Furthermore, for any $nu$, we know how to prove that at least one of the constraints is violated. The key idea is then to use the ellipsoid method to #emph[certify] the emptiness of the polytope. Normally, the ellipsoid method is used to find a point in a set, but in our case, the point does not exist and we want to use the ellipsoid method to isolate constraints that prove the emptiness of the set. For this reason, the algorithm was called Ellipsoid-Against-Hope by #citet(label("papadimitriou2008computing")).
 
-The ellipsoid will maintain a search space which can be thought of as a suitable subset of the deviator's set. At every iteration $t$, the algorithm will compute the center point $nu_t$ of the set. Then, it will find a violated constraint using the distribution $mu_t colon.eq mu \( nu_t \)$ in the proof of #ref(label("thm:hart schmeidler")). The violated constraint implies that the deviator set must be curtailed, and the ellipsoid will be updated accordingly reducing the size of the search space by a constant. The algorithm will continue until the search space is small enough to guarantee that the set is empty. In the process, it takes $O (log (1 \/ epsilon.alt))$ iterations for the search space to shrink to size $epsilon.alt$. By the last iteration $T$, the algorithm will have produced several violated constraints, each of which is associated with a mediator strategy $mu_t$. The set
+The ellipsoid will maintain a search space which can be thought of as a suitable subset of the deviator's set. At every iteration $t$, the algorithm will compute the center point $nu_t$ of the set. Then, it will find a violated constraint using the distribution $mu_t colon.eq mu \( nu_t \)$ in the proof of #ref(label("thm:hart schmeidler")). The violated constraint implies that the deviator set must be curtailed, and the ellipsoid will be updated accordingly reducing the size of the search space by a constant. The algorithm will continue until the search space is small enough to guarantee that the set is empty. The iteration count also depends polynomially on the dimension and encoding/conditioning bounds. For an approximate guarantee, use constraints with a positive $epsilon.alt$ margin and the corresponding separation and volume bounds; shrinking an arbitrary open set does not by itself certify exact emptiness. The following algebra describes the exact finite certificate when one has been obtained. By the last iteration $T$, the algorithm will have produced several violated constraints, each of which is associated with a mediator strategy $mu_t$. The set
 
-$ {nu in Delta {(i \, a_i) : i in \[ n \] \, a_i in A_i} : bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu_1) [u_i (a_i \, a_(- i)) - u_i (a_i \, a_(- i))] > 0\
+$ {nu in Delta {(i \, a_i) : i in \[ n \] \, a_i in A_i} : bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu_1) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] > 0\
 dots.v\
-bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu_T) [u_i (a_i \, a_(- i)) - u_i (a_i \, a_(- i))] > 0} . $
+bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu_T) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] > 0} . $
 
-The constraints of the set are all linear in $nu$, and the set is empty. By Farkas' lemma, there must exist a convex combination of the constraints the makes all the coefficients on the left-hand size non-positive. In other words, there must exist $alpha_1 \, dots.h \, alpha_T gt.eq 0$ such that
+The constraints of the set are all linear in $nu$, and the set is empty. By Farkas' lemma, there must exist a convex combination of the constraints the makes all the coefficients on the left-hand size non-positive. In other words, there must exist $alpha_1 \, dots.h \, alpha_T gt.eq 0$ with $sum_t alpha_t=1$ such that
 
 $ sum_(t = 1)^T alpha_t bb(E)_(a tilde.op mu_t) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 \, #h(2em) forall i in \[ n \] \, a'_i in A_i . $
 
@@ -124,11 +124,11 @@ This completes the sketch of the proof of the correctness of the Ellipsoid-Again
 
 == Applications beyond normal-form games
 
-The above argument mostly uses ideas from convex optimization. In particular, it generalizes verbatim to any #emph[convex game], that is, any setting with the following properties:
+The above argument mostly uses ideas from convex optimization. In particular, it extends, with suitable oracle and encoding assumptions, to #emph[multilinear games on compact convex domains], that is, any setting with the following properties:
 
 #list(
 [
-Player $i$'s strategy set is a convex set of some dimension $d_i$. For normal-form games, a strategy is an element of $Delta \( A_i \)$, that is, a distribution over the player's strategies. We assume we have oracle access to the set, which runs in time polynomial in $d_i$.
+Player $i$'s strategy set is a nonempty compact convex set of some dimension $d_i$, with suitable rational descriptions or geometric bounds for the ellipsoid method. For normal-form games, a strategy is an element of $Delta \( A_i \)$, that is, a distribution over the player's strategies. We assume an efficient separation oracle with the bit-complexity and geometric bounds required by convex optimization.
 ],
 [
 The utility function $u_i \( x_1 \, dots.h \, x_n \)$ is linear in each player's strategy. For normal-form games, this is true since the utility is just an expectation.
@@ -138,7 +138,7 @@ The utility function $u_i \( x_1 \, dots.h \, x_n \)$ can be evaluated efficient
 ]
 )
 
-The Ellipsoid-Against-Hope algorithm can then be applied and runs in time polynomial in $sum_i^n d_i$, $R$, and $log \( 1 \/ epsilon.alt \)$. Examples of games that satisfy the above properties include polymatrix games, congestion games, and sequential imperfect-information (extensive-form) games. We will see some of these games later in this course.
+The Ellipsoid-Against-Hope algorithm can then be applied and has polynomial complexity in $sum_i^n d_i$, oracle costs, encoding and geometric bounds, and $log \( 1 \/ epsilon.alt \)$. Applications include polymatrix games and finite perfect-recall extensive-form games; a succinct game representation must be checked for the required oracles before applying the result. We will see some of these games later in this course.
 
 = Bibliographic remarks
 
@@ -149,28 +149,9 @@ If you are curious to read more, the following papers contains extensions and re
 #appendix[
 = Appendix: Proof of Theorem~#ref(label("thm:hart schmeidler"), supplement: none)
 
-The key here is to pick $mu$ in a way that depends on $nu$. In particular, we will pick $mu$ to be the #emph[product] distribution that outputs
+Let $s_i=sum_(a_i in A_i) nu_(i,a_i)$ be the total mass assigned to player $i$'s deviations. If $s_i>0$, set $mu_i(a_i)=nu_(i,a_i)/s_i$; if $s_i=0$, choose any distribution $mu_i$ on $A_i$. Let $mu=mu_1 times dots.h times mu_n$ be their product distribution.
 
-$ (a_1 \, dots.h \, a_n) upright(" with probability proportional to ") nu_(1 \, a_1) dot.op dots.h dot.op nu_(n \, a_n) . $
-
-With this choice and some simple manipulations,
-
-$  & bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))]\
- & = sum_i sum_(a'_i in A_i) nu_(i \, a'_i) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))]\
- & = sum_i sum_(a'_i in A_i) nu_(i \, a'_i) (bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i))] - bb(E)_(a tilde.op mu) [u_i (a_i \, a_(- i))])\
- & = sum_i (sum_(a'_i in A_i) nu_(i \, a'_i) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i))] - sum_(a'_i in A_i) nu_(i \, a'_i) bb(E)_(a tilde.op mu) [u_i (a_i \, a_(- i))])\
- & = sum_i #scale(x: 300%, y: 300%)[\(] underbrace(sum_(a'_i in A_i) nu_(i \, a'_i) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i))], (suit.spade.filled)) - underbrace((sum_(a'_i in A_i) nu_(i \, a'_i)) bb(E)_(a tilde.op mu) [u_i (a_i \, a_(- i))], (suit.club.filled)) #scale(x: 300%, y: 300%)[\)] . $
-
-We now expand $(suit.spade.filled)$, using the symbol $nu_(- i \, a_(- i))$ to mean the product of $nu_(1 \, a_1)$, $dots.h$, $nu_(i - 1 \, a_(i - 1))$, $nu_(i + 1 \, a_(i + 1))$, $dots.h$, $nu_(n \, a_n)$. Using the construction of $m u$ as a product distribution, we can write
-
-$ (suit.spade.filled) & = sum_(a'_i in A_i) nu_(i \, a'_i) sum_(a_i in A_i) sum_(a_(- i) in A_(- i)) nu_(i \, a_i) nu_(- i \, a_(- i)) u_i (a_i \, a_(- i))\
- & = sum_(a'_i in A_i) nu_(i \, a'_i) ((sum_(a_(- i) in A_(- i)) nu_(- i \, a_(- i)) u_i (a_i \, a_(- i))) (sum_(a_i in A_i) nu_(i \, a_i)))\
- & = (sum_(a'_i in A_i) nu_(i \, a'_i) sum_(a_(- i) in A_(- i)) nu_(- i \, a_(- i)) u_i (a_i \, a_(- i))) (sum_(a_i in A_i) nu_(i \, a_i))\
- & = (sum_(a'_i in A_i) sum_(a_(- i) in A_(- i)) nu_(i \, a'_i) nu_(- i \, a_(- i)) u_i (a_i \, a_(- i))) (sum_(a_i in A_i) nu_(i \, a_i)) = (suit.club.filled) . $
-
-Hence,
-
-$ max_nu min_mu bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq max_nu 0 = 0 \, $
-
-completing the proof.
+For $s_i>0$, averaging the deviating action according to $nu_(i,dot)/s_i$ is exactly the same as drawing it from $mu_i$, independently of the opponents. Therefore
+$ sum_(a'_i) nu_(i,a'_i) EE_(a tilde.op mu)[u_i(a'_i,a_(-i))-u_i(a_i,a_(-i))] = s_i(EE_(a tilde.op mu)[u_i(a)]-EE_(a tilde.op mu)[u_i(a)])=0. $
+If $s_i=0$, the same expression is zero because all its coefficients vanish. Sum over players to obtain the theorem, with equality. This normalization also handles zero-mass players, for whom an unnormalized product of the $nu$ entries would not define a probability distribution.
 ]

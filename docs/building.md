@@ -42,7 +42,7 @@ diagram figures, compiles each lecture to HTML and PDF, generates the course
 index from the syllabus, and assembles `html/` using Typst's experimental bundle
 target. `make bundle` also produces `dist/6.7980-notes.zip`.
 
-The generated website has a schedule, 15 lecture and supplementary pages,
+The generated website has a schedule, 18 lecture and supplementary pages,
 PDF downloads, downloadable chapter sources, a syllabus, and local browser
 assets. KaTeX 0.16.22 renders supported expressions; unsupported expressions
 retain their Typst SVG rendering. No npm installation is needed for the course

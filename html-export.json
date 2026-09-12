@@ -72,6 +72,20 @@
       ]
     },
     {
+      "source": "content/kernelized.typ",
+      "supplementary": false,
+      "syllabus_ids": [
+        "kernelized"
+      ]
+    },
+    {
+      "source": "content/tfnp.typ",
+      "supplementary": false,
+      "syllabus_ids": [
+        "tfnp"
+      ]
+    },
+    {
       "source": "content/ppad_completeness.typ",
       "supplementary": false,
       "syllabus_ids": [
@@ -111,6 +125,12 @@
     {
       "source": "content/phi_regret.typ",
       "short_title": "Phi-regret minimization",
+      "supplementary": true,
+      "syllabus_ids": []
+    },
+    {
+      "source": "content/fast_minimax.typ",
+      "short_title": "Fast computation via the minimax theorem",
       "supplementary": true,
       "syllabus_ids": []
     }

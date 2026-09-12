@@ -132,6 +132,20 @@ class CourseIndexTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Invalid syllabus_ids'):
             resolve_readings(config, self.modules)
 
+    def test_syllabus_title_change_requires_explicit_typst_title_edit(self):
+        from build_site import chapter_source_text
+        source = self.syllabus.replace('[High-dimensional games]',
+            '[High-dimensional games: kernels and learning]')
+        modules = self.evaluate(source)
+        resolved = resolve_readings(self.config, modules)
+        note = next(n for n in resolved['notes'] if n['syllabus_ids'] == ['kernelized'])
+        title = 'High-dimensional games: kernels and learning'
+        self.assertEqual(note['title'], title)
+        self.assertEqual(note['short_title'], title)
+        self.assertIn('>' + title + '</a>', render_index(resolved, modules))
+        with self.assertRaisesRegex(ValueError, 'authored title.*does not match'):
+            chapter_source_text(ROOT / note['source'], note)
+
     def test_all_authored_note_titles_match_syllabus_or_supplementary_list(self):
         from build_site import chapter_source_text
         for note in self.config['notes']:
@@ -165,6 +179,8 @@ class CourseIndexTests(unittest.TestCase):
         source = source.replace('title: "Topics in Multiagent Learning"', 'title: "Updated course title"')
         source = source.replace('Projects may be completed individually',
                                 'Projects showcase *student research* and may be completed individually')
+        source = source.replace('Defense oracles, the ellipsoid construction',
+                                '*Updated supplementary description*, the ellipsoid construction')
         with tempfile.NamedTemporaryFile(mode='w', suffix='.typ', dir=self.path.parent) as file:
             file.write(source)
             file.flush()
@@ -173,7 +189,8 @@ class CourseIndexTests(unittest.TestCase):
         html = render_index(config, self.modules)
         for expected in ('TEST-ROOM', '10:00–11:30', 'Improving material 35%',
                          'accounts for 35%', 'Project 45%', 'accounts for 45%',
-                         'Updated course title', '<strong>student research</strong>'):
+                         'Updated course title', '<strong>student research</strong>',
+                         '<strong>Updated supplementary description</strong>'):
             self.assertIn(expected, html)
         self.assertEqual(config['how_to_cite']['booktitle'], 'MIT Updated course title Lecture Notes')
         self.assertNotIn('assets/course/html-notes-collage.svg', html)

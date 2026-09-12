@@ -17,11 +17,11 @@ The proof can be broken down into two main steps:
 - Reduction from the End-of-the-line problem to (approximate) Brouwer.
 - Reduction from (approximate) Brouwer to (approximate) Nash equilibria.
 
-The first step is relatively easy, and we will not cover it here. The second step is more involved and requires a careful construction of a reduction from Brouwer to Nash equilibria. This is the part we will focus on in this lecture.
+The first step requires a carefully encoded path and interpolation construction; we will not cover it here. The second step is more involved and requires a careful construction of a reduction from Brouwer to Nash equilibria. This is the part we will focus on in this lecture.
 
-The key idea is the following: in the reduction from #smallcaps[End-of-the-line] to Brouwer, we define a continuous function $f$ for which we need to find an approximate fixed point. We now need to construct a game such that a Nash equilibrium of the game is the same as a fixed point of $f$ (up to approximations). The issue is that it is not clear how we can have games "compute" functions. Can we construct games in such a way that their behavior at Nash equilibria can be seen as "computing something"? The answer is positive, as we see next.
+The key idea is the following: in the reduction from #smallcaps[End-of-the-line] to Brouwer, we define a continuous function $f$ for which we need to find an approximate fixed point. We now need to construct a game such that every sufficiently accurate approximate Nash equilibrium can be decoded into an approximate fixed point of $f$. The issue is that it is not clear how we can have games "compute" functions. Can we construct games in such a way that their behavior at Nash equilibria can be seen as "computing something"? The answer is positive, as we see next.
 
-= Arithmetic Circuit SAT
+= Generalized circuits and approximation
 
 We show that given a function represented as an _arithmetic circuit_, it is possible to construct a game whose Nash equilibria correspond to computing a fixed point of the function. This is the key idea behind the reduction from Brouwer to Nash equilibria.
 
@@ -38,7 +38,7 @@ In particular, we will restrict our attention to functions constructed through c
     [Constant], [#image("figures/ppad_completeness/gate_constant.svg", width: 2.25cm, alt: "Constant gate.")], [$y=a$],
     [Addition], [#image("figures/ppad_completeness/gate_addition.svg", width: 2.25cm, alt: "Addition gate.")], [$y=min{1, x_1+x_2}$],
     [Subtraction], [#image("figures/ppad_completeness/gate_subtraction.svg", width: 2.25cm, alt: "Subtraction gate.")], [$y=max{0, x_1-x_2}$],
-    [Multiplication], [#image("figures/ppad_completeness/gate_multiplication.svg", width: 2.25cm, alt: "Multiplication gate.")], [$y=max{0,min{1, a dot x_1}}$],
+    [Scaling], [#image("figures/ppad_completeness/gate_multiplication.svg", width: 2.25cm, alt: "Multiplication gate.")], [$y=max{0,min{1, a dot x_1}}$],
     [Comparison],
     [#image("figures/ppad_completeness/gate_comparison.svg", width: 2.25cm, alt: "Comparison gate.")],
     [$y=display(cases(1\, qquad& "if" x_1 > x_2,
@@ -47,31 +47,41 @@ In particular, we will restrict our attention to functions constructed through c
       When the inputs are equal, this gate does not restrict the output.
     ],
   )
+- Each constant $a$ is rational and lies in $[0,1]$. Scaling multiplies by this constant; multiplication of two variable inputs is not one of the permitted gates.
 - Directed edges connecting variables to gates and gates to variables (loops are allowed);
 - Variable nodes have in-degree 1; gates have 0, 1, or 2 inputs depending on type as above; gates & nodes have arbitrary fanout.
 
-#definition[Arithmetic Circuit SAT problem][
-  Given an arithmetic circuit satisfying the description above, output an assignment of values $v_1, ..., v_n in [0,1]$ that satisfies all the gates.
+The table gives ideal gate relations. To state a finite search problem appropriate for approximate Nash, fix a rational tolerance $delta in (0,1/4)$.
+
+#definition[Approximate generalized-circuit problem][
+  Find a rational assignment $v_1,...,v_n in [0,1]$ such that each assignment, constant, addition, subtraction, and scaling gate has output within $delta$ of the value in the table. A comparison gate must satisfy
+  $ x_1 > x_2+delta ==> y >= 1-delta, quad x_1 < x_2-delta ==> y <= delta. $
+  If $|x_1-x_2| <= delta$, any output in $[0,1]$ is allowed. Cyclic wiring is permitted; this is a simultaneous constraint problem, rather than an acyclic circuit evaluation.
 ]
 
 #example[
-  Consider the following diagram.
+  In the diagram below, the exact relations force $a=b=c=1/2$; with positive tolerance, assignments need only satisfy the approximate relations.
   #figure[
-#image("figures/ppad_completeness/circuit.svg", width: 5cm, alt: "A cyclic arithmetic circuit containing a one-half constant, a comparison gate, and an assignment gate.")]
-  The only satisfying assignment is $a = b = c = 1\/2$.
+    #image("figures/ppad_completeness/circuit.svg", width: 5cm, alt: "A cyclic arithmetic circuit containing a one-half constant, a comparison gate, and an assignment gate.")
+  ]
 ]
 
-It is easy to see that this problem has the flavor of a Brouwer fixed point.
-#theorem[#citep(<dgp09>)][
-  The Arithmetic Circuit SAT problem always admits a solution, and it is PPAD-complete to find it.
+#theorem[Generalized-circuit hardness #citep(<chen2009settling>)][
+  Approximate generalized circuits always have a solution. For sufficiently small inverse-polynomial tolerance in the circuit encoding size, finding such a solution is PPAD-complete.
 ]
+
+#proofsketch[
+  Replace each comparison by a continuous ramp: output $0$ when $x_1-x_2 <= -delta/2$, output $1$ when $x_1-x_2 >= delta/2$, and interpolate linearly between. All other gates already give continuous maps into $[0,1]$. Updating every output coordinate defines a continuous self-map of $[0,1]^n$, which has a fixed point by Brouwer. Rounding this fixed point to a sufficiently fine rational grid preserves the displayed $delta$ constraints: the arithmetic gates are Lipschitz, and comparisons have a margin between the ramp's transition and the required thresholds. Polynomially many bits suffice. The PPAD reduction and hardness construction are the substantive additional parts of the cited result.
+]
+
+The restriction to rational-constant scaling matters. Allowing arbitrary variable multiplication changes the exact fixed-point problem to an algebraic one; exact multiplayer Nash is associated with FIXP #citep(<etessami2010fixedpoints>). The statement above explicitly concerns approximate solutions.
 
 = From gates to games
 
-It is possible to convert an Arithmetic Circuit SAT instance into a Nash equilibrium computation problem in a _multiplayer game_. (The game can also be
+It is possible to convert an approximate generalized-circuit instance into an approximate Nash equilibrium computation problem in a _multiplayer game_. (The game can also be
 converted into a two-player #citep(<chen2009settling>) or three-player game #citep(<dgp09>), but we do not show how in this lecture).
 
-The idea is to use _gadgets_: constructions that simulate the behavior of the gates in the circuit.
+The idea is to use _gadgets_: constructions that simulate the behavior of the gates in the circuit. We first prove their exact equilibrium behavior to expose the mechanism. A full approximation reduction must also bound the error of each gadget, normalize payoffs, and choose the Nash tolerance as a function of the circuit tolerance.
 
 == Addition gate
 
@@ -138,6 +148,14 @@ Consider any game that contains the following interaction between four players $
 
   The only remaining possibility is therefore $z = min{x+y,1},$ as we wanted to show.
 ]
+
+== Comparison gate
+
+For input players with action-$1$ probabilities $x,y$, give an output player $z$ payoff equal to the input action of $x$ when she plays $1$, and equal to the input action of $y$ when she plays $0$. Her expected payoff difference between the two actions is $x-y$. Therefore, in an exact equilibrium, $z=1$ if $x>y$, $z=0$ if $x<y$, and any mixture is allowed at a tie.
+
+This also illustrates why approximate comparisons need a gap. In an $epsilon.alt$-Nash equilibrium, if $x-y>delta$, then playing action $0$ with probability $1-z$ incurs deviation gain $(1-z)(x-y)$, so $1-z <= epsilon.alt/delta$. Taking $epsilon.alt <= delta^2$ enforces $z >= 1-delta$. The case $y-x>delta$ is symmetric.
+
+These local arguments explain the gate simulation. They do not by themselves prove the full hardness theorem: composing all gadgets while preserving their incentives, controlling approximation errors, and converting the graphical construction to a fixed number of players require the remaining reductions in the cited papers.
 
 #lec_bibliography("meta/refs.bib")
 

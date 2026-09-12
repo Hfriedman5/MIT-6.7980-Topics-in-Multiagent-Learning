@@ -56,7 +56,7 @@ where the asterisk denotes a tuple of arbitrary length representing the history 
 When further restrictions are imposed on how the policy can depend on the history, we arrive at two important distinctions.
 
 #definition[Markovian policy][
-A policy is #emph[history-independent], or #emph[Markovian], if it only depends on the current state and time. This means that given any two histories of the same length, the policy is the same. In particular, the policy is a function 
+A policy is #emph[history-independent], or #emph[Markovian], if it only depends on the current state and time. This means that given any two histories of the same length ending in the same current state, the action distribution is the same. In particular, the policy is a function
 
 $ pi_i : S times NN arrow.r Delta (A_i) . $
 ]
@@ -72,6 +72,8 @@ Given a collection of policies $pi_1 \, dots.h \, pi_m$ for the players of a sto
 $ u_i \( pi_1 \, dots.h \, pi_m \) = EE_(s_0 tilde.op mu \;\
 forall t > 0 : s^(\( t \)) tilde.op ℙ (dot.op \| med s^(\( t - 1 \)) \, a^(\( t - 1 \)))\
 forall t gt.eq 0 \, i : med a_i^(\( t \)) tilde.op pi_i (s^(\( t \)) \, \( s^(\( tau \)) \, a^(\( tau \)) \)_(tau < t))) [sum_(t gt.eq 0) gamma^t r_i \( s^(\( t \)) \, a^(\( t \)) \)] . $
+
+For the finite-horizon version, truncate the sum at $t=H-1$ and restrict the trajectory to those $H$ stages.
 
 In particular, $u_i \( pi_1 \, dots.h \, pi_m \)$ is the expected discounted utility of player $i$ under the random trajectory which starts at $s^(\( 0 \)) tilde.op mu$ and is sampled by having each player sampling an action from their policy at each state, and having the environment transition according to its dynamics. In terms of these utilities, Nash equilibrium is defined in the natural way as follows. Notice that this  definition generalizes the concept of Nash equilibrium in normal-form games.
 
@@ -167,7 +169,7 @@ $ u_i (pi_i \, pi_(- i)) gt.eq u_i (pi'_i \, pi_(- i)) #h(2em) forall i \, pi'_i
 ]
 
 #proof[
-Given a policy profile $pi = (pi_1 \, dots.h \, pi_m)$ and a player $i in \[ m \]$, we introduce the following notation: 
+Given a stationary Markov policy profile $pi = (pi_1 \, dots.h \, pi_m)$ and a player $i in \[ m \]$, we introduce the following notation:
 
 #list(
 [
@@ -192,7 +194,7 @@ $ v_i^pi = (I - gamma Gamma^pi)^(- 1) r_i^pi . $
 [
 $q_i^pi (s \, a_i)$, for $s in S$ and $a_i in A_i$, is the infinite discounted utility of player $i$ if the game started at state $s$, and players used policies $pi_1 \, dots.h \, pi_m$, with the only exception that the very first action of player $i$ is set to $a_i$. In symbols, 
 
-$ q_i^pi (s \, a_i) = sum_(a_(- i)) r_i (s \, a) dot.op pi_(- i) (a_(- i) \| s) + gamma sum_s v_i^pi \( s' \) sum_(a_(- i)) pi_(- i) (a_(- i) \| s) dot.op ℙ (s' \| s \, a) . $
+$ q_i^pi (s \, a_i) = sum_(a_(- i)) r_i (s \, a) dot.op pi_(- i) (a_(- i) \| s) + gamma sum_(s') v_i^pi \( s' \) sum_(a_(- i)) pi_(- i) (a_(- i) \| s) dot.op ℙ (s' \| s \, a) . $
 
  Like before, the function $q_i^pi$ is continuous in the policies $pi$, since everything on the right-hand side is continuous, including the $v_i^pi$ as discussed above. Furthermore, 
 
@@ -225,7 +227,7 @@ $ tilde(V)^(pi_i^(*)) \( s \) equiv v_i^(pi^(*)) \( s \) \, forall s . $
 
 Moreover, #ref(label("eq:linearity between v's and q's")) and #ref(label("eq:one state deviations weak")) together imply that 
 
-$ forall s in S \, #h(2em) tilde(V)^(pi_i^(*)) \( s \) = max_(a_i) {tilde(r) (s \, a_i) + gamma sum_(s') tilde(V)^(pi_i^(*)) \( s \) tilde(ℙ) (s' \| s \, a_i)} . $
+$ forall s in S \, #h(2em) tilde(V)^(pi_i^(*)) \( s \) = max_(a_i) {tilde(r) (s \, a_i) + gamma sum_(s') tilde(V)^(pi_i^(*)) \( s' \) tilde(ℙ) (s' \| s \, a_i)} . $
 
  The previous condition is the Bellman equation for the MDP. From the theory of MDPs, we conclude that $pi_i^(*)$ is an optimal policy in the MDP, even among history-dependent policies. Therefore $pi_i^(*)$ is a best response to $pi_(- i)^(*)$, even among history-dependent policies.
 ]
@@ -268,7 +270,7 @@ The reason contraction maps have fixed points is intuitive: applying the map str
 
 $ d \( x^(\( t + 1 \)) \, x^(\( t \)) \) = d \( T \( x^(\( t \)) \) \, T \( x^(\( t - 1 \)) \) \) lt.eq lambda dot.op d \( x^(\( t \)) \, x^(\( t - 1 \)) \) . $
 
-By induction, the steps become exponentially smaller: $d \( x^(\( t + 1 \)) \, x^(\( t \)) \) lt.eq lambda^t d \( x^(\( 1 \)) \, x^(\( 0 \)) \) .$ The sequence is therefore Cauchy and must converge to a unique limit.
+By induction, the steps become exponentially smaller: $d \( x^(\( t + 1 \)) \, x^(\( t \)) \) lt.eq lambda^t d \( x^(\( 1 \)) \, x^(\( 0 \)) \) .$ For $k>t$, the triangle inequality bounds $d(x^((k)),x^((t)))$ by $lambda^t d(x^((1)),x^((0)))/(1-lambda)$. Completeness gives a limit $x^*$. Continuity of $T$ implies $T(x^*)=x^*$. If $y^*$ were another fixed point, contraction would give $d(x^*,y^*) <= lambda d(x^*,y^*)$, forcing equality of the points.
 ]
 
 === Shapley's Operator
@@ -289,64 +291,53 @@ The operator $cal(T)$ is a contraction mapping with modulus $gamma$. That is, $n
 
 #proofsketch[
 The proof relies on the fact that the value of a zero-sum matrix game is #emph[non-expansive] with respect to its payoffs (if payoffs change by $delta$, the value changes by at most $delta$). Here, if future values $U$ and $V$ differ by $epsilon.alt$, the payoffs in the local matrix games differ by at most $gamma epsilon.alt$. Thus, the values of these local games differ by at most $gamma epsilon.alt$.
+
+At the fixed point, choose a saddle pair in each local matrix game. Fixing either player's policy gives the other player a discounted MDP. Its optimal Bellman operator fixes $V^*$ because the chosen local strategies are a saddle pair. Uniqueness of the MDP value therefore shows that these stationary policies secure $V^*$ against arbitrary history-dependent opponents. This proves the value and equilibrium assertions, as well as the contraction claim.
 ]
 
-=== Computation: Value Iteration
+=== Computation: value iteration and a stopping certificate
 
-The constructive nature of the Banach Fixed-Point Theorem yields a natural algorithm for computing the Nash equilibrium, known as #emph[Value Iteration]. Conceptually, this algorithm is “decentralized.” We do not need to solve one giant optimization problem for the whole game. Instead, in each round, we update the value of every state by solving a local normal-form game based on the values from the previous round.
+Value iteration starts from $V_0=0$ and computes $V_(t+1)=cal(T)V_t$. Each step solves one matrix game per state. To extract policies with a specified equilibrium error, we need to relate the Bellman residual to deviation gains.
 
-#enum(numbering: "1.", full: true, 
-[
-#strong[Initialization:] Set $V^(\( 0 \)) \( s \) = 0$ for all $s in S$.
-],
-[
-#strong[Iterative Step:] For $t = 0 \, 1 \, 2 \, dots.h$:
-
-#enum(numbering: "1.", full: true, 
-[
-For each state $s in S$, construct the matrix game $M_s$ with payoffs:
-
-$ A_(i j) = r \( s \, a_i \, a_j \) + gamma sum_(s') ℙ \( s' \| s \, a_i \, a_j \) V^(\( t \)) \( s' \) . $
-],
-[
-Compute the value $v_s$ of the matrix game $M_s$ (this can be done efficiently using Linear Programming).
-],
-[
-Update the estimate: $V^(\( t + 1 \)) \( s \) arrow.l v_s$.
+#theorem[Residual certificate for an approximate equilibrium][
+  Let $V$ be any value vector and choose a saddle pair $pi=(pi_1,pi_2)$ in every local matrix game $Q_(s,V)$. Set
+  $ rho=norm(cal(T)V-V)_oo. $
+  The resulting stationary profile is a $2 rho/(1-gamma)$-Nash equilibrium from every initial state, for the unnormalized discounted utilities used in this lecture.
 ]
-)
-],
-[
-#strong[Termination:] Stop when $norm(V^(\( t + 1 \)) - V^(\( t \)))_oo lt.eq epsilon.alt frac(1 - gamma, 2 gamma)$.
+#proof[
+  Let $cal(T)_pi$ be the affine Bellman operator obtained by fixing both policies. Let $cal(T)_1$ be the maximizing player's best-response operator with $pi_2$ fixed, and $cal(T)_2$ the minimizing player's best-response operator with $pi_1$ fixed. The local saddle conditions give
+  $ cal(T)_pi V = cal(T)_1 V = cal(T)_2 V = cal(T)V. $
+  All three operators are $gamma$-contractions. For any contraction $F$ with fixed point $w$,
+  $ norm(w-V)_oo <= gamma norm(w-V)_oo + norm(F V-V)_oo. $
+  Thus its fixed point lies within $rho/(1-gamma)$ of $V$. Applied to the three operators, this bounds the profile value and both best-response values. Their pairwise differences are at most $2 rho/(1-gamma)$, which bounds either player's unilateral gain. Discounted MDP optimality includes history-dependent deviations.
 ]
-)
 
-Once the value function $V^(*)$ (or a sufficient approximation) is computed, the stationary Nash equilibrium strategy for each player at state $s$ is simply the optimal (minimax) strategy in the local matrix game defined by payoffs $Q_(s \, V^(*))$.
+A concrete algorithm is therefore:
 
-Note that the convergence rate of the algorithm above depends heavily on the contraction modulus $gamma$. Specifically, the number of iterations required to reach precision $epsilon.alt$ scales with $frac(1, 1 - gamma)$. This raises a difficulty if the discount factor is extremely close to $1$ (the “high-precision” regime), or if we are investigating the #emph[undiscounted] setting where $gamma arrow.r 1$. In such cases, the term $frac(1, 1 - gamma)$ blows up, potentially rendering the basic algorithm inefficient.
+1. Set $V=0$.
+2. For each state, solve $Q_(s,V)$, retaining its value $W(s)$ and saddle strategies $pi_1(s),pi_2(s)$.
+3. If $norm(W-V)_oo <= epsilon.alt(1-gamma)/2$, return the retained policies.
+4. Otherwise set $V=W$ and repeat.
 
-However, if our goal is merely to find an #emph[$epsilon.alt$-approximate] Nash equilibrium, we can circumvent this issue by #emph[artificially contracting] the map. Even if the true game has $gamma approx 1$, we can substitute it with a surrogate game having a discount factor $tilde(gamma) = 1 - epsilon.alt$. It can be shown that the value of this surrogate game differs from the true value by at most $O \( epsilon.alt \)$. Crucially, running Value Iteration on this surrogate game requires a number of iterations proportional to $frac(1, 1 - tilde(gamma)) = 1 / epsilon.alt$. This standard trick effectively converts the dependence on the discount factor into a polynomial dependence on $1 \/ epsilon.alt$.
+The returned policies are those computed from the same $V$ whose residual was tested. The proof also handles $gamma=0$ without dividing by $gamma$. If the stage games are solved numerically, their optimization errors must be included in the residual and best-response bounds; the displayed certificate assumes exact local solutions.
 
-=== The Complexity Landscape
+=== Discount dependence and computational complexity
 
-We can now place the difficulty of solving two-player zero-sum Markov games in a rigorous context. By analyzing how the computational cost scales with the precision $epsilon.alt$, we observe a striking hierarchy that mirrors the mathematical tools used to prove existence:
+Suppose $|r(s,a)| <= R$ and $0<gamma<1$. Contraction implies
+$ norm(V_(t+1)-V_t)_oo <= gamma^t norm(V_1-V_0)_oo <= gamma^t R. $
+Consequently the stopping criterion is met once $gamma^t R <= epsilon.alt(1-gamma)/2$. For fixed $R>0$, the number of iterations is bounded by
+$ 1 + O(frac(1,1-gamma) log max{1, frac(2R,epsilon.alt(1-gamma))}). $
+Each iteration solves $|S|$ matrix games. This is an arithmetic/optimization bound; bit complexity also accounts for rational input lengths and the precision of the local solves. If $1-gamma$ is exponentially small in its binary encoding length, this iteration bound is not polynomial in the input length.
 
-#list(
-[
-#strong[Two-player Zero-sum Normal-form Games ($upright(bold(log \( 1 \/ epsilon.alt \)))$):]
-    These are the “easiest” case. Existence is guaranteed by #strong[Linear Programming Duality]. Consequently, we can use linear programming algorithms (like Interior Point methods) to find $epsilon.alt$-approximate equilibria in time proportional to $log \( 1 \/ epsilon.alt \)$.
-],
-[
-#strong[Two-player Zero-sum Markov Games ($upright(bold(upright("poly") \( 1 \/ epsilon.alt \)))$):]
-    This setting occupies the #emph[middle ground]. Existence is guaranteed by #strong[Banach's Fixed Point Theorem] (Contraction Mappings). As discussed above, even in the worst case where $gamma arrow.r 1$, we can use the artificial contraction trick to find $epsilon.alt$-approximate equilibria in time proportional to $upright("poly") \( 1 \/ epsilon.alt \)$.
-],
-[
-#strong[General-sum Normal-form Games ($upright(bold(exp \( 1 \/ epsilon.alt \)))$):]
-    These are the “hardest” case. Existence is guaranteed only by #strong[Brouwer's Fixed Point Theorem] (Topology), which provides no constructive recipe. Computing a Nash equilibrium is PPAD-complete. The best known algorithms run in time ($n^(O \( log n \/ epsilon.alt^2 \))$), quasi-polynomial in the number of actions and exponential in $1 \/ epsilon.alt$.
-]
-)
+Changing the discount factor changes the problem, and cannot in general remove this dependence. For example, a one-state game with reward $1$ at every step has value $1/(1-gamma)$. Replacing $gamma=0.9999$ by $1-epsilon.alt$ with $epsilon.alt=0.01$ changes the value from $10,000$ to $100$. There is no $O(epsilon.alt)$ approximation of these unnormalized values. Such a substitution also needs a separate policy-transfer argument before it can certify an equilibrium of the original game.
 
-This spectrum ($log \( 1 \/ epsilon.alt \)$ vs. $upright("poly") \( 1 \/ epsilon.alt \)$ vs. $exp \( 1 \/ epsilon.alt \)$) highlights the unique position of Markov games. While the $upright("poly") \( 1 \/ epsilon.alt \)$ result ensures tractability, a major open problem is whether two-player zero-sum Markov games can be pushed into the “logarithmic” category. Specifically, can they be solved in #emph[strongly polynomial time] (time independent of the transitions and discount factor)? This is known as the #strong[Simplest Stochastic Games Conjecture] and it is one of the major open questions in algorithmic game theory.
+The computational comparisons should therefore be made with their models specified:
+
+- A rational two-player zero-sum normal-form game can be solved exactly by linear programming in polynomial bit complexity.
+- For finite discounted two-player zero-sum Markov games, the value-iteration guarantee above depends on $1/(1-gamma)$ as well as the requested accuracy. Banach's theorem supplies this quantitative convergence argument, not a discount-independent polynomial bound.
+- General-sum two-player normal-form Nash computation is PPAD-complete #citep(<chen2009settling>). For more players, exact algebraic solutions and approximate equilibria must be distinguished #citep(<etessami2010fixedpoints>).
+
+Simple stochastic games, studied by #citet(<condon1992stochastic>), form a different model: a turn-based reachability game with maximizing, minimizing, and random vertices. The decision problem belongs to NP intersect coNP. This result is not a claim about strongly polynomial algorithms for arbitrary simultaneous-move discounted Markov games. Here, “polynomial time” counts the binary encoding of numerical data, whereas “strongly polynomial” imposes a stricter arithmetic-operation requirement.
 
 = Bibliography for this lecture
 

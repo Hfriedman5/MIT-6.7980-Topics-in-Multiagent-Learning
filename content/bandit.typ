@@ -36,7 +36,7 @@ Typically, the construction of bandit algorithms follows the template shown in @
   #image("figures/bandit/bandit.svg", width: 100%, alt: "Bandit algorithm template: observed utility enters a gradient estimator, then a full-information regret minimizer, exploration mixture, and strategy sampler.")
 ] <fig-bandit>
 
-The exploration term can be ignored if regret bounds _in expectation_ are sought. Its role becomes important when _high-probability guarantees_ are sought instead. We explain the difference next.
+Some loss-based algorithms obtain pseudoregret bounds without an explicit exploration mixture. High-probability guarantees require additional control of estimation errors; a uniform mixture alone does not provide that guarantee. We explain the difference next.
 
 #paragraph-marker() *Stochastic regret guarantees.*~~
 Because online learning algorithms benefit from randomization, as is crucially the case in bandit settings, the regret of a bandit algorithm is a random variable. This adds a layer of complexity when approaching the analysis of bandit algorithms. As a rule of thumb, three "flavors" of guarantees are typically considered in the literature. We list them from the weakest (and easiest to obtain) to the strongest (and hardest to obtain):
@@ -57,7 +57,7 @@ Because online learning algorithms benefit from randomization, as is crucially t
   $
   for any $delta > 0$ small enough.
 
-To make sense of the measures with respect to which the expectations and probabilities are computed in the above definitions, consider a randomized algorithm for the learner that takes as input the history, $(x^((tau)),w^((tau)))_(tau<t)$, observable to the learner so far and produces a strategy $x^((t))$ and, similarly, a randomized algorithm for the adversary that takes as input the history, $(x^((tau)),u^((tau)))_(tau<t-1)$, observable to the adversary so far and chooses a loss function $u^((t))$. Pitting the two algorithms against each other defines a probability measure with respect to which the above expectations and probabilities are defined.
+To make sense of the measures with respect to which the expectations and probabilities are computed in the above definitions, consider a randomized algorithm for the learner that takes as input the history, $(x^((tau)),w^((tau)))_(tau<t)$, observable to the learner so far and produces a strategy $x^((t))$ and, similarly, a randomized algorithm for the adversary that takes as input the history, $(x^((tau)),u^((tau)))_(tau<t)$, observable to the adversary so far and chooses a utility function $u^((t))$. Pitting the two algorithms against each other defines a probability measure with respect to which the above expectations and probabilities are defined.
 
 Finally, notice that Pseudoregret and expected regret guarantees are different, since $max EE <= EE max$, but the converse is not true in general. This means that bounding expected regret automatically bounds the pseudoregret but the opposite is not necessarily the case. In fact, bounds on the pseudoregret are _not_ strong enough to conclude convergence to the set of equilibria, in general.
 
@@ -73,14 +73,14 @@ $EE_t [x^((t))] = p^((t)).$
 #paragraph-marker() *Gradient estimator.*~~ For this setting, the standard gradient estimator is the _importance sampling_ estimator. Given the utility scalar $w^((t)) in [0, 1]$, the importance sampling estimator is defined as
 $ tilde(g)^((t)) := (w^((t)) / p^((t))_(a^((t)))) e_(a^((t))) in RR^A. $
 
-#theorem[Let $w^((t)) = ip(g^((t)), x^((t)))$ where $g^((t))$ is some unknown utility gradient. Then, the importance sampling estimator $tilde(g)^((t))$ is unbiased, that is,
+#theorem[Assume $p^((t))_a>0$ for every action. Let $w^((t)) = ip(g^((t)), x^((t)))$ where $g^((t))$ is some unknown utility gradient. Then, the importance sampling estimator $tilde(g)^((t))$ is unbiased, that is,
   $EE_t [tilde(g)^((t))] = g^((t)).$
 ]
 #v(-2mm)
 #proof[
   The result follows by direct calculation. The randomness is due to the sampling of the action $a^((t))$. Each action $a in A$ is sampled with probability $p^((t))_a$. Hence,
   $
-    EE_t [tilde(g)^((t))] = sum_(a in A) p^((t))_a (w^((t)) / p^((t))_a) e_a = sum_(a in A) p^((t))_a (
+    EE_t [tilde(g)^((t))] = sum_(a in A) p^((t))_a (g^((t))_a / p^((t))_a) e_a = sum_(a in A) p^((t))_a (
       ip(g^((t)), e_(a)) / p^((t))_a
     ) e_a = sum_(a in A) g^((t))_a e_a = g^((t)).
   $
@@ -89,25 +89,34 @@ $ tilde(g)^((t)) := (w^((t)) / p^((t))_(a^((t)))) e_(a^((t))) in RR^A. $
 
 == The Exp3 algorithm
 
-The Exp3 (short for "exponential weights for exploration and exploitation") algorithm, introduced by
-#citet(<auer2002nonstochastic>), applies the multiplicative weights update (MWU) algorithm on the importance sampling estimator. No exploration term is added, so that the deterministic strategy $x^((t))$ is sampled from the $y^((t))$ output by MWU directly (see also @fig-bandit).
+Exp3 (short for "exponential weights for exploration and exploitation") was introduced by #citet(<auer2002nonstochastic>). We use a loss-form variant that needs no explicit exploration mixture. Convert rewards $g^((t))_a in [0,1]$ into losses $ell^((t))_a=1-g^((t))_a$. This changes neither realized regret nor pseudoregret.
 
-It is important to note that the analysis of MWU we did in Lecture 5 does not apply well to analyze the regret incurred by the full-information regret minimizer. The issue is that the estimated utilities potentially have a large range due to the division by the probabilities $p^((t))_a$. However, a better analysis of MWU in this case is possible.
+Start with positive weights $W_(1,a)=1$. At time $t$, sample action $a^((t))$ from $p^((t))_a=W_(t,a)/sum_b W_(t,b)$ and observe its loss. Set
+$ hat(ell)^((t))=frac(1-w^((t)),p^((t))_(a^((t)))) e_(a^((t))), quad W_(t+1,a)=W_(t,a) exp(-eta hat(ell)^((t))_a). $
+Equivalently, the full-information utility learner receives $-hat(ell)^((t))$. The sign matters: exponentially weighting an unbounded positive reward estimate is not justified by the following argument.
 
-#theorem[
-  If the regret minimizer is set to MWU with learning rate $eta = sqrt(log |A|\/ (T|A|))$, the Exp3 algorithm guarantees pseudoregret
-  $ "PseudoReg"^((T)) = O(sqrt(T|A| log |A|)). $
+#theorem[Loss-form Exp3][
+  For $K=|A|>=2$, this algorithm satisfies
+  $ "PseudoReg"^((T)) <= frac(log K, eta) + eta K T/2. $
+  Taking $eta=sqrt(frac(2 log K, K T))$ gives $"PseudoReg"^((T)) <= sqrt(2K T log K)$ against any nonanticipating adversary.
+]
+#proofsketch[
+  Because the estimates are nonnegative, $exp(-z)<=1-z+z^2/2$ applies for every $z=eta hat(ell)^((t))_a$, even if an estimate is large. The exponential-weights potential bound against each fixed action $a$ is
+  $ sum_t ip(p^((t)),hat(ell)^((t))) - sum_t hat(ell)^((t))_a <= frac(log K, eta) + eta/2 sum_t sum_b p^((t))_b (hat(ell)^((t))_b)^2. $
+  Conditional unbiasedness identifies the expected loss terms, while
+  $ EE_t[sum_b p^((t))_b (hat(ell)^((t))_b)^2]=sum_b (ell^((t))_b)^2 <= K. $
+  Take expectations and then maximize over the fixed comparator. This proves pseudoregret; it does not interchange a random hindsight maximum with expectation.
 ]
 
 == Tsallis entropy
 
-It can be shown that, information theoretically, no bandit learning algorithm for a finite set of actions $|A|$ can achieve better than $Omega(sqrt(T |A|))$ expected regret in general. The regret guaranteed by the Exp3 algorithm is therefore optimal only up to a logarithmic factor. It remained open for a long time whether this logarithmic factor could be removed. A positive answer was given recently by #citet(<audibert2010regret>), who proposed the idea of replacing the MWU algorithm with the FTRL algorithm instantiated with the negative $(1\/2)$-Tsallis entropy regularizer
+It can be shown that, information theoretically, no bandit learning algorithm for a finite set of actions $|A|$ can achieve better than $Omega(sqrt(T |A|))$ expected regret in general. The regret guaranteed by the Exp3 algorithm is therefore optimal only up to a logarithmic factor. It remained open for a long time whether this logarithmic factor could be removed. A positive answer was given by #citet(<audibert2010regret>), who proposed the idea of replacing the MWU algorithm with the FTRL algorithm instantiated with the negative $(1\/2)$-Tsallis entropy regularizer
 $
   psi(x) = 2 - 2 sum_(a in A) sqrt(x_a).
 $
 
 #theorem[
-  If the regret minimizer is set to FTRL algorithm with (1/2)-Tsallis entropy and learning rate $eta = sqrt(1 \/ T)$, the resulting bandit algorithm guarantees pseudoregret
+  If FTRL with (1/2)-Tsallis entropy receives the estimated utilities $-hat(ell)^((t))$ defined above, with learning rate $eta = sqrt(1 \/ T)$, the resulting bandit algorithm guarantees pseudoregret
   $ "PseudoReg"^((T)) = O(sqrt(T|A|)), $
   which is the optimal bound for bandit learning on finite probability distributions.
 ]
@@ -116,16 +125,20 @@ A simplified analysis can also be found in #citep(<zimmert2021tsallis>).
 
 == The Exp3.P algorithm
 
-The Exp3.P algorithm, introduced by #citet(<auer2002nonstochastic>), is a variant of the Exp3 algorithm to achieve high-probability regret guarantees. Intuitively, the difficulty with getting high-probabilty bounds for the regret in Exp3 is due to the importance sampling: the gradient estimator has entries of magnitude inversely proportional to the probabilities output by MWU. This makes the variance of the estimator large, and the concentration of the regret around its expectation difficult. To sidestep the issue, the Exp3.P algorithm uses the idea of superimposing a _uniform exploration term_ to the output $y^((t))$ of MWU. More specifically, the input to the strategy sampler is set to
-$ p^((t)) := (1 - gamma) y^((t)) + gamma bold(1) / (|A|) in Delta(A), $
-where $gamma in [0, 1]$ is a parameter.
+Exp3.P uses both uniform exploration and an upper-confidence correction to reward estimates #citep(<auer2002nonstochastic>). For $K=|A|>=2$, let $y^((t))$ be normalized positive weights and sample from
+$ p^((t))=(1-gamma)y^((t))+gamma bold(1)/K. $
+With the reward estimator $tilde(g)$ defined earlier, update the weights by
+$ W_(t+1,a)=W_(t,a) exp(eta (tilde(g)^((t))_a + frac(alpha,p^((t))_a sqrt(K T)))). $
+The positive bonus accounts for uncertainty; uniform exploration bounds inverse sampling probabilities. This is a different estimator/update from the loss-form Exp3 above.
 
-The exploration term increases the exploration of the algorithm, reducing the variance of the estimator. However, it is important to observe that this correction incurs a regret penalty due to the fact that MWU recommended $y^((t))$, and yet the decision maker sampled from $p^((t))$. The effect of such misalignment grows with the exploration parameter $gamma$. Nonetheless, the following can be shown.
-
-#theorem[#citep(<Abernethy:EECS-2009-10>)][
-  Consider the Exp3.P algorithm with exploration parameter $gamma = sqrt(|A|\/T)$ and learning rate $eta = sqrt(log |A|\/(T|A|))$. Then, for any $delta in (0,1)$,
-  $ PP["Reg"^((T)) <= O(sqrt(T|A| log (|A|)/delta))] >= 1 - delta. $
+#theorem[Exp3.P #citep(<auer2002nonstochastic>)][
+  Initialize all weights equally. For horizon $T>=1$ and $delta in (0,1)$, choose
+  $ gamma=min{3/5,2sqrt(frac(3K log K,5T))}, quad eta=gamma/(3K), quad alpha=2sqrt(log(K T/delta)). $
+  Then, with probability at least $1-delta$,
+  $ "Reg"^((T)) <= O(sqrt(K T log(K T/delta)) + log(K T/delta)). $
 ]
+
+The confidence parameter enters the logarithm and the bonus. Adding exploration to an unbiased estimator, without this correction or another concentration-control mechanism, is not the Exp3.P algorithm.
 
 = Adversarial bandit learning on general convex domains
 
