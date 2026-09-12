@@ -207,7 +207,25 @@
   let available = size.width - 12pt
   let figure-width = (1 - text-width / 100%) * available
   let text-width = text-width / 100% * available
-  let figure-body = align(center, figure-body)
+  let figure-body = {
+    // Preserve requested sizes; only shrink images that exceed their column.
+    show image: it => context {
+      let width = if it.width == auto {
+        measure(it, width: figure-width).width
+      } else {
+        (it.width.ratio * figure-width + it.width.length).to-absolute()
+      }
+      if width <= figure-width {
+        it
+      } else {
+        // Keep the original element's resolved source path and alt text, and
+        // anchor its artwork before cropping and scaling the oversized frame.
+        let visual = pad(right: width - figure-width, box(width: figure-width, align(left, it)))
+        scale(figure-width / width * 100%, reflow: true, visual)
+      }
+    }
+    align(center, figure-body)
+  }
   if side == left {
     grid(
       columns: (figure-width, text-width),

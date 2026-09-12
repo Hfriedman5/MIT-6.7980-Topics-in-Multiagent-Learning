@@ -216,6 +216,13 @@ Use `wrapped-figure` for prose alongside a compact diagram:
 The two columns stack on narrow screens. `wrapped-figure-with-caption` accepts
 a third content argument for a caption.
 
+The first content argument is always the text and the second is the figure;
+`side` chooses which side holds the figure. `text-width` controls the column
+split. Image percentages are relative to the figure column: `width: 100%`
+fills it, while `width: 60%` uses 60% of it. In PDFs, fixed and automatic image
+widths are also preserved, and oversized images shrink to fit without changing
+their aspect ratio. Smaller images remain centered in the figure column.
+
 ## Typography and verification
 
 The build loads the bundled regular and bold Frutiger faces from
