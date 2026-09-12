@@ -3,15 +3,15 @@
 #let lecture = (lec_num: "S1", date: [Fall 2026], title: "A second look at the minimax theorem", instructor: [Prof. Gabriele Farina])
 #show: gabri_notes.with(..lecture)
 
-In Lecture 3, we introduced the notion of coarse correlated equilibria. As we discussed, coarse correlated equilibria sidestep various difficulties (including topological and related to use of irrational numbers) that come with Nash equilibria. In this lecture, we show a powerful centralized algorithm for computing coarse correlated equilibria. (Soon in this course, we will also see that coarse correlated equilibria can also be #emph[learned] efficiently in a multi-agent setting, in a distributed fashion.)
+#lecture-link("correlated", <def-cce>)[] introduced the notion of coarse correlated equilibria. As we discussed, coarse correlated equilibria sidestep various difficulties (including topological and related to use of irrational numbers) that come with Nash equilibria. In this lecture, we show a powerful centralized algorithm for computing coarse correlated equilibria. (Soon in this course, we will also see that coarse correlated equilibria can also be #lecture-link("learning_intro", <sec-learning-correlated>)[_learned_ efficiently in a distributed multi-agent setting].)
 
-We have seen at the end of Lecture 3 that a coarse correlated equilibrium can be computed by solving a linear program, in which the variables correspond to the probabilities $mu_(a_1 \, dots.h \, a_n)$ of the joint actions, and the constraints correspond to the incentive constraints of the players. While this is a perfectly valid way to compute a coarse correlated equilibrium, it has the drawback that the linear program has a number of variables that is exponential in the number of players. This becomes an issue quickly, if we want to consider games with many players. It also is a problem for those games in which the payoff tensor has a succinct representation (for example, a sparse factorization that we can exploit); there, we would ideally want an algorithm that runs in polynomial time in the size of such a succinct representation. The latter is often the case in structured games, which we will see later in this course.
+The #lecture-link("correlated", <sec-cce>)[CCE incentive constraints] give a linear program for computing a coarse correlated equilibrium, in which the variables correspond to the probabilities $mu_(a_1 \, dots.h \, a_n)$ of the joint actions, and the constraints correspond to the incentive constraints of the players. While this is a perfectly valid way to compute a coarse correlated equilibrium, it has the drawback that the linear program has a number of variables that is exponential in the number of players. This becomes an issue quickly, if we want to consider games with many players. It also is a problem for those games in which the payoff tensor has a succinct representation (for example, a sparse factorization that we can exploit); there, we would ideally want an algorithm that runs in polynomial time in the size of such a succinct representation. The latter is often the case in structured games, which we will see later in this course.
 
 In this lecture, we will see a different algorithm for computing coarse correlated equilibria, which does not suffer from the above issues and requires a number of variables that scales with the #emph[sum] (rather than #emph[product]!) of the number of actions of the players. The algorithm is called Ellipsoid-Against-Hope, and was introduced by #citet(label("papadimitriou2008computing")), with later extensions by other authors #citep(label("jiang2011polynomial"), label("huang2008computing"), label("farina2024polynomial")).
 
 The algorithm is based on a constructive proof of the minimax theorem, which we will also present in this lecture.
 
-= Revisiting the existence of coarse correlated equilibria
+= Revisiting the existence of coarse correlated equilibria <sec-cce-existence>
 
 In order to understand why there is hope to compute coarse correlated equilibria more efficiently, it is useful to understand better how we can prove that these equilibria exist in the first place. We will then turn such an existence proof into a computational algorithm.
 
@@ -57,9 +57,9 @@ $ max_nu min_mu bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (
 
 and using the minimax theorem, we conclude the existence of coarse correlated equilibria.
 
-= Turning the minimax theorem into an efficient algorithm
+= Turning the minimax theorem into an efficient algorithm <sec-minimax-algorithm>
 
-Like what we did for the Nash equilibrium in Lecture 2, it is worth inspecting where the “magic” happens in the above proof. If we squint our eyes a bit, the argument of the proof looked like this:
+As in the #lecture-link("brouwer", <sec-sperner-proof>)[analysis of the existence proof underlying Nash equilibrium], it is worth inspecting where the “magic” happens in the above proof. If we squint our eyes a bit, the argument of the proof looked like this:
 
 #enum(numbering: "1.", 
 [
@@ -140,6 +140,8 @@ The utility function $u_i \( x_1 \, dots.h \, x_n \)$ can be evaluated efficient
 )
 
 The Ellipsoid-Against-Hope algorithm can then be applied and has polynomial complexity in $sum_i^n d_i$, oracle costs, encoding and geometric bounds, and $log \( 1 \/ epsilon.alt \)$. Applications include polymatrix games and finite perfect-recall extensive-form games; a succinct game representation must be checked for the required oracles before applying the result. We will see some of these games later in this course.
+
+#lecture-link("fast_minimax", none)[] develops the precision guarantee and the extension to richer deviation families.
 
 = Bibliographic remarks
 

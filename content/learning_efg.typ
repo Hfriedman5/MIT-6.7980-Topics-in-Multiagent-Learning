@@ -8,13 +8,13 @@
 )
 #show: gabri_notes.with(..lecture)
 
-Several approaches for constructing no-regret algorithms for extensive-form games have been proposed. For one, extensive-form games are a particular instance of combinatorial games for which the multiplicative weights update algorithm can be implemented efficiently in the reduced normal form of the game, despite the exponential size. We will see more details about this in a later class.
+Several approaches for constructing no-regret algorithms for extensive-form games have been proposed. For one, extensive-form games are a particular instance of combinatorial games for which the multiplicative weights update algorithm can be implemented efficiently in the reduced normal form of the game, despite the exponential size. #lecture-link("kernelized", none)[] develops this construction.
 
-As explained in Lecture 7, the natural representation of strategies to define learning in extensive-form games is the #emph[sequence-form representation]. Indeed, in that representation utility functions are linear and the strategy set of each player a convex polytope, aligning with the requirements of the regret minimization framework.
+The #lecture-link("efg_intro", <sec-sequence-form>)[_sequence-form representation_] is the natural representation of strategies for learning in extensive-form games. Indeed, in that representation utility functions are linear and the strategy set of each player a convex polytope, aligning with the requirements of the regret minimization framework.
 
 #wrapped-figure(
   [
-Thanks to the sequence form representation of strategies, all the results about external regret minimization we have seen so far apply to extensive-form games as well, including for example the fact that a Nash equilibrium in a two-player zero-sum game can be found by letting two regret minimizers play against each other by exchanging sequence-form strategies at every iteration according to the canonical learning setup.
+    Thanks to the sequence form representation of strategies, all the results about external regret minimization we have seen so far apply to extensive-form games as well, including for example the fact that a Nash equilibrium in a two-player zero-sum game can be found by letting two regret minimizers play against each other by exchanging sequence-form strategies at every iteration according to the #lecture-link("learning_intro", <sec-learning-zero-sum>)[canonical self-play setup].
   ],
   [#image("figures/learning_intro/self_play.svg", width: 330pt)],
   side: right,
@@ -23,16 +23,16 @@ Thanks to the sequence form representation of strategies, all the results about 
 
 Another example is the computation of coarse correlated equilibria in any multiplayer extensive-form game via external regret minimization, or computation of best responses against static opponents.
 
-To construct an external regret minimizer that outputs sequence-form strategies, several approaches can be followed. For one, we have seen that one can always use the online projected gradient ascent algorithm, which is a particular instantiation of the online mirror descent (OMD) algorithm. The drawback of such approach is that it requires projecting onto the polytope of sequence form strategies, which might be laborious. Alternative regularizers (#emph[i.e.], distance-generating functions) that render projection easier have been proposed. However, for today we focus on a different approach, which has been extremely popular in practice: the #emph[counterfactual regret minimization (CFR)] algorithm.
+To construct an external regret minimizer that outputs sequence-form strategies, several approaches can be followed. For one, we have seen that one can always use the #lecture-link("learning1", <def-online-gradient-ascent>)[online projected gradient ascent algorithm], which is a particular instantiation of online mirror descent (OMD). The drawback of such approach is that it requires projecting onto the polytope of sequence form strategies, which might be laborious. Alternative regularizers (#emph[i.e.], distance-generating functions) that render projection easier have been proposed. However, for today we focus on a different approach, which has been extremely popular in practice: the #emph[counterfactual regret minimization (CFR)] algorithm.
 
-= The CFR algorithm
+= The CFR algorithm <sec-cfr>
 
 The idea of the CFR algorithm is simple: construct a regret minimizer for the whole tree-form problem starting from #emph[local] regret minimizers at each decision point, each learning what actions to play at that decision point.
 
 #example[
   #wrapped-figure(
     [
-As an example, consider the TFDP faced by Player~1 in the game of Kuhn poker~#citep(label("Kuhn50:Simplified")), which we already introduced in Lecture 7. The black nodes are the #emph[decision points] of the player, and the white nodes are the #emph[observation points].
+      As an example, consider the TFDP faced by Player~1 in the game of Kuhn poker~#citep(label("Kuhn50:Simplified")), introduced in the #lecture-link("efg_intro", <sec-tfdp>)[tree-form decision process example]. The black nodes are the #emph[decision points] of the player, and the white nodes are the #emph[observation points].
 
       Since the player has six decision points---denoted $j_1 \, dots.h \, j_6$ in the figure---the CFR algorithm will use six local regret minimizers, which we denote $R_1 \, dots.h \, R_6$. Each regret minimizer $R_j$ will be responsible for outputting a local strategy $b_j in Delta (A_j)$ for the decision point $j$.
     ],
@@ -62,7 +62,7 @@ It is then immediate to see that if each $upright(R e g)_j^(\( T \))$ grows subl
 
 In order to formally introduce counterfactual utility, we recall a bit of notation to deal with tree-form decision processes.
 
-#strong[Notation for tree-form decision processes]  We recall the following notation for dealing with tree-form decision processes (TFDPs), which we introduced in Lecture 7. The notation is also summarized in #ref(label("tab:notation")).
+#strong[Notation for tree-form decision processes]  We recall the following notation for dealing with tree-form decision processes (TFDPs), introduced in #lecture-link("efg_intro", <sec-tfdp-notation>)[]. The notation is also summarized in #ref(label("tab:notation")).
 
 #list(
   [
@@ -134,7 +134,7 @@ In order to formally introduce counterfactual utility, we recall a bit of notati
 
 == Pseudocode for CFR
 
-Pseudocode for CFR is given in #ref(label("algo:cfr")). Note that the implementation is parametric on the regret minimization algorithms $R_j$ run locally at each decision point. Any regret minimizer $R_j$ for simplex domains can be used to solve the local regret minimization problems. Popular options are the regret matching algorithm, and the regret matching plus algorithm (Lecture 5).
+Pseudocode for CFR is given in #ref(label("algo:cfr")). Note that the implementation is parametric on the regret minimization algorithms $R_j$ run locally at each decision point. Any regret minimizer $R_j$ for simplex domains can be used to solve the local regret minimization problems. Popular options are #lecture-link("learning1", <sec-rm>)[regret matching] and #lecture-link("learning1", <sec-rmp>)[regret matching plus].
 
 #pseudocode-list(numbered-title: [CFR regret minimizer])[
   - *Data:* $R_j$, regret minimizer for $Delta(A_j)$; one for each decision point $j in cal(J)$ of the TFDP.
@@ -150,7 +150,7 @@ Pseudocode for CFR is given in #ref(label("algo:cfr")). Note that the implementa
           + $x^((t))[j a] arrow.l b_j^((t))[a]$
         + *else*:
           + $x^((t))[j a] arrow.l x^((t))[p_j] dot b_j^((t))[a]$
-    - _You should convince yourself that the vector $x^((t))$ we just filled in above is a valid sequence-form strategy, that is, it satisfies the required consistency constraints we saw in Lecture 7. In symbols, $x^((t)) in cal(Q)$._
+    - _You should convince yourself that the vector $x^((t))$ we just filled in above is a valid sequence-form strategy, that is, it satisfies the #lecture-link("efg_intro", <sec-sequence-form>)[sequence-form consistency constraints]. In symbols, $x^((t)) in cal(Q)$._
     + *return* $x^((t))$
   + *function ObserveUtility($g^((t)) in RR^(abs(Sigma))$)*
     - _Step 1: we compute the expected utility for each subtree rooted at each node $v in cal(J) union cal(K)$._
@@ -173,7 +173,7 @@ Pseudocode for CFR is given in #ref(label("algo:cfr")). Note that the implementa
 
 == Learning using self-play
 
-The CFR algorithm can be used to learn a Nash equilibrium in a two-player zero-sum game by letting two regret minimizers play against each other. The two regret minimizers exchange their sequence-form strategies at every iteration according to the canonical learning setup.
+The CFR algorithm can be used to learn a Nash equilibrium in a two-player zero-sum game by letting two regret minimizers play against each other. The two regret minimizers exchange their sequence-form strategies at every iteration according to the #lecture-link("learning_intro", <sec-learning-zero-sum>)[canonical self-play setup].
 
 = Bibliography for this lecture
 

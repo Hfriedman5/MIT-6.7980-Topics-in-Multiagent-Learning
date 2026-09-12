@@ -8,7 +8,7 @@
 )
 #show: gabri_notes.with(..lecture)
 
-In this lecture, we will do a deep dive into the proof of Brouwer's fixed point theorem, the main theorem that we invoked in the previous lecture to show the existence of Nash equilibrium. We will provide an elementary proof of Brouwer's theorem, one of several in the literature, with the goal of distilling Brouwer's existence-of-fixed-points result into a pure, combinatorial form. In particular, we seek to provide an answer to the following question:
+In this lecture, we will do a deep dive into the proof of Brouwer's fixed point theorem, the main theorem that we invoked in the #lecture-link("nfgs_nash", <sec-nash-existence>)[proof of Nash equilibrium existence]. We will provide an elementary proof of Brouwer's theorem, one of several in the literature, with the goal of distilling Brouwer's existence-of-fixed-points result into a pure, combinatorial form. In particular, we seek to provide an answer to the following question:
 
 #align(center)[
 
@@ -26,15 +26,15 @@ Towards an answer, we will provide a proof of Brouwer's theorem via another exis
 
 And why are we interested in this pursuit? One reason is that we want to de-mystify what makes Nash equilibria exist in every game, and what makes fixed points exist in every continuous function from a convex compact set to itself.
 
-Another reason is that designing algorithms for computing Nash equilibria can benefit from understanding the nature of the combinatorial argument underlying the existence of Nash equilibria. Indeed, we will soon see algorithms for computing Nash equilibria using the findings from this lecture.
+Another reason is that designing algorithms for computing Nash equilibria can benefit from understanding the nature of the combinatorial argument underlying the existence of Nash equilibria. Indeed, the #lecture-link("nash_algorithms", <sec-lemke-howson>)[Lemke–Howson algorithm] uses the directed-parity principle developed here.
 
 And, in the reverse direction, understanding whether there are complexity barriers in the computation of Nash equilibria might benefit from known barriers for computing Brouwer fixed points, and colorful triangles in colored grids. Indeed, we will develop these ideas to study the computational complexity of Nash equilibria.
 
 Relating the last two points, in #emph[this] lecture we will lay the foundations for proving that: computing Nash equilibria can be polynomial-time reduced to computing fixed points of Lipschitz continuous functions; that the latter can be  polynomial-time reduced to finding colorful triangles, guaranteed to exist in some large, colored grid by Sperner's lemma; and that the latter can be polynomial-time reduced to finding odd degree vertices in some large, directed graph given another odd degree vertex in that graph. So, informally, Nash will reduce to Brouwer which will reduce to Sperner which will reduce to a computational problem capturing the parity argument in directed graphs. This direction of reductions will give us ideas for Nash equilibrium computation algorithms.
 
-Surprisingly, in a #emph[future] lecture we will also establish reductions in the #emph[reverse] direction, namely that parity reduces to Sperner which reduces to Brouwer which reduces to Nash! And we will use this direction of reductions to study the computational complexity of Nash equilibrium computation.
+Surprisingly, reductions also hold in the #emph[reverse] direction, from directed parity through fixed points to Nash equilibria. The lecture on #lecture-link("ppad_completeness", <sec-generalized-circuits>)[_PPAD-hardness_] discusses this direction, focusing on how to encode fixed-point constraints as equilibrium incentives. These reductions explain the computational difficulty of Nash equilibrium computation.
 
-= Sperner's lemma
+= Sperner's lemma <sec-sperner>
 
 #wrapped-figure(side: right, text-width: 60%)[
   Key to distilling the combinatorial essence of why Nash equilibria exist in every game and why fixed points exists in every continuous function mapping a convex compact set to itself is a theorem that, at first glance, has little to do with fixed points nor equilibria: Sperner's lemma.
@@ -69,7 +69,7 @@ Given any Sperner coloring, we are interested in finding a trichromatic triangle
   Consider a Sperner coloring of a triangulated grid of any size. There must exist at least #emph[one] trichromatic triangle.
 
   In fact, there must exist an #emph[odd] number  of trichromatic triangles.
-]#label("thm:sperner")
+]#label("thm-sperner")
 
 We illustrate the previous theorem in the colored grid of #ref(label("fig:sperner coloring")).
 
@@ -77,13 +77,13 @@ We illustrate the previous theorem in the colored grid of #ref(label("fig:sperne
   #wrapped-figure(side: right, text-width: 60%)[
     In the coloring of #ref(label("fig:sperner coloring")), there are a total of #emph[five] trichromatic triangles, as highlighted in green on the right.
 
-    Indeed, five is an odd number, validating the statement of #ref(label("thm:sperner")).
+    Indeed, five is an odd number, validating the statement of #ref(label("thm-sperner")).
   ][
     #image("figures/brouwer/sperner_triangulation.svg")
   ]
 ]
 
-== The connection between Brouwer and Sperner
+== The connection between Brouwer and Sperner <sec-brouwer-sperner>
 
 What does Sperner's lemma have to do with Brouwer's fixed point theorem? The connection is not immediate, but upon second thought, several glimpses of connections emerge.  For one, both results are existence results. Furthermore, both results are trivially false if the “boundary conditions” in their statements are violated. In the case of Brouwer's fixed point theorem,
 the boundary conditions are that the continuous function must map the compact set to itself, i.e.~the boundary points must be mapped to somewhere inside the set. In the case of Sperner's lemma, the boundary conditions are the coloring rules on the boundary.
@@ -93,7 +93,7 @@ the boundary conditions are that the continuous function must map the compact se
 ][
   #image("figures/brouwer/color_wheel.svg", width: 92.774pt)
 ]
-(This coloring is a more boring version of the coloring we used in Lecture 1, but it will work for our purposes.)
+(This coloring is a more boring version of the #lecture-link("nfgs_nash", <sec-nash-improvement>)[coloring of the Nash improvement function], but it will work for our purposes.)
 
 If the direction of $f \( z \) - z$ lies in the yellow-blue, blue-red, or yellow-red boundary, we can assign any one of the two compatible colors, but we will make sure that, for grid points lying on the boundary of $[0 \, 1]^2$, we will break ties in favor of the color that does not violate the Sperner coloring conditions. Because $f$ maps $[0 \, 1]^2$ to itself, there should always be at least one such option! Thus, the coloring we will obtain will be a valid Sperner coloring, and it will have at least one trichromatic~triangle.
 
@@ -102,7 +102,7 @@ In turn, it should be intuitively clear why trichromatic triangles have value vi
 We formalize these ideas in the next sections, arriving at two results. First, we will show a complete proof of Brouwer's fixed point theorem, using Sperner's lemma and a compactness argument. Second, we will establish the following computational reduction. Suppose we are given access to an algorithm that takes as input a Sperner coloring of a triangulated grid and computes a trichromatic triangle guaranteed by Sperner's lemma. Then, we can use this algorithm to compute approximate Brouwer fixed points of a Lipschitz continuous function, $f$, from $[0 \, 1]^2$ to itself, by discretizing the domain into a grid whose cells have small enough diameter, as a function of the Lipschitz constant and the desired approximation, coloring the vertices of this grid according to the scheme presented above, and finding a trichromatic triangle. We illustrate how this reduction would work with an example.
 
 #example[
-  The following plots illustrate the Sperner discretization of the Nash improvement function in the three games we used in Lecture 1.
+  The following plots illustrate the Sperner discretization of the Nash improvement function in the #lecture-link("nfgs_nash", <sec-nash-improvement>)[three running examples for the Nash improvement function].
 
   #align(center)[
     #image("figures/brouwer/example_games.svg", width: 100.0%)
@@ -111,7 +111,7 @@ We formalize these ideas in the next sections, arriving at two results. First, w
 
 It is worth noting that the trichromatic triangles obtained via the above reduction are not always in the proximity of exact fixed points of the function. Unless the discretization is fine enough and $f$ has extra properties, we will only guarantee that the trichromatic triangles are in the proximity of approximate fixed points. While this is not the case in the examples above, it can be the case.
 
-== Formalizing the connection
+== Formalizing the connection <sec-brouwer-approximation>
 
 To make the argument formal, we need to establish a formal connection between a trichromatic triangle and an approximate Brouwer fixed point, and connect that to a choice of discretization parameter.
 
@@ -130,7 +130,7 @@ Now, given $f$ and $epsilon.alt$, consider a triangulation of $\[ 0 \, 1 \]^2$ i
   Suppose that $z_Y$ is the yellow corner of a trichromatic triangle in a Sperner discretization of some continuous function $f : \[ 0 \, 1 \]^2 arrow.r \[ 0 \, 1 \]^2$ of diameter $delta lt.eq delta (epsilon.alt)$, where $delta \( epsilon.alt \)$ satisfies~#ref(label("eq: uniform continuity")) for some $epsilon.alt$. Then
 
   $ ∥f (z_Y) - z_Y∥_oo < epsilon.alt + delta . $
-]
+] <thm-sperner-approximation>
 
 #proof[
   Let $z_R \, z_B \,$ and $z_Y$ be the red, blue, and yellow vertices of the trichromatic triangle. The key observation is that, by the coloring rule:
@@ -185,7 +185,7 @@ In turn, using a standard compactness argument, #ref(label("cor:sperner")) impli
   Since $d (z_(Y \, n_j)) in [0 \, 2 dot.op 2^(- j)]$, we conclude $d (z_Y^(*)) = 0$, which is equivalent to $f (z_Y^(*)) = z_Y^(*)$. This proves that a fixed point exists.
 ]
 
-= Proof of Sperner's lemma
+= Proof of Sperner's lemma <sec-sperner-proof>
 
 Now we turn to proving Sperner's lemma. As it turns out, the lemma can be obtained as a corollary of a very basic parity argument on directed graphs.
 
@@ -214,7 +214,7 @@ Now that our boundary coloring is standard, we can easily show Sperner's lemma u
 
 For the standard Sperner coloring of #ref(label("fig:sperner coloring")), the corresponding graph is shown just above on the left.
 
-== Properties of the Sperner graph
+== Properties of the Sperner graph <sec-sperner-graph>
 
 As you might have guessed from the picture, the following key properties hold.
 
@@ -254,7 +254,7 @@ As you might have guessed from the picture, the following key properties hold.
 
 At this point, the proof of Sperner's lemma is immediate. A graph in which each node has indegree at most one and outdegree at most one is composed of connected components that can only be singleton nodes, directed paths, or directed simple cycles. Only paths have nodes with outdegree $1$ and indegree $0$, or outdegree $0$ and indegree $1$; each has exactly one of each. Note also that the standard boundary coloring forces the bottom left cell not to be trichromatic, and node corresponding to this cell to have outdegree $1$ and indegree $0$. So this node must be the source of a path. The sink of that path is trichromatic as per~#ref(label("thm:sperner graph properties")). If there are other paths, both their source and their sink are trichromatic, as per~#ref(label("thm:sperner graph properties")). Hence, there are an odd number of trichromatic triangles in any standard Sperner coloring, and therefore any Sperner coloring.
 
-= Beyond the unit square
+= Beyond the unit square <sec-brouwer-general>
 
 We stated and proved Sperner's lemma for the two-dimensional grid, and used that to prove Brouwer's fixed point theorem for continuous functions mapping the unit square to itself. There is a $d$-dimensional generalization of Sperner's lemma, which can be used to prove Brouwer's fixed point theorem for continuous functions mapping $\[ 0 \, 1 \]^d$ to itself. In the high-dimensional  case, a $d$-dimensional grid is partitioned into simplices, the $d$-dimensional analog of triangles, without introducing any more vertices other than those in the grid. The vertices of the grid are now colored with $d + 1$ colors, $0 \, 1 \, dots.h \, d$. Now, a coloring is valid if color $i$ is not present in facet $x_i = 0$, for all $i = 1 \, dots.h \, d$, and color $0$ is not present in all facets $x_i = 1$, for all $i = 1 \, dots.h \, d$. Sperner's lemma guarantees the existence of a simplex that has all $d + 1$ colors on its $d + 1$ vertices. Using the $d$-dimensional version of Sperner's lemma to prove Brouwer's fixed point theorem for continuous functions mapping the $d$-dimensional hypercube to itself is analogous to the $d = 2$ case. Finally, given Brouwer's fixed point theorem for the hypercube it is not hard to prove it for other convex and compact sets. Given a function defined on an arbitrary convex and compact set, one can first affinely transform the coordinate system so the set lies inside the unit hypercube. Then the function can be extended outside of the set by first projecting points of the hypercube to the set and then applying the function. This will not introduce any spurious fixed points.
 

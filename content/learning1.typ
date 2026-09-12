@@ -22,7 +22,7 @@
 
 #let mU = $upright(U)_1$
 
-In Lecture 4 we have mentioned how no-external-regret dynamics recover several solution concepts of interest, including Nash equilibria in two-player zero-sum games, normal-form coarse-correlated equilibria in multiplayer general-sum games, and more generally convex-concave saddle point problems.
+The #lecture-link("learning_intro", <sec-learning-applications>)[applications of regret minimization] show how no-external-regret dynamics recover several solution concepts of interest, including Nash equilibria in two-player zero-sum games, normal-form coarse-correlated equilibria in multiplayer general-sum games, and more generally convex-concave saddle point problems.
 
 In this lecture, we begin exploring how no-external-regret dynamics can be constructed, starting from normal-form games.
 
@@ -77,12 +77,12 @@ Overall, it's easy to see that in all this jumping around, the regrets grow line
 Where to go from here? A few ideas seem natural:
 - We can replace picking the action with the highest regret with picking actions _proportionally_ to their regret; this leads to the algorithm called _Regret Matching_, which we will discuss in @sec-rm.
 - We can _smooth out_ the maximum operator by using the _softmax_ function. This leads to the _multiplicative weights update_ algorithm, which we will discuss in @sec-mwu.
-- We can _regularize_ the maximum operator by adding a term that penalizes large jumps in the strategy space. This leads to a very flexible algorithm called _follow-the-regularized-leader_ algorithm, which we will discuss in @sec-ftrl as well as in the next lecture.
+- We can _regularize_ the maximum operator by adding a term that penalizes large jumps in the strategy space. This leads to a very flexible algorithm called _follow-the-regularized-leader_ algorithm, which we will discuss in @sec-ftrl as well as in the supplementary reading on #lecture-link("learning2", <sec-predictivity>)[predictive learning algorithms].
 
 All these ideas work. Before we move on, though, it is worth knowing that---while flawed---the follow-the-leader algorithm is not completely hopeless.
 
 #remark[Fictitious play][
-  In the canonical learning setup (see Lecture 4), the use of follow-the-leader by all players goes under the name of _fictitious play_ #citep(<brown1949some>) #citep(<brown1951iterative>). In certain classes of games, including two-player zero-sum games, fictitious play is able to recover a Nash equilibrium, albeit with a potentially exponentially slow convergence rate #citep(<Robinson1951>).
+  In the #lecture-link("learning_intro", <def-canonical-learning>)[canonical learning setup], the use of follow-the-leader by all players goes under the name of _fictitious play_ #citep(<brown1949some>) #citep(<brown1951iterative>). In certain classes of games, including two-player zero-sum games, fictitious play is able to recover a Nash equilibrium, albeit with a potentially exponentially slow convergence rate #citep(<Robinson1951>).
 ]
 
 == The Regret Matching (RM) algorithm <sec-rm>
@@ -171,7 +171,7 @@ side: right, text-width: 50%,
 ]
 
 Our interest for the regret bound under the specific condition that $norm(vg^((t)))_oo <= 1$ is as follows.
-#remark[Within the canonical learning setup (see Lecture 4), the entries of $vg^((t))$ are the expected payoffs of all actions of the players. Thus, the condition $norm(vg^((t)))_oo <= 1$ corresponds to the condition that the game's payoffs lie in $[-1,1]$.]
+#remark[Within the #lecture-link("learning_intro", <def-canonical-learning>)[canonical learning setup], the entries of $vg^((t))$ are the expected payoffs of all actions of the players. Thus, the condition $norm(vg^((t)))_oo <= 1$ corresponds to the condition that the game's payoffs lie in $[-1,1]$.]
 
 As of today, Regret Matching and its variants are still often some of the most practical algorithms for learning in games.
 
@@ -231,7 +231,7 @@ Compared to RM, MWU has a different flavor: it uses _softmax_ instead of ReLU. T
 
   $ "Reg"^((T)) <= 2 sqrt(T log |A|). $
 ]<mwu-regret-bound>
-We will see the proof of @mwu-regret-bound in the next lecture, as a reflection of a substantially more general framework.
+The general FTRL/OMD bound in @ftrl-omd-regret-bound implies @mwu-regret-bound; @sec-omd-mwu gives the entropy specialization.
 
 For now, we remark a crucial aspect of MWU. Compared with the regret bound of RM and RM#super[+], the regret bound of MWU has only a _logarithmic_ dependence on the number of actions $|A|$. Despite in practice RM/RM#super[+] tend to outperform MWU (all while getting rid of any hyperparameter tuning), this property has profound _theoretical_ implications, especially in combinatorial games where the effective number of actions is exponential. The gist of it is that several important classes of games can be converted into _exponentially large_ normal-form games (this is the case of sequential games, for example). Since MWU only has logarithmic dependence on the number of actions of the resulting normal-form games, this shows that---at least ignoring computation---external regret minimization is possible with polynomial dependence on the game size even in these classes of complex, structured games.
 
@@ -298,7 +298,7 @@ We also remark the following connection between the two algorithms.
 
 #remark[For linear utilities and a fixed learning rate, FTRL and OMD agree when the mirror updates stay in the interior of the regularizer's domain without additional active constraints. Their dual-coordinate updates then telescope. Entropy on the simplex is an example (working within its affine hull). With additional constraints, the required projections can make the two algorithms different.]
 
-We mention the following regret bound for the general case. We will mention an even more powerful result next time.
+We mention the following regret bound for the general case. The supplementary reading on #lecture-link("learning2", <sec-rvu>)[predictive regret bounds] gives a stronger result when feedback is predictable.
 
 #theorem[Regret bound for FTRL and OMD][
   The regret cumulated by the FTRL and OMD algorithms is upper bounded by
@@ -347,7 +347,7 @@ In the special case in which $psi(x) := 1/2 norm(x)_2^2$, then the OMD algorithm
       ip(vg^((t-1)), xhat) - 1 / (2 eta) norm(xhat - vx^((t-1)))_2^2
     } = #text(size: 14pt, $Pi$)_(cX)(vx^((t-1)) + eta vg^((t-1))).
   $
-]
+] <def-online-gradient-ascent>
 
 Since the squared Euclidean norm is $1$-strongly convex with respect to the $ell_2$ norm, the regret bound for OGD can be derived from the general bound for OMD (@ftrl-omd-regret-bound) and is as follows.
 
@@ -368,7 +368,7 @@ The next plots illustrate the behavior of OGD and MWU in a simple $2 times 2$ ga
     The unique Nash equilibrium of the game is in
     $ x^* &= (2/3, 1/3), \
       y^* &= (1/3, 2/3). $
-    The purple dot indicates the starting strategy. The gray dotted line tracks the profile of _average_ strategies, which converges to an approximate Nash equilibrium as proved in Lecture 4.
+    The purple dot indicates the starting strategy. The gray dotted line tracks the profile of _average_ strategies, which converges to an approximate Nash equilibrium as proved by the #lecture-link("learning_intro", <thm-regret-gap>)[regret-to-equilibrium argument].
   ],
   [
     #image("figures/learning1/ogd_mwu.svg", width: 100%, alt: "OGD and MWU trajectories in the two-by-two zero-sum game; averages converge to equilibrium.")

@@ -9,7 +9,7 @@
 )
 #show: gabri_notes.with(..lecture)
 
-Nash's theorem guarantees an equilibrium, but its existence proof does not give a polynomial-time algorithm. We have already met a similar distinction in Sperner's lemma: a fully labeled simplex exists, yet the path certifying existence can be exponentially long. Today we formalize search problems whose solutions are guaranteed to exist, and isolate the directed parity argument underlying PPAD #citep(<papadimitriou1994parity>).
+#lecture-link("nfgs_nash", <cor-nash-existence>)[] guarantees a Nash equilibrium, but its existence proof does not give a polynomial-time algorithm. We have already met a similar distinction in #lecture-link("brouwer", <thm-sperner>)[Sperner's lemma]: a fully labeled simplex exists, yet the path certifying existence can be exponentially long. Today we formalize search problems whose solutions are guaranteed to exist, and isolate the directed parity argument underlying PPAD #citep(<papadimitriou1994parity>).
 
 = From decision to search
 
@@ -33,10 +33,10 @@ An existence theorem supplies the last condition. Polynomial balance and verific
 For a rational finite game and rational $epsilon.alt>0$, an $epsilon.alt$-Nash equilibrium can be represented by a rational profile of polynomial encoding length in the game description and $log(1/epsilon.alt)$. To see the length bound, round an exact equilibrium to a sufficiently fine rational grid: multilinearity and bounded payoffs control the resulting change in every deviation gain. Payoffs and deviations can then be evaluated in polynomial time for an explicitly represented game.
 
 #remark[Exact and approximate equilibria][
-  Two-player games with rational payoffs have rational equilibria of polynomial encoding length. With three or more players, exact equilibria can require irrational probabilities, so one cannot simply use a rational profile as the FNP witness for exact Nash. The algebraic fixed-point class FIXP captures this different issue #citep(<etessami2010fixedpoints>).
+  Two-player games with rational payoffs have rational equilibria of polynomial encoding length. With three or more players, exact equilibria can require #lecture-link("correlated", <sec-irrational-equilibria>)[irrational probabilities], so one cannot simply use a rational profile as the FNP witness for exact Nash. The algebraic fixed-point class FIXP captures this different issue #citep(<etessami2010fixedpoints>).
 ]
 
-= Reductions between search problems
+= Reductions between search problems <sec-search-reductions>
 
 #definition[Search reduction][
   A polynomial-time reduction from relation $R$ to relation $Q$ consists of polynomial-time functions $f$ and $g$ such that, whenever $R$ has a solution on $x$, the target problem has a solution on $f(x)$ and every such solution satisfies
@@ -52,7 +52,7 @@ Totality also explains why the usual SAT decision reduction is not an immediate 
   Suppose a polynomial construction maps a formula $F$ to an instance of a total polynomially verifiable search problem, and a polynomial decoder labels every valid witness with the correct satisfiable/unsatisfiable answer for $F$. Then unsatisfiability has an NP certificate: provide a valid target witness that the decoder labels unsatisfiable. Totality supplies such a witness, and correctness prevents a false one. Hence such a reduction would imply $"NP"="coNP"$. This statement concerns reductions that recover the decision answer, not just a search reduction required to work on satisfiable formulas.
 ]
 
-= The End-of-Line problem
+= The End-of-Line problem <sec-end-of-line>
 
 Consider a finite directed graph in which every vertex has at most one incoming edge and at most one outgoing edge. Its nontrivial components are directed paths or cycles. If one vertex has unequal in-degree and out-degree, some other vertex must also be unbalanced, because the sum of out-degree minus in-degree over all vertices is zero.
 
@@ -81,7 +81,7 @@ This convention handles every circuit pair. On the usual valid instances, $0$ is
 
 Following the path from $0$ will eventually find an endpoint, but can require exponentially many steps. The input contains circuits of polynomial size, not an explicit list of all $2^n$ vertices. The gap between verification and search is therefore compatible with a very simple graph-theoretic existence proof.
 
-= PPAD and other total-search classes
+= PPAD and other total-search classes <sec-ppad>
 
 #definition[PPAD][
   PPAD is the class of total polynomially verifiable search problems that admit a polynomial-time search reduction to End-of-Line. A problem is PPAD-hard if every problem in PPAD reduces to it, and PPAD-complete if it is both PPAD-hard and in PPAD.
@@ -95,24 +95,24 @@ Other classes organize total search by different existence principles. PPA uses 
   #image("figures/tfnp/complexity_classes.svg", width: 58%, alt: "A schematic with polynomial-time total search inside PPAD, inside TFNP, inside FNP; FNP-complete problems are shown separately as a conjectural placement.")
 ]
 
-= Encoding a PPAD reduction
+= Encoding a PPAD reduction <sec-ppad-encoding>
 
-Lecture 2, _Brouwer and Sperner_, established the geometric ingredients: the directed Sperner graph and the conversion from a trichromatic cell to an approximate fixed point. We now use those results to explain what a polynomial-time reduction must actually construct #citep(<papadimitriou1994parity>).
+#lecture-link("brouwer", none)[] established the geometric ingredients: the directed Sperner graph and the conversion from a trichromatic cell to an approximate fixed point. We now use those results to explain what a polynomial-time reduction must actually construct #citep(<papadimitriou1994parity>).
 
-#paragraph-marker() *Short cell encodings.*~~ Consider the two-dimensional grid from Lecture 2 with $2^b$ subdivisions per coordinate. Its interior colors are given by a Boolean circuit $C$ on the binary coordinates; the standard boundary colors are imposed by a fixed rule. Thus validity of the boundary does not require checking exponentially many outputs of $C$. Splitting each grid square along a fixed diagonal produces $2^(2b+1)$ triangles, but a triangle is specified by only its two square indices and one bit selecting the half-square. The boundary padding from Lecture 2 adds only a constant number of bits to this $O(b)$-bit encoding.
+#paragraph-marker() *Short cell encodings.*~~ Consider the #lecture-link("brouwer", <sec-sperner>)[two-dimensional Sperner grid] with $2^b$ subdivisions per coordinate. Its interior colors are given by a Boolean circuit $C$ on the binary coordinates; the standard boundary colors are imposed by a fixed rule. Thus validity of the boundary does not require checking exponentially many outputs of $C$. Splitting each grid square along a fixed diagonal produces $2^(2b+1)$ triangles, but a triangle is specified by only its two square indices and one bit selecting the half-square. The #lecture-link("brouwer", <sec-sperner-proof>)[boundary padding] adds only a constant number of bits to this $O(b)$-bit encoding.
 
-#paragraph-marker() *Local predecessor and successor circuits.*~~ Given a cell encoding, compute its three corners, evaluate their colors, and apply the orientation rule proved in Lecture 2 to identify its incoming and outgoing neighbors. This uses a constant number of calls to $C$ and arithmetic on $O(b)$-bit coordinates. These local procedures therefore give polynomial-size circuits $P,S$; constructing them never requires listing the grid. A missing neighbor is represented by the cell itself. Relabel the known boundary source as the all-zero vertex, and make unused bit strings isolated vertices by setting $P(v)=S(v)=v$.
+#paragraph-marker() *Local predecessor and successor circuits.*~~ Given a cell encoding, compute its three corners, evaluate their colors, and apply the #lecture-link("brouwer", <sec-sperner-graph>)[orientation rule for the Sperner graph] to identify its incoming and outgoing neighbors. This uses a constant number of calls to $C$ and arithmetic on $O(b)$-bit coordinates. These local procedures therefore give polynomial-size circuits $P,S$; constructing them never requires listing the grid. A missing neighbor is represented by the cell itself. Relabel the known boundary source as the all-zero vertex, and make unused bit strings isolated vertices by setting $P(v)=S(v)=v$.
 
-#paragraph-marker() *A decoder for every endpoint.*~~ By the Sperner-graph properties proved in Lecture 2, every unbalanced vertex other than the designated boundary source is a trichromatic cell. Decoding its coordinates takes polynomial time. Consequently, _any_ valid End-of-Line answer solves the succinct Sperner instance, including an endpoint on a different path from the one that starts at zero. This is the search-reduction requirement from Section L18.2.
+#paragraph-marker() *A decoder for every endpoint.*~~ By these Sperner-graph properties, every unbalanced vertex other than the designated boundary source is a trichromatic cell. Decoding its coordinates takes polynomial time. Consequently, _any_ valid End-of-Line answer solves the succinct Sperner instance, including an endpoint on a different path from the one that starts at zero. This is the search-reduction requirement from @sec-search-reductions.
 
-The reduction has polynomial cost in the circuit description and $b$, even though the represented graph has exponentially many vertices. End-of-Line is asked to supply an endpoint; the reduction does not find one by tracing a potentially exponential path. This distinction is what makes the existence argument from Lecture 2 a PPAD membership argument.
+The reduction has polynomial cost in the circuit description and $b$, even though the represented graph has exponentially many vertices. End-of-Line is asked to supply an endpoint; the reduction does not find one by tracing a potentially exponential path. This distinction is what makes the Sperner existence argument a PPAD membership argument.
 
-For a fixed-point application, one must additionally derive a suitable polynomially bounded precision $b$ and an efficiently computable coloring from the finite description of the function and the requested accuracy. The quantitative approximation bound is supplied by Lecture 2; continuity alone does not supply these computational guarantees #citep(<etessami2010fixedpoints>). The two-dimensional example explains the encoding step. Applications in variable dimension require the corresponding higher-dimensional construction.
+For a fixed-point application, one must additionally derive a suitable polynomially bounded precision $b$ and an efficiently computable coloring from the finite description of the function and the requested accuracy. The #lecture-link("brouwer", <thm-sperner-approximation>)[quantitative approximation bound] supplies this accuracy control; continuity alone does not supply these computational guarantees #citep(<etessami2010fixedpoints>). The two-dimensional example explains the encoding step. Applications in variable dimension require the corresponding higher-dimensional construction.
 
 = The connection to Nash computation
 
 Membership reduces approximate Nash to End-of-Line via a fixed-point construction. Hardness reduces End-of-Line to a game whose every sufficiently accurate equilibrium decodes to a valid endpoint.
 
-The next lecture uses action probabilities as circuit variables and payoff incentives to enforce gate relations #citep(<dgp09>, <chen2009settling>). The gates, payoff normalization, and approximation tolerance must be specified. PPAD-completeness concerns worst-case instances; a long path-following algorithm alone proves no lower bound on all algorithms.
+#lecture-link("ppad_completeness", none)[] uses action probabilities as circuit variables and payoff incentives to enforce gate relations #citep(<dgp09>, <chen2009settling>). The gates, payoff normalization, and approximation tolerance must be specified. PPAD-completeness concerns worst-case instances; a long path-following algorithm alone proves no lower bound on all algorithms.
 
 #lec_bibliography("meta/refs.bib")

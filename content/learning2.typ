@@ -26,7 +26,7 @@
 
 #v(-4mm)
 In recent years, there has been a lot of interest in the idea of _optimism_ in
-learning algorithms. The fundamental idea behind optimism is the following:
+learning algorithms. We build on the #lecture-link("learning1", <ftrl-omd-general-case>)[FTRL and OMD updates and regret bounds]. The fundamental idea behind optimism is the following:
 
 #v(-1mm)
 #h(1mm)#box(
@@ -35,7 +35,7 @@ learning algorithms. The fundamental idea behind optimism is the following:
   inset: (left: 3mm, top: 0mm, bottom: 1mm),
 )[_When all players learn at the same time, the environment is nonstationary but not necessarily adversarial. Can one then take advantage of this to design learning algorithms with better regret guarantees and convergence properties?_]
 
-= Predictivity, optimism, and acceleration
+= Predictivity, optimism, and acceleration <sec-predictivity>
 
 The idea of predictive is to _anticipate_ the next utility gradient $vg^((t+1))$ by
 having a _prediction_ $vm^((t+1))$.
@@ -81,7 +81,7 @@ At least three variants can be defined.
 )
 
 
-While the three predictive algorithms are in general different, they coincide in the special case of _Legendre regularizers_ (see also Lecture 5).
+While the three predictive algorithms are in general different, they coincide in the special case of _Legendre regularizers_ (see also the #lecture-link("learning1", <ftrl-omd-general-case>)[discussion of when FTRL and OMD agree]).
 
 #remark[
   For Legendre regularizers (i.e., when $psi$'s gradients go to infinity at the boundary of $cX$), the three predictive algorithms (FTRL, non-reflected OMD, reflected OMD) coincide.
@@ -93,7 +93,7 @@ It is also worth noting that the predictive versions of the algorithms subsume t
   to zero, i.e., $vm^((t)) = 0$ at all times $t$.
 ]
 
-== Optimism
+== Optimism <sec-optimism>
 
 The idea of optimism is to use predictivity with the specific guess $vm^((t+1)) = vg^((t))$ at
 all times $t$. This corresponds to predicting that the feedback is slow-changing.
@@ -118,7 +118,7 @@ all times $t$. This corresponds to predicting that the feedback is slow-changing
 In two-player games, optimism serves as a form of _negative_ momentum that pushes the iterates towards the equilibrium. We illustrate this in the following example. We will give a quantitative analysis of the effect of optimism in the convergence of learning algorithms in @sec-iterate-convergence.
 
 #example[
-  The following plots show the dynamics of the optimistic and non-optimistic versions of MWU and OGD in the small two-player zero-sum game we used in Lecture 5, whose utility matrix is
+  The following plots show the dynamics of the optimistic and non-optimistic versions of MWU and OGD in the #lecture-link("learning1", <sec-ogd>)[two-player zero-sum example used to compare OGD and MWU], whose utility matrix is
   $ U_1 := mat(2, 1; 0, 2). $
   The multiplicative weights update algorithm was set up with constant learning rate $eta = 0.25$, while the online gradient descent algorithm was set up with learning rate $eta = 0.1$.
   #wrapped-figure(
@@ -136,7 +136,7 @@ In two-player games, optimism serves as a form of _negative_ momentum that pushe
   )
 ]
 
-== Predictive regret bounds (RVU)
+== Predictive regret bounds (RVU) <sec-rvu>
 
 Intuitively, one would expect that predictions _help_ in reducing the regret of the learning algorithm.
 At one extreme, one would presumably hope that if the prediction is perfect, then the regret would be very small.
@@ -155,7 +155,7 @@ This is indeed the case, as shown by #citet(<syrgkanis2015fast>).
 #remark[
   A consequence of the previous regret bound is the fact that---assuming $m^((t)) = vg^((t))$ is _omniscent_---the regret of the learning algorithm _does not grow with time_.]
 
-== Accelerated learning of Nash equilibria in two-player zero-sum games
+== Accelerated learning of Nash equilibria in two-player zero-sum games <sec-fast-zero-sum>
 
 As noted by #citep(<syrgkanis2015fast>), the RVU bound implies accelerated convergence to Nash equilibria in two-player zero-sum games. The proof is quite elementary, and we present it next.
 
@@ -173,7 +173,7 @@ As noted by #citep(<syrgkanis2015fast>), the RVU bound implies accelerated conve
   $norm(mU)_"op" := max_(z in RR^n) norm(mU z)_* \/ norm(z)$
   is the operator norm of $mU$, then, at any time $T$, the sum of the regrets of the players satisfies the bound
   $ "Reg"_1^((T)) + "Reg"_2^((T)) <= (Omega_1 + Omega_2) / eta $
-  which is _constant_ with respect to time. This immediately implies convergence to the set of Nash equilibria in two-player zero-sum games at the rate of $O_T (1\/T)$.
+  which is _constant_ with respect to time. The #lecture-link("learning_intro", <thm-regret-gap>)[regret-to-saddle-point-gap identity] then implies convergence to the set of Nash equilibria in two-player zero-sum games at the rate of $O_T (1\/T)$.
 ]
 #proof[
   The statement follows from summing up the RVU bounds, and observing that the middle terms cancel out with the right-most terms. More precisely, we have

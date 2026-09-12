@@ -5,7 +5,7 @@
 
 Normal-form games model simultaneous-move interactions with a single move (think about rock-paper-scissors). Despite their simplicity, normal-form games will provide a natural ground for looking into important concepts in multiagent settings, such as notions of equilibria (Nash, maxmin, correlated, $dots.h$), and learning from repeated play. In the second part of the course, we will move on to notions of games that explicitly capture more complex phenomena, such as sequential moves and imperfect information.
 
-= Normal-form games and the Nash equilibrium
+= Normal-form games and the Nash equilibrium <sec-normal-form>
 
 When introducing a (finite) normal-form game, we need to specify the following quantities:
 
@@ -59,7 +59,7 @@ where the notation $x_(- i)$ is popular syntactic sugar to denote the tuple $(x_
 
 The above idea has some merits, especially in two-player zero-sum games, that is, those two-player games where $u_1 (a_1 \, a_2) + u_2 (a_1 \, a_2) = 0$ for all combinations of actions. In those games, players are in direct competition, so it makes sense to assume that the opponent is “out to get us.” But in more general games, the maxmin strategy can be too conservative, since it assumes that all other players have nothing better going on than to minimize our payoff, even if that hurts them.
 
-== The Nash equilibrium
+== The Nash equilibrium <sec-nash-equilibrium>
 
 In general, defining what constitutes “optimal play” is tricky. But we can start from what is convincingly #emph[not] optimal play: if we predict that the players should play according to some strategies $x_1 \, dots.h \, x_n$, then it is not optimal if it turned out that any player would be better off by switching to something else. This is the idea behind the #emph[Nash equilibrium].
 
@@ -67,7 +67,7 @@ In general, defining what constitutes “optimal play” is tricky. But we can s
 A strategy profile $(x_1 \, dots.h \, x_n) in Delta (A_1) times dots.h.c times Delta (A_n)$ is a #emph[Nash equilibrium] if no player benefits from unilaterally deviating from their strategy. In symbols,
 
 $ forall i in \[ n \] \, x'_i in Delta (A_i) \, #h(2em) #h(2em) u_i (x'_i \, x_(- i)) lt.eq u_i (x_1 \, dots.h \, x_n) . $
-]
+] <def-nash-equilibrium>
 
 #remark[
 Without loss of generality, when verifying if a profile $(x_1 \, dots.h \, x_n)$ is a Nash equilibrium, it is sufficient to consider only #emph[deterministic] deviations $x_i in A_i$. Indeed, if a player has a profitable randomized deviation, this must mean that at least one of the actions they are randomizing over is profitable.
@@ -97,7 +97,7 @@ Consider the following small game:
   This is not a coincidence: in two-player nondegenerate games, there is always an #emph[odd] number of Nash equilibria. This fact comes from more profound connections with some combinatorial objects that we will uncover quite soon.
 ]
 
-= Existence of mixed-strategy Nash equilibrium
+= Existence of mixed-strategy Nash equilibrium <sec-nash-existence>
 
 In 1950, John Nash established one of the most celebrated results in game theory:#footnote[John Nash went on to win the Nobel prize in economics for his fundamental contributions to game theory.] mixed-strategies Nash equilibria exist in all games, no matter the number of players or number of actions. The proof of Nash is nonconstructive, and fundamentally boils down to showing that one can think of Nash equilibria as fixed points. Two remarks are in order: 
 
@@ -112,7 +112,7 @@ The idea of viewing Nash equilibria as fixed points is not just natural, but als
 
 In the remainder of the lecture, we will give a proof of the existence of Nash equilibria. While the first proof of #citet(label("Nash50:Equilibrium")) invokes Kakutani's fixed point theorem, a year later Nash noticed that a much more elementary proof can be given #citep(label("Nash51:NonCooperative")). We present a variation of the latter today.
 
-== The Nash improvement function
+== The Nash improvement function <sec-nash-improvement>
 
 As mentioned above, one can think about Nash equilibria as fixed points of a “profitable response” function from the set of mixed strategy to itself. Intuitively, this function must calculate a profitable response for each player. Furthermore, to invoke fixed point theorems, this function must be continuous. The key insight of Nash was to find a simple continuous function that, given a strategy profile, calculates a “profitable response” for each player. For lack of a better term, we will refer to this function with the term #emph[“Nash improvement function”].
 
@@ -130,7 +130,7 @@ Let $x_1 in Delta (A_1) \, dots.h \, x_n in Delta (A_n)$ be arbitrary strategies
 #math.equation(block: true, numbering: "(1)", $phi_(i \, a_i) (x_1 \, dots.h \, x_n) colon.eq frac(x_(i \, a_i) + [r_(i \, a_i) (x_1 \, dots.h \, x_n)]^(+), 1 + sum_(a'_i in A_i) [r_(i \, a'_i) (x_1 \, dots.h \, x_n)]^(+))$.body)#label("nif")
 
   for every player $i in \[ n \]$ and action $a_i in A_i$. Here, $\[ r \]^(+) colon.eq max {0 \, r}$ denotes the positive part of $r$.
-]
+] <def-nash-improvement>
 
 It is straightforward to verify that $phi$ is well-defined and maps strategy profiles into strategy profiles. Indeed, the numerator in #ref(label("nif"), supplement: none) is always nonnegative, and the denominator is always at least $1$, implying that $phi_(i \, a_i) gt.eq 0$ for all $a_i in A_i$ and player $i in \[ n \]$. Furthermore,
 
@@ -148,13 +148,13 @@ The plots below visualize the displacement $phi (x_1 \, x_2) - (x_1 \, x_2)$ ind
  The background of the plots highlights the angle of displacement induced by the Nash improvement function, according to the gradient wheel shown below here.
 
 #wrapped-figure(side: right, text-width: 68%)[
-\[If the color scheme seems arbitrary, as a small spoiler it will play a fundamental role in the proof of the #emph[computational complexity] of Nash equilibria, which we will discuss later on in this course. In particular, the three regions of the coloring scheme will be key in defining an important #emph[combinatorial] construction called #emph[Sperner coloring].\]
+\[If the color scheme seems arbitrary, as a small spoiler it will play a fundamental role in the proof of the #emph[computational complexity] of Nash equilibria, which we will discuss later on in this course. In particular, the three regions of the coloring scheme will be key in defining an important #emph[combinatorial] construction called #lecture-link("brouwer", <sec-sperner>)[_Sperner coloring_].\]
 ][
 #image("figures/nfgs_nash/color_wheel.svg", width: 82.527pt)
 ]
 ]
 
-== Quantifying the increase in utility of the improvement step
+== Quantifying the increase in utility of the improvement step <sec-nash-improvement-gain>
 
 We validate our intuition that the Nash improvement function is a “profitable response” function. The following result shows that if a player has positive regret for any action, then the Nash improvement function unilaterally increases that player's utility. This is a key property that will allow us to show that the fixed points of the Nash improvement functions must be Nash equilibria.
 
@@ -164,7 +164,7 @@ For any strategy profile $(x_1 \, dots.h \, x_n)$, and any player $i in \[ n \]$
 $ u_i (phi_i (x_1 \, dots.h \, x_n) \, x_(- i)) - u_i (x_1 \, dots.h \, x_n) = frac(sum_(a_i in A_i) ([r_(i \, a_i) (x_1 \, dots.h \, x_n)]^(+))^2, 1 + sum_(a_i in A_i) [r_(i \, a_i) (x_1 \, dots.h \, x_n)]^(+)) . $
 
   So, if even one action of a player $i$ has positive regret, then the Nash improvement function unilaterally #emph[strictly] increases the utility of that player.
-]#label("thm:imp")
+]#label("thm-nash-improvement")
 
 #proof[
 Since we are focusing on a generic player $i$ and keeping all the other ones fixed (and playing strategies $x_(- i)$), we will reduce the notational burden by using the following shorthands:
@@ -191,7 +191,7 @@ At this point, the following is a simple corollary.
 
 #theorem[
 A strategy profile $(x_1 \, dots.h \, x_n)$ is a Nash equilibrium if and only if it is a fixed point of the Nash improvement function $phi$.
-]#label("thm:nash fp")
+]#label("thm-nash-fixed-points")
 
 #proof[
 ($arrow.r.double.long$) If $(x_1 \, dots.h \, x_n)$ is a Nash equilibrium, then by definition for all $i in \[ n \]$ and $a_i in A_i$, we have $r_(i \, a_i) (x_1 \, dots.h \, x_n) lt.eq 0$. Hence, for all $i in \[ n \]$ and $a_i in A_i$, we have
@@ -200,18 +200,18 @@ $ phi_(i \, a_i) (x_1 \, dots.h \, x_n) = frac(x_(i \, a_i) + [r_(i \, a_i) (x_1
 
   that is, $(x_1 \, dots.h \, x_n)$ is a fixed point of $phi$.
 
-  ($arrow.l.double.long$) Conversely, suppose that $(x_1 \, dots.h \, x_n)$ is a fixed point of $phi$. Then, for all $i in \[ n \]$, from #ref(label("thm:imp")) we have
+  ($arrow.l.double.long$) Conversely, suppose that $(x_1 \, dots.h \, x_n)$ is a fixed point of $phi$. Then, for all $i in \[ n \]$, from #ref(label("thm-nash-improvement")) we have
 
 $ frac(sum_(a_i in A_i) ([r_(i \, a_i) (x_1 \, dots.h \, x_n)]^(+))^2, 1 + sum_(a_i in A_i) [r_(i \, a_i) (x_1 \, dots.h \, x_n)]^(+)) = u_i (phi_i (x_1 \, dots.h \, x_n) \, x_(- i)) - u_i (x_1 \, dots.h \, x_n) = 0 . $
 
   Hence, it must be $r_(i \, a_i) (x_1 \, dots.h \, x_n) lt.eq 0$ for all $i in \[ n \]$ and $a_i in A_i$ (or the left-hand side would be strictly positive), and therefore $(x_1 \, dots.h \, x_n)$ is a Nash equilibrium.
 ]
 
-By invoking Brouwer's fixed-point theorem, we recover the central result of this lecture: Nash equilibria always exist.
+By invoking #lecture-link("brouwer", <sec-brouwer-general>)[Brouwer's fixed-point theorem], we recover the central result of this lecture: Nash equilibria always exist.
 
 #corollary[
-Since $phi$ is continuous and maps the nonempty compact convex set $Delta (A_1) times dots.h.c times Delta (A_n)$ into itself, by Brouwer's fixed point theorem, it has a fixed point. By #ref(label("thm:nash fp")), this implies that every game has (at least) one Nash equilibrium in mixed strategies.
-]
+Since $phi$ is continuous and maps the nonempty compact convex set $Delta (A_1) times dots.h.c times Delta (A_n)$ into itself, by Brouwer's fixed point theorem, it has a fixed point. By #ref(label("thm-nash-fixed-points")), this implies that every game has (at least) one Nash equilibrium in mixed strategies.
+] <cor-nash-existence>
 
 = Bibliography for this lecture
 

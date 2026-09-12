@@ -24,6 +24,10 @@ class LectureLinkValidationTests(unittest.TestCase):
         self.target.write_text('= The result <stable-result>\n')
         self.config = {'notes': [{'source': 'one.typ'}, {'source': 'two.typ'}]}
 
+    def test_current_course_links_are_valid(self):
+        config = json.loads((ROOT / 'html-export.json').read_text())
+        self.assertGreater(validate_lecture_links(ROOT, config), 0)
+
     def test_renaming_heading_text_preserves_links(self):
         self.target.write_text('= Renamed result <stable-result>\n')
         self.assertEqual(validate_lecture_links(self.root, self.config), 1)

@@ -12,17 +12,17 @@
 )
 #show: gabri_notes.with(..lecture)
 
-We continue the discussion from the lecture on total search and TFNP by giving a glimpse of how the PPAD-hardness of finding $eps$-approximate Nash equilibria was shown by #citet(<dgp09>).
+We continue the discussion from #lecture-link("tfnp", none)[] by giving a glimpse of how the PPAD-hardness of finding $eps$-approximate Nash equilibria was shown by #citet(<dgp09>).
 
 The proof can be broken down into two main steps:
-- Reduction from the End-of-the-line problem to (approximate) Brouwer.
+- Reduction from #lecture-link("tfnp", <sec-end-of-line>)[End-of-Line] to (approximate) Brouwer.
 - Reduction from (approximate) Brouwer to (approximate) Nash equilibria.
 
 The first step requires a carefully encoded path and interpolation construction; we will not cover it here. The second step is more involved and requires a careful construction of a reduction from Brouwer to Nash equilibria. This is the part we will focus on in this lecture.
 
 The key idea is the following: in the reduction from #smallcaps[End-of-the-line] to Brouwer, we define a continuous function $f$ for which we need to find an approximate fixed point. We now need to construct a game such that every sufficiently accurate approximate Nash equilibrium can be decoded into an approximate fixed point of $f$. The issue is that it is not clear how we can have games "compute" functions. Can we construct games in such a way that their behavior at Nash equilibria can be seen as "computing something"? The answer is positive, as we see next.
 
-= Generalized circuits and approximation
+= Generalized circuits and approximation <sec-generalized-circuits>
 
 We show that given a function represented as an _arithmetic circuit_, it is possible to construct a game whose Nash equilibria correspond to computing a fixed point of the function. This is the key idea behind the reduction from Brouwer to Nash equilibria.
 
@@ -72,7 +72,7 @@ The table gives ideal gate relations. To state a finite search problem appropria
 ]
 
 #proofsketch[
-  Replace each comparison by a continuous ramp: output $0$ when $x_1-x_2 <= -delta/2$, output $1$ when $x_1-x_2 >= delta/2$, and interpolate linearly between. All other gates already give continuous maps into $[0,1]$. Updating every output coordinate defines a continuous self-map of $[0,1]^n$, which has a fixed point by Brouwer. Rounding this fixed point to a sufficiently fine rational grid preserves the displayed $delta$ constraints: the arithmetic gates are Lipschitz, and comparisons have a margin between the ramp's transition and the required thresholds. Polynomially many bits suffice. The PPAD reduction and hardness construction are the substantive additional parts of the cited result.
+  Replace each comparison by a continuous ramp: output $0$ when $x_1-x_2 <= -delta/2$, output $1$ when $x_1-x_2 >= delta/2$, and interpolate linearly between. All other gates already give continuous maps into $[0,1]$. Updating every output coordinate defines a continuous self-map of $[0,1]^n$, which has a fixed point by #lecture-link("brouwer", <sec-brouwer-general>)[Brouwer's theorem]. Rounding this fixed point to a sufficiently fine rational grid preserves the displayed $delta$ constraints: the arithmetic gates are Lipschitz, and comparisons have a margin between the ramp's transition and the required thresholds. Polynomially many bits suffice. The PPAD reduction and hardness construction are the substantive additional parts of the cited result.
 ]
 
 The restriction to rational-constant scaling matters. Allowing arbitrary variable multiplication changes the exact fixed-point problem to an algebraic one; exact multiplayer Nash is associated with FIXP #citep(<etessami2010fixedpoints>). The statement above explicitly concerns approximate solutions.

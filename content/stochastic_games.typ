@@ -91,7 +91,7 @@ If all strategies $pi_1 \, dots.h \, pi_m$ are Markovian, the Nash equilibrium i
 == The finite-horizon case
  #label("sec:finite horizon Nash existence")
 
-If we are content with non-Markovian strategies, a finite-horizon stochastic game can just be “unrolled” and converted into a perfect-recall extensive-form game, whose Nash equilibrium strategies can be converted to a Nash equilibrium of the stochastic game. In general, this Nash equilibrium will not be in Markovian strategies. However, finite-horizon stochastic games do have Nash equilibria in Markovian strategies, as can be seen by a #emph[backward induction] argument. 
+If we are content with non-Markovian strategies, a finite-horizon stochastic game can just be “unrolled” and converted into a #lecture-link("efg_intro", <sec-game-trees>)[perfect-recall extensive-form game], whose Nash equilibrium strategies can be converted to a Nash equilibrium of the stochastic game. In general, this Nash equilibrium will not be in Markovian strategies. However, finite-horizon stochastic games do have Nash equilibria in Markovian strategies, as can be seen by a #emph[backward induction] argument.
 
 #theorem[
 Every finite-horizon stochastic game with a finite number of states, actions, and players, has a Nash equilibrium in Markovian strategies. More formally, in the setting of Definition~#ref(label("def:finite horizon stochastic game"), supplement: none), there exists a collection of policies $pi_1 \, dots.h \, pi_m$ where $pi_i : S times { 0 \, dots.h \, H - 1 } arrow.r Delta (A_i)$ such that 
@@ -203,7 +203,7 @@ $ q_i^pi (s \, a_i) = sum_(a_(- i)) r_i (s \, a) dot.op pi_(- i) (a_(- i) \| s) 
 ]
 )
 
-We now define a Nash-type function $phi$, similar to what we used in Lecture 2, mapping policy profiles to improved policy profiles as follows: 
+We now define a Nash-type function $phi$, analogous to the #lecture-link("nfgs_nash", <def-nash-improvement>)[Nash improvement function for normal-form games], mapping policy profiles to improved policy profiles as follows:
 
 #math.equation(block: true, numbering: "(1)", $forall i \, s \, a_i : #h(2em) pi'_i (a_i \| s) arrow.l frac(pi_i (a_i \| s) + [q_i^pi (s \, a_i) - v_i^pi \( s \)]^(+), 1 + sum_(a'_i) [q_i^pi (s \, a'_i) - v_i^pi \( s \)]^(+)) .$.body)#label("eq:nash function for Markov games")
 
@@ -211,7 +211,7 @@ We now define a Nash-type function $phi$, similar to what we used in Lecture 2, 
 
 To complete the proof, we need to argue that the fixed point $pi^(*)$ is a Nash equilibrium, that is, for all $i$, $pi_i^(*)$ is a best response to $pi_(- i)^(*)$, even if the best response is computed with respect to arbitrary policies $pi'_i : S times \( S times A \)^(*) arrow.r Delta \( A_i \)$.
 
-Pick an arbitrary player $i$ and  state $s$. Using the same logic in the Nash equilibrium existence proof in Lecture 2, we infer that 
+Pick an arbitrary player $i$ and  state $s$. Using the #lecture-link("nfgs_nash", <thm-nash-improvement>)[utility-improvement argument from the Nash existence proof], we infer that
 
 #math.equation(block: true, numbering: "(1)", $forall a_i in A_i \, #h(2em) v_i^(pi^(*)) \( s \) gt.eq q_i^(pi^(*)) (s \, a_i) .$.body)#label("eq:one state deviations weak")
 
@@ -282,7 +282,7 @@ We define the #emph[Shapley Operator] (or Bellman Operator) $cal(T) : RR^(abs(S)
 
 $ Q_(s \, V) \( a \) colon.eq r \( s \, a \) + gamma sum_(s') ℙ \( s' \| s \, a \) V \( s' \) . $
 
-The operator updates the value of state $s$ to be the minimax value of this local game:
+The operator updates the value of state $s$ to be the #lecture-link("correlated", <sec-zero-sum>)[minimax value] of this local game:
 
 $ \( cal(T) V \) \( s \) colon.eq max_(pi_1 in Delta \( A_1 \)) min_(pi_2 in Delta \( A_2 \)) EE_(a tilde.op \( pi_1 \, pi_2 \)) \[ Q_(s \, V) \( a \) \] . $
 

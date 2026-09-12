@@ -7,11 +7,11 @@ In this lecture, we will continue analyzing the properties of Nash equilibria in
 
 = Further properties of the Nash equilibrium
 
-We ended Lecture 1 with the definition of a Nash equilibrium. Recall that a strategy profile is a Nash equilibrium if no player can unilaterally deviate from their strategy to improve their payoff. We also discussed the existence of Nash equilibria in finite games, which is guaranteed by the Brouwer fixed-point theorem.
+We introduced the #lecture-link("nfgs_nash", <def-nash-equilibrium>)[definition of a Nash equilibrium] in the notes on normal-form games. Recall that a strategy profile is a Nash equilibrium if no player can unilaterally deviate from their strategy to improve their payoff. We also discussed the existence of Nash equilibria in finite games, which is guaranteed by the Brouwer fixed-point theorem.
 
-== Nash equilibrium in two-player zero-sum games
+== Nash equilibrium in two-player zero-sum games <sec-zero-sum>
 
-As mentioned in the previous lecture, in two-player zero-sum games the Nash equilibria are exactly those strategy profiles for which both players are playing a maxmin strategy. We formalize this in the next theorem.  First, though, we introduce some notation which will make our life easier when dealing with two-player games.
+In two-player zero-sum games the Nash equilibria are exactly those strategy profiles for which both players are playing a maxmin strategy. We formalize this in the next theorem.  First, though, we introduce some notation which will make our life easier when dealing with two-player games.
 
 #definition[Matrices $U_1$ and $U_2$ for two-player games][
 Consider a generic two-player zero-sum game, as shown next. As usual, we denote the sets of actions for player by $A_1$ and $A_2$.
@@ -80,7 +80,7 @@ The key insight is that this problem can be rewritten as
 
 $ cases(max_v v, upright("s.t.") v lt.eq x^top U_1 a_2 quad forall a_2 in A_2, upright("") 1^top x = 1, x gt.eq 0 .) $
 
-which is a linear program with a linear number of constraints in the number of actions of Player 2. We can use any linear programming solver to find such a solution. We will see more scalable methods to compute maxmin strategies from repeat play starting next week.
+which is a linear program with a linear number of constraints in the number of actions of Player 2. We can use any linear programming solver to find such a solution. The #lecture-link("learning_intro", <sec-learning-zero-sum>)[self-play construction] gives more scalable methods to compute maxmin strategies from repeated play.
 
 #strong[Connection with linear programming]  It is worth pausing for a moment to appreciate some historical context. We started the proof by assuming von Neumann's minimax theorem, which we justified as a consequence of linear programming duality. However, historically, von Neumann did not have the luxury of linear programming to prove his theorem.
 
@@ -117,7 +117,7 @@ All of this seems simple with the luxury of hindsight. But the two fields were n
         ]
 ],
 [
-In light of the above you might be wondering how easy it would be to prove the minimax theorem without relying on linear programming duality. As we will show, the mere existence of learning dynamics in games is enough. We will also see a different proof next time.
+In light of the above you might be wondering how easy it would be to prove the minimax theorem without relying on linear programming duality. The #lecture-link("learning_intro", <sec-learning-minimax>)[proof using regret minimization] only requires the existence of suitable learning dynamics. The supplementary reading on #lecture-link("eah", <sec-minimax-algorithm>)[constructive minimax] develops a different computational approach.
 ]
 )
 
@@ -171,7 +171,7 @@ This follows directly from the way Lemke-Howson works, which is similar to the s
 
 An interesting result about the computation of $epsilon.alt$-approximate Nash equilibria is due to #citet(label("LMM03")), and is based on the observation that every game admits an $epsilon.alt$-approximate Nash equilibrium where the strategy of Player 1 is supported on at most $w colon.eq O (frac(log \| A_2 \|, epsilon.alt^2))$ strategies. This follows from using a Hoeffding bound on samples from the distribution of Player 1's strategy. One can then check any support for Player 1's strategy of size up to $w$, and for each such support, solve a linear program to verify if a Nash equilibrium with that support exists. This gives a subexponential-time algorithm (of order $O (s^(log s \/ epsilon.alt^2))$, where $s$ is the size of input) for computing an $epsilon.alt$-approximate Nash equilibrium.
 
-== Nash equilibrium in games with more than two players
+== Nash equilibrium in games with more than two players <sec-irrational-equilibria>
 
 In games with more than two players, the behavior of Nash equilibria can be even more problematic.
 
@@ -209,7 +209,7 @@ If one is willing to stomach a worst-case superpolynomial runtime, some methods 
 
 The discussion above shows that Nash equilibria can be hard to compute and might not form a convex (or even contractible) set. This motivates the study of #emph[correlated equilibria] #citep(label("Aumann1974Mar")) and #emph[coarse correlated equilibria] #citep(label("moulin1978strategically")), which are a relaxation of Nash equilibria that are easier to compute, always form a convex set, and for which rational solutions always exist. As we will show starting in a few lectures, another major advantage of correlated equilibria is that they can be learned from repeated play, in a way that is fundamentally incompatible with Nash equilibria.#footnote[A paradigm that has been successful in applications is to learn a correlated equilibrium from repeated play, and then marginalize it into a profile that is hoped to be close to a Nash equilibrium. This was used for example to reach superhuman performance in multiplayer poker #citep(label("Brown2019Aug")).]
 
-== Coarse correlated equilibrium
+== Coarse correlated equilibrium <sec-cce>
 
 Remember that in a Nash equilibrium we are seeking a strategy profile $(x_1 \, dots.h \, x_n) in Delta (A_1) times dots.h.c times Delta (A_n)$ such that no player can unilaterally deviate to improve their payoff, that is,
 
@@ -223,7 +223,7 @@ The concept of #emph[coarse correlated equilibrium] is a relaxation of this defi
 A #emph[coarse correlated equilibrium (CCE)] is a correlated strategy $mu in Delta (A_1 times dots.h times A_n)$ such that
 
 #math.equation(block: true, numbering: "(1)", $bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (a'_1 \, dots.h \, a_n)] lt.eq bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (a_1 \, dots.h \, a_n)] #h(2em) forall i in \[ n \] \, a'_i in A_i .$.body)#label("eq:cce")
-]#label("def:cce")
+]#label("def-cce")
 
 #remark[
 The definition of a CCE is a relaxation of the definition of a Nash equilibrium. In a Nash equilibrium, the players randomize independently; in a CCE, they can randomize in a correlated way. #emph[A Nash equilibrium is a CCE $mu$ that happens to be a product distribution], that is, $mu = x_1 ⊗ dots.h.c ⊗ x_n .$
@@ -231,7 +231,7 @@ The definition of a CCE is a relaxation of the definition of a Nash equilibrium.
   This shows that the set of CCEs is a superset of the set of Nash equilibria. Thus, a coarse correlated equilibria always exists in every game.
 ]
 
-#strong[Properties and computation]  We can turn #ref(label("def:cce")) into an optimization problem. The variables are the entries of the probability distribution $mu$. This is a $(A_1 times dots.h.c times A_n)$-dimensional nonnegative vector whose entries must satisfy the linear equality constraint
+#strong[Properties and computation]  We can turn #ref(label("def-cce")) into an optimization problem. The variables are the entries of the probability distribution $mu$. This is a $(A_1 times dots.h.c times A_n)$-dimensional nonnegative vector whose entries must satisfy the linear equality constraint
 
 $ sum_(a_1 in A_1) dots.h.c sum_(a_n in A_n) mu_(a_1 \, dots.h \, a_n) = 1 . $
 
@@ -248,7 +248,7 @@ Since the coefficients of the linear constraints are the payoffs of the game, th
 
 It is worth knowing that a CCE can also be computed in polynomial time in imperfect-information sequential games, despite the number of "actions" there, which is the number of strategies in the tree, is exponential in the input. Unfortunately, we lose the ability to optimize over the set.
 
-== Correlated equilibrium
+== Correlated equilibrium <sec-ce>
 
 The concept of #emph[correlated equilibrium] is an intermediate relaxation between Nash equilibrium and coarse correlated equilibrium.
 
@@ -258,7 +258,7 @@ A #emph[correlated equilibrium (CE)] is a correlated strategy $mu in Delta (A_1 
 $ bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (phi.alt_i (a_i) \, a_(- i))] lt.eq bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (a_i \, a_(- i))] #h(2em) forall i in \[ n \] \, phi.alt_i : A_i arrow.r A_i \, $
 
   where the function $phi.alt_i : A_i arrow.r A_i$ is arbitrary.
-]
+] <def-ce>
 
 #remark[
 A CCE is a special case of a CE, where the functions $phi.alt_i$ considered are only #emph[constant] functions. Furthermore, it is not hard to show from expanding the definition that any Nash equilibrium is a CE. Thus, the set of CEs is a superset of the set of Nash equilibria and a subset of the set of CCEs.

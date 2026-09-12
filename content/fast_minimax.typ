@@ -12,9 +12,9 @@
 
 The minimax theorem converts a response to each opponent strategy into a single strategy that works against every opponent. How many responses must we compute to carry out this conversion? This lecture follows #citet(<farina2026defense>), with particular attention to computing $Phi$-equilibria. The central tool is a generalization of Ellipsoid-Against-Hope: select a small collection of responses, then compute a suitable mixture of them.
 
-The supplementary reading _A second look at the minimax theorem_ introduces the coarse correlated equilibrium application. Here we develop the precision guarantee and the fixed-point construction that extends the method to richer deviations. Familiarity with minimax, regret minimization, and linear programming duality is useful; _Phi-regret minimization_ provides complementary background.
+#lecture-link("eah", none)[] introduces the coarse correlated equilibrium application. Here we develop the precision guarantee and the fixed-point construction that extends the method to richer deviations. Familiarity with minimax, regret minimization, and linear programming duality is useful; #lecture-link("phi_regret", none)[] provides complementary background.
 
-= From responses to a uniform guarantee
+= From responses to a uniform guarantee <sec-defense-oracle>
 
 Let $X subset.eq RR^d$ be a nonempty compact convex set. The opponent chooses $x in X$ and minimizes a payoff $f(x,y)$; we choose $y in Y$ and maximize it. Assume $Y$ is convex and $f$ is affine in each argument. For example, $f(x,y)=x^T A y$ is bilinear. Affine terms can be included by adding a constant coordinate. We assume that payoffs are bounded on the relevant domains.
 
@@ -31,7 +31,7 @@ Minimax says that a uniform guarantee exists when a defense oracle exists. The c
 
 == A learning-based construction
 
-Simulate an opponent with a regret bound for linear losses. At round $t$, let it choose $x_t$, return $y_t=h(x_t)$, and give it loss $f(dot,y_t)$. Its regret is
+Simulate an opponent with a #lecture-link("learning_intro", <def-external-regret>)[regret bound] for linear losses. At round $t$, let it choose $x_t$, return $y_t=h(x_t)$, and give it loss $f(dot,y_t)$. Its regret is
 $ R_T=sum_(t=1)^T f(x_t,y_t)-min_(x in X) sum_(t=1)^T f(x,y_t). $
 For $macron(y)=T^(-1) sum_t y_t$, affinity gives
 $ min_(x in X) f(x,macron(y))
@@ -142,7 +142,7 @@ Notice what this proves: the weighted deviation chosen by this particular oppone
 
 For a rational polytope $S_i$ and an affine map $phi_i (s_i)=M_i s_i+b_i$, finding a fixed point is linear feasibility:
 $ s_i in S_i, quad (I-M_i)s_i=b_i. $
-Existence follows from the fixed-point theorem for continuous self-maps of compact convex sets. Computing this affine fixed point is an LP task. A general nonlinear map would require a separate computational argument.
+Existence follows from #lecture-link("brouwer", <sec-brouwer-general>)[Brouwer's fixed-point theorem] for continuous self-maps of compact convex sets. Computing this affine fixed point is an LP task. A general nonlinear map would require a separate computational argument.
 
 == Coarse correlated equilibria
 
@@ -150,7 +150,7 @@ Take $Phi_i$ to be the constant maps $s_i mapsto a_i$ for $a_i in S_i$. The mean
 $ s_i=EE_(a_i tilde.op nu_i)[a_i] quad "when" quad w_i>0. $
 For a finite normal-form game, write $nu_(i,a)$ for the mass of deviation to action $a$. The response is the product distribution with marginals
 $ p_i (a)=frac(nu_(i,a),w_i), quad w_i=sum_a nu_(i,a). $
-Choose any marginal when $w_i=0$. This is the normalized Hart--Schmeidler construction from the earlier supplement and the archived Fall 2024 Lecture 15. It avoids allocating a variable to every joint action. A final mixture of these product distributions is generally correlated.
+Choose any marginal when $w_i=0$. This is the normalized Hart--Schmeidler construction from the #lecture-link("eah", <sec-cce-existence>)[minimax supplement] and the archived Fall 2024 Lecture 15. It avoids allocating a variable to every joint action. A final mixture of these product distributions is generally correlated.
 
 == Correlated equilibria: stationary distributions
 
@@ -185,7 +185,7 @@ These are substantive assumptions. A compact game description by itself does not
 
 The exact result of #citet(<farina2024polynomial>) applies to rational polyhedral games with the polynomial utility-gradient property and a well-described, efficiently separable polytope of valid linear deviations. Under these assumptions, an exact $Phi$-equilibrium is computable in polynomial time. Their framework supplies the rational feasibility and certificate machinery beyond the approximate geometric argument above.
 
-In a finite perfect-recall extensive-form game, sequence-form polytopes give compact strategy coordinates, and tree traversal computes utility gradients. With an appropriate efficiently represented family of linear deviations, this yields exact linear-deviation correlated equilibria. The family of deviations is part of the theorem's input: one must establish its oracle before claiming tractability for a particular equilibrium concept. A distribution over sequence-form profiles can be implemented by selecting a profile with the shared mixture index and then realizing each player's sequence-form strategy.
+In a finite perfect-recall extensive-form game, #lecture-link("efg_intro", <sec-sequence-form>)[sequence-form polytopes] give compact strategy coordinates, and tree traversal computes utility gradients. With an appropriate efficiently represented family of linear deviations, this yields exact linear-deviation correlated equilibria. The family of deviations is part of the theorem's input: one must establish its oracle before claiming tractability for a particular equilibrium concept. A distribution over sequence-form profiles can be implemented by selecting a profile with the shared mixture index and then realizing each player's sequence-form strategy.
 
 The approximate algorithm does not become exact by setting $epsilon.alt=0$, and rounding an arbitrary approximate equilibrium need not preserve incentives. Exact polynomial-time computation uses rational descriptions, bounds on certificate encoding lengths, and exact LP recovery. For nonpolyhedral domains the statement established here is an approximation guarantee under the stated geometry and oracle assumptions.
 

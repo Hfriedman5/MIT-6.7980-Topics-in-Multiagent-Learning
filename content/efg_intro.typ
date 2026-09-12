@@ -10,7 +10,7 @@
 
 Imperfect-information extensive-form games  model tree-form strategic interactions in which not all actions might be observed by all players. They represent an ample majority of strategic interactions encountered in the real world, ranging from recreational games such as poker, to negotiation, and auctions.
 
-= Game trees and information sets
+= Game trees and information sets <sec-game-trees>
 
 The standard representation of an imperfect-information extensive-form game is through its #emph[game tree], which formalizes the interaction of the players as a directed tree. In the game tree, each non-terminal node belongs to exactly one player, who acts at the node by picking one of the outgoing edges (each labeled with an action name). Imperfect information is captured in this representation by partitioning the nodes of each player into sets (called information sets) of nodes that are indistinguishable to that player given his or her observations.
 
@@ -77,7 +77,7 @@ To model imperfect information, the histories of each player $i in \[ n \]$ are 
   In Kuhn poker, each player observes their own private card and the actions of the opponent, but not the opponent's private card. The twelve information sets, six for Player 1 denoted $sans(A)$ through $sans(F)$, and six for Player 2 denoted $sans(P)$ through $sans(U)$, reflect this partial information. For example, Player 1's histories following actions $sans(Q K)$ and $sans(Q J)$ of the nature player (the dealer) are part of the same information set $sans(B)$, in that Player 1 cannot distinguish between the two histories, having observed only their private $sans(Q u e e n)$ card. As another example, Player 2's information set $sans(P)$ captures the uncertainty the player has on the underlying history after having observed a private $sans(K i n g)$ card, and a check from Player 1.
 ]
 
-== Perfect recall
+== Perfect recall <sec-perfect-recall>
 
 A standard assumption in extensive-form games is that no player forgets about their actions, and about information once acquired. Without this assumption, called #emph[perfect recall], solving extensive-form games can be intractable. The perfect recall condition can be formalized as follows.
 
@@ -85,7 +85,7 @@ A standard assumption in extensive-form games is that no player forgets about th
   A player $i in \[ n \]$ is said to have #emph[perfect recall] if, for any information set $I in cal(I)_i$, for any two histories $h \, h' in I$ the sequence of Player $i$'s actions encountered along the path from the root to $h$ and from the root to $h'$ must coincide (or otherwise Player $i$ would be able to distinguish among the histories, since the player remembers all of the actions they played in the past). The game is perfect recall if all players have perfect recall.
 ]#label("def:perfect-recall")
 
-= Player's perspective: Tree-form decision processes
+= Player's perspective: Tree-form decision processes <sec-tfdp>
 
 The game tree representation introduced above provides a description of the global dynamics of the game, without taking the side of any player in particular. But what is the strategy space from the point of view of #emph[one] decision maker (player) in the game? In a normal-form game, the strategy space of a player is a set of probability distributions over the set of actions available to that player. In an extensive-form game, the strategy space of a player is a #emph[tree-form decision process (TFDP)].
 
@@ -189,7 +189,7 @@ As a remark, #ref(label("def:tfdp")) leaves the labeling and structure of observ
   ]
 ]
 
-== Some notation
+== Some notation <sec-tfdp-notation>
 
 Trees always require a bit of notation to be handled properly. We introduce some notation that will be useful when discussing decision problems faced by players in tree-form games.
 
@@ -226,7 +226,7 @@ Trees always require a bit of notation to be handled properly. We introduce some
 What does it mean to have a mixed strategy for an extensive-form game?
 We discuss ways in which one could decide to represent a strategy, and contrast their pros and cons.
 
-== Strategic form: Extensive-form games as normal-form games
+== Strategic form: Extensive-form games as normal-form games <sec-strategic-form>
 
 One classical answer is the following. Consider a player, and imagine enumerating all their deterministic strategies for the tree. A mixed strategy is then a probability distribution over these deterministic strategies.
 
@@ -242,11 +242,11 @@ One classical answer is the following. Consider a player, and imagine enumeratin
 
 By considering the normal-form game in which each player's strategy space is the set of all deterministic strategies in the tree, we have converted the extensive-form game into its #emph[normal-form equivalent].
 
-#strong[Cons]  Of course, the most glaring issue with this representation is that the number of strategies in the normal-form game is exponential in the size of the game tree. For this reason, it was long believed that operating with this normal-form representation was computationally infeasible. Historically, this led to the development of specialized algorithms for extensive-form games, such as CFR and its variants. This belief was actually unfounded. In fact, it is possible to simulate the OMWU dynamics in the normal-form equivalent of an extensive-form game exactly in polynomial time. We will talk more about this in the future.
+#strong[Cons]  Of course, the most glaring issue with this representation is that the number of strategies in the normal-form game is exponential in the size of the game tree. For this reason, it was long believed that operating with this normal-form representation was computationally infeasible. Historically, this led to the development of specialized algorithms for extensive-form games, such as #lecture-link("learning_efg", <sec-cfr>)[CFR and its variants]. This belief was actually unfounded. In fact, it is possible to simulate the OMWU dynamics in the normal-form equivalent of an extensive-form game exactly in polynomial time. The #lecture-link("kernelized", <sec-kernelization>)[kernelization construction] explains how.
 
 #strong[Pros]  By virtue of this conversion, the machinery and concepts of normal-form games can be applied to extensive-form games, such as Nash equilibria, correlated equilibria, and so on.
 
-== Behavioral form
+== Behavioral form <sec-behavioral-form>
 
 A different conceptualization of a strategy for a player is as a choice of (independent) distributions over the set of actions $A_j$ at each decision node $j in cal(J)$. This is called a #emph[behavioral strategy]. We can represent it accordingly as a vector $x in bb(R)_(gt.eq 0)^Sigma$ indexed over sequences. Each entry $x_(j a)$ assigns to action $a$ at decision node $j$ the probability of picking that action at that decision node. The set of all possible behavioral strategies is clearly convex, as it is the Cartesian product of probability simplexes---one per each decision node.
 
@@ -269,7 +269,7 @@ A different conceptualization of a strategy for a player is as a choice of (inde
   In a perfect recall extensive-form game, any distribution over terminal nodes that can be induced via normal-form strategies can be induced via behavioral strategies, and #emph[vice versa].
 ]
 
-== Sequence form
+== Sequence form <sec-sequence-form>
 
 The #emph[sequence-form representation] #citep(label("Romanovskii62:Reduction"), label("Koller96:Efficient"), label("Stengel96:Efficient")) soundly resolves the issue of non-convexity. Like behavioral strategies, in the sequence-form representation a strategy is a vector $x in bb(R)_(gt.eq 0)^Sigma$ whose entries are indexed by $Sigma$. However, the generic entry $x_(j a)$ contains the #emph[product] of the probabilities of all actions at all decision nodes on the path from the root of the process to action $a$ at decision node $j$. In order to be a valid sequence-form strategy, the entries in $x$ must therefore satisfy the following probability-flow-conservation constraints:
 

@@ -20,11 +20,11 @@
 #v(.8cm)
 With this lecture we begin to explore what it means to "learn" in a game, and how that "learning", which is intrinsically a _dynamic_ and _local_ (per-player) concept, relates to the much more _static_ and _global_ concept of game-theoretic equilibrium.
 
-= Hindsight rationality and $Phi$-regret
+= Hindsight rationality and $Phi$-regret <sec-phi-regret>
 
 What does it mean to "learn" in games? Multiple answers are correct. However, today we focus on a powerful answer through the concept of _hindsight rationality_.
 
-Take the point of view of _one_ player in a game, and denote with $cX$ be their set of available strategies. In normal-form games, we have seen that a strategy is just a distribution over the set of available actions $A$ for the player, so $cX = Delta(A)$.
+Take the point of view of _one_ player in a game, and denote with $cX$ be their set of available strategies. In #lecture-link("nfgs_nash", <sec-normal-form>)[normal-form games], we have seen that a strategy is just a distribution over the set of available actions $A$ for the player, so $cX = Delta(A)$.
 At each time $t =1,2,...$, the player will play some strategy $vx^((t)) in cX$, receive some form
 of feedback, and will incorporate that feedback to formulate a "better" strategy $vx^((t+1)) in cX$ for the next repetition of the game. A typical (and natural) choice of "feedback" is just the utility of the player, given what all the other agents played. However, for the purposes of the abstract model we are building today, let's not make any assumptions about how the feedback is assigned; we will strive to build algorithms that perform competitively under _any_ feedback---even adversarial one.
 
@@ -58,10 +58,10 @@ We have thus arrived at the following formalization.
 Calls to `NextStrategy` and `ObserveUtility` keep alternating to each other: first, the regret minimizer will output a point $vx^((1))$, then it will received feedback $u^((1))$ from the environment, then it will output a new point $vx^((2))$, and so on.
 The decision making encoded by the regret minimizer is _online_, in the sense that at each time $t$, the output of the regret minimizer can depend on the prior outputs $vx^((1)), ...,vx^((t-1))$ and corresponding observed utility functions $u^((1)),...,u^((t-1))$, but no information about future utilities is available.
 
-== Notable choices of transformations $Phi$
+== Notable choices of transformations $Phi$ <sec-regret-transformations>
 The size of the set of transformations $Phi$ considered by the player defines
 a natural notion of how "rational" the agent is. There are several choices of interest for $Phi$ for a normal-form strategy space $cX = Delta(A)$.
-- $Phi = $ set of _all_ stochastic matrices, mapping $Delta(A) -> Delta(A)$. This notion of $Phi$-regret is known under the name _swap regret_. This notion is related to convergence to the set of correlated equilibria.
+- $Phi =$ set of _all_ stochastic matrices, mapping $Delta(A) -> Delta(A)$. This notion of $Phi$-regret is known under the name _swap regret_. This notion is related to convergence to the set of #lecture-link("correlated", <def-ce>)[correlated equilibria].
 - $Phi =$ set of all "probability mass transport" on $cX$, defined as
   $Phi = {phi.alt_(a-> b)}_(a, b in A)$, where
   $
@@ -91,7 +91,7 @@ a natural notion of how "rational" the agent is. There are several choices of in
     When all agents in a two-player zero-sum normal-form game play so that their external regret grows sublinearly, their average strategies converge to the set of _Nash equilibria_ of the game.
   ]
 
-== An important special case: regret minimization
+== An important special case: regret minimization <sec-external-regret>
 
 The special case where $Phi$ is chosen to be the set of constant transformations is so important that it warrants its own special definition and notation.
 
@@ -104,7 +104,7 @@ The special case where $Phi$ is chosen to be the set of constant transformations
   $
     "Reg"^((T)) := max_(xhat in cX) {sum_(t=1)^T u^((t))(xhat) - u^((t))(vx^((t)))}.
   $
-]
+] <def-external-regret>
 Again, the goal for a regret minimizer is to ensure its cumulative regret $"Reg"^((T))$ grows sublinearly in $T$.
 
 An important result asserts the existence of algorithms that guarantee sublinear regret for any convex and compact domain $cX$, typically of the order $"Reg"^((T)) = O(sqrt(T))$ asymptotically.
@@ -112,9 +112,9 @@ An important result asserts the existence of algorithms that guarantee sublinear
 As we will show below, external regret minimization alone is enough to guarantee convergence to Nash equilibrium in two-player zero-sum games, to coarse correlated equilibrium in multiplayer general-sum games, to best responses to static stochastic opponents in multiplayer general-sum games, and much more.
 
 #paragraph-marker() *Teaser: From regret minimization to $Phi$-regret minimization.*~~
-As discussed, regret minimization is _one_ instantiation of $Phi$-regret minimization---and perhaps the smallest sensible instantiation. Then, clearly, coming up with a regret minimizer for a set $cX$ cannot be harder than the problem of coming up with a $Phi$-regret minimizer for $cX$ for richer sets of transformation functions $Phi$. It might then seem surprising that there exists a construction that reduces $Phi$-regret minimization to regret minimization. We will discuss more about this in Supplementary reading S6.
+As discussed, regret minimization is _one_ instantiation of $Phi$-regret minimization---and perhaps the smallest sensible instantiation. Then, clearly, coming up with a regret minimizer for a set $cX$ cannot be harder than the problem of coming up with a $Phi$-regret minimizer for $cX$ for richer sets of transformation functions $Phi$. It might then seem surprising that there exists a construction that reduces $Phi$-regret minimization to regret minimization. #lecture-link("phi_regret", none)[] develops this reduction.
 
-= Applications of regret minimization
+= Applications of regret minimization <sec-learning-applications>
 
 To establish regret minimization as a meaningful abstraction for learning
 in games, we check that regret minimizing and $Phi$-regret minimizing dynamics indeed lead to the expected behavior in common scenarios.
@@ -122,7 +122,7 @@ in games, we check that regret minimizing and $Phi$-regret minimizing dynamics i
 #definition[Canonical learning setup][In the cases that we will mention, a recurring idea will be to consider the setup in which all players $i in [n]$ play according to the outputs $x_i^((t))$ of a $Phi$-regret minimizer. At each iteration, the utility function that each player $i$ observes from the environment is the utility function $u_i$ of that player, evaluated in the strategies played by all players, that is,
   $ u^((t)) : Delta(A_i) -> RR qquad qquad u^((t)) (x_i) := u_i lr(size: #70%, (x_i, x^((t))_(-i))). $
   Given its importance, we give to this natural setup the name of _canonical learning setup_.
-]
+] <def-canonical-learning>
 
 == Learning a best response against stochastic opponents
 
@@ -144,7 +144,7 @@ $
 $
 (You should try to prove this!)
 
-== Learning a Nash equilibrium in two-player zero-sum games
+== Learning a Nash equilibrium in two-player zero-sum games <sec-learning-zero-sum>
 
 It turns out that regret minimization can be used to converge to bilinear saddle points, that is solutions to problems of the form
 #set math.equation(numbering: "(1)")
@@ -181,7 +181,7 @@ A point $(vx , vy) in cX times cY$ has zero saddle point gap if and only if it i
   $
     gamma(overline(vx)^((T)), overline(vy)^((T))) = ("Reg"_cX^((T)) + "Reg"_cY^((T))) / T -> 0 qquad "as " T->oo.
   $
-]
+] <thm-regret-gap>
 #proof[
   By definition of regret,
   $
@@ -200,7 +200,7 @@ A point $(vx , vy) in cX times cY$ has zero saddle point gap if and only if it i
   Letting $T -> oo$ and using the sublinearity of regret, we obtain the statement.
 ]
 
-== Proof of the minimax theorem
+== Proof of the minimax theorem <sec-learning-minimax>
 
 The very _existence_ of regret minimizers is a powerful enough fact to imply the minimax theorem!
 
@@ -250,7 +250,7 @@ The very _existence_ of regret minimizers is a powerful enough fact to imply the
   Letting $T -> oo$ proves the result.
 ]
 
-== Learning (coarse) correlated equilibria
+== Learning (coarse) correlated equilibria <sec-learning-correlated>
 
 The previous result is in fact a direct corollary of the more general connection between $Phi$-regret minimization and the set of coarse-correlated equilibria in multiplayer general-sum games. We present a general form of this connection in the next theorem.
 

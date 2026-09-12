@@ -63,9 +63,9 @@ Different equilibrium notions differ as to how the lower bounds are set as a fun
 
 == Extensive-form perfect equilibrium (EFPE)
 
-#emph[Extensive-form perfect equilibrium (EFPE)], due to #citet(label("Selten75:Reexamination")), is conceptually the simplest of the two. In an EFPE, the trembles are #emph[behavioral]: given $epsilon.alt > 0$, the perturbed game simply mandates that every action at every decision point must be picked with probability at least $epsilon.alt$.
+#emph[Extensive-form perfect equilibrium (EFPE)], due to #citet(label("Selten75:Reexamination")), is conceptually the simplest of the two. In an EFPE, the trembles are #lecture-link("efg_intro", <sec-behavioral-form>)[_behavioral_]: given $epsilon.alt > 0$, the perturbed game simply mandates that every action at every decision point must be picked with probability at least $epsilon.alt$.
 
-Since our game solving formalism is based around the sequence-form representation of strategies, it is important to check that those behavioral trembling constraints can be expressed in the sequence form. That is the case: asking that action $a$ at decision point $j$ of Player~$1$ be selected with probability at least $epsilon.alt$ corresponds to the sequence-form constraint
+Since our game solving formalism is based around the #lecture-link("efg_intro", <sec-sequence-form>)[sequence-form representation of strategies], it is important to check that those behavioral trembling constraints can be expressed in the sequence form. That is the case: asking that action $a$ at decision point $j$ of Player~$1$ be selected with probability at least $epsilon.alt$ corresponds to the sequence-form constraint
 
 #math.equation(
   block: true,

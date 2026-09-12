@@ -15,7 +15,7 @@ Extensive-form games belong to a larger class of games that we will call _combin
 
 Write $X_i = "conv"(V_i)$. A distribution $lambda_i in Delta(V_i)$ induces a mean strategy $x_i = sum_(v in V_i) lambda_(i)(v) v in X_i$. By multilinearity, when the players randomize independently, their expected utilities depend only on these means. Thus we can work in dimension $d_i$, even when the number of deterministic strategies $|V_i|$ is exponentially larger.
 
-The central question of this lecture is whether multiplicative weights can also exploit this compact representation. We follow the kernelization approach of #citet(<Farina22:Kernelized>).
+The central question of this lecture is whether #lecture-link("learning1", <sec-mwu>)[multiplicative weights] can also exploit this compact representation. We follow the kernelization approach of #citet(<Farina22:Kernelized>).
 
 = Examples of combinatorial games
 
@@ -29,7 +29,7 @@ The mean of a distribution over these vectors is exactly the usual mixed strateg
 
 == Extensive-form games
 
-In a finite perfect-recall extensive-form game, utility is multilinear in the players' sequence-form strategies. The vertices of a player's sequence-form polytope have entries in ${0,1}$. They describe _reduced pure realization plans_: choices below an unselected own action have realization weight zero. Different full contingency plans can therefore represent the same vertex.
+In a finite perfect-recall extensive-form game, utility is multilinear in the players' #lecture-link("efg_intro", <sec-sequence-form>)[sequence-form strategies]. The vertices of a player's sequence-form polytope have entries in ${0,1}$. They describe _reduced pure realization plans_: choices below an unselected own action have realization weight zero. Different full contingency plans can therefore represent the same vertex.
 
 #example[Sequence-form vertices][
   In the game below, black nodes belong to Player 1 and white nodes to Player 2. Player 1 observes the move at $P$, but not the move at $Q$: the two nodes in information set $D$ require the same action. The nine numbered actions give the coordinates of Player 1's realization plan.
@@ -46,7 +46,7 @@ In a finite perfect-recall extensive-form game, utility is multilinear in the pl
 ]
 
 #figure(
-  caption: [The seven binary vertices of Player 1's sequence-form polytope, shown as reduced pure realization plans. See also Lecture 7, _Modeling extensive-form games_.],
+  caption: [The seven binary vertices of Player 1's sequence-form polytope, shown as reduced pure realization plans. See also the #lecture-link("efg_intro", <sec-strategic-form>)[reduced normal-form plans in the modeling notes].],
 )[
   #image(
     "figures/efg_intro/nf_strategies.svg",
@@ -81,11 +81,11 @@ If a player selects exactly $m$ of $d$ objects, use the set
 $ V = {v in {0,1}^d : sum_(k=1)^d v_k=m}, quad 0 <= m <= d. $
 These strategies are often called _$m$-sets_. There are $binom(d, m)$ of them. Their indicator vectors again give a compact representation for games with multilinear selection payoffs. If the cardinality restriction is removed, the strategy set is the entire hypercube ${0,1}^d$.
 
-= Learning in combinatorial games and kernelization
+= Learning in combinatorial games and kernelization <sec-kernelization>
 
 One way to learn over $X_i$ is projected gradient descent, provided projections onto $X_i$ can be computed efficiently. But the choice of learning algorithm also affects regret. For normal-form games with coordinate payoffs in $[-1,1]$, the standard Euclidean analysis gives an $O(sqrt(d_i T))$ bound, whereas MWU gives $O(sqrt(T log d_i))$. The geometry used by MWU yields a substantially better dependence on the number of actions.
 
-Optimistic MWU provides another motivation. In suitable self-play settings, optimism improves the dependence on the number of rounds; those guarantees require their own payoff and learning-rate hypotheses. An exact implementation on combinatorial strategies transfers the corresponding normal-form guarantees under the same hypotheses. Here we concentrate on how to obtain that implementation.
+#lecture-link("learning2", <sec-optimism>)[Optimistic MWU] provides another motivation. In suitable self-play settings, optimism improves the dependence on the number of rounds; those guarantees require their own payoff and learning-rate hypotheses. An exact implementation on combinatorial strategies transfers the corresponding normal-form guarantees under the same hypotheses. Here we concentrate on how to obtain that implementation.
 
 == Multiplicative weights on deterministic strategies
 

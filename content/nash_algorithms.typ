@@ -3,11 +3,11 @@
 #let lecture = (lec_num: "S2", date: [Fall 2026], title: "Centralized algorithms for Nash equilibrium computation", instructor: [Prof. Constantinos Daskalakis])
 #show: gabri_notes.with(..lecture)
 
-In previous lectures, we saw the basic game theory formalism, and some of the most fundamental equilibrium concepts, and their existence proofs. Nash's proof that a Nash equilibrium in randomized strategies exists in every finite game makes use of Brouwer's fixed point theorem, which does not immediately suggest an algorithm for computing Nash equilibria. On the other hand, we saw that the existence of Nash equilibrium in two-player zero-sum games can also be established using strong linear programming duality, which suggests a polynomial-time algorithm for computing Nash equilibria in these games.
+In previous lectures, we saw the basic game theory formalism, and some of the most fundamental equilibrium concepts, and their existence proofs. The #lecture-link("nfgs_nash", <sec-nash-existence>)[proof of Nash equilibrium existence] makes use of Brouwer's fixed point theorem, which does not immediately suggest an algorithm for computing Nash equilibria. On the other hand, we saw that the existence of Nash equilibrium in two-player zero-sum games can also be established using #lecture-link("correlated", <sec-zero-sum>)[strong linear programming duality], which suggests a polynomial-time algorithm for computing Nash equilibria in these games.
 
-Similarly, correlated and coarse correlated equilibria in general-sum games can also be computed in time polynomial in the game description using linear programming, as the equilibrium constraints can be written as a system of linear inequalities in the joint distribution over actions. Moreover, linear programming methods can be leveraged to obtain polynomial-time algorithms for certain families of what are called “succinct games,” wherein the payoffs are sparse or have other structure that makes an explicit representation of a joint distribution over actions super-polynomial in  size compared to the game's natural description. Still a correlated or coarse correlated equilibrium can be computed efficiently in many cases, using linear programming approaches such as Ellipsoid Against Hope~#citep(label("papadimitriou2008computing")).
+Similarly, correlated and coarse correlated equilibria in general-sum games can also be computed in time polynomial in the game description using linear programming, as the equilibrium constraints can be written as a system of linear inequalities in the joint distribution over actions. Moreover, linear programming methods can be leveraged to obtain polynomial-time algorithms for certain families of what are called “succinct games,” wherein the payoffs are sparse or have other structure that makes an explicit representation of a joint distribution over actions super-polynomial in  size compared to the game's natural description. Still a correlated or coarse correlated equilibrium can be computed efficiently in many cases, using linear programming approaches such as #lecture-link("eah", <sec-minimax-algorithm>)[Ellipsoid Against Hope]~#citep(label("papadimitriou2008computing")).
 
-In this lecture, we revisit Nash equilibrium computation in general games. We will discuss several algorithms for computing Nash equilibria. Roughly speaking those algorithms  fall into two buckets. One bucket contains algorithms that directly target the equilibrium constraints, using linear programming, and more generally algorithms for solving systems of polynomial equations and inequalities. The other bucket contains algorithms that make tighter use of the fixed point nature of Nash equilibrium, and the directed parity argument underlying its existence proofs. In all cases, our algorithms will have super-polynomial complexity, unless the game has special structure. In future lectures, we will offer complexity theoretic justification  is a deep reason why polynomial-time
+In this lecture, we revisit Nash equilibrium computation in general games. We will discuss several algorithms for computing Nash equilibria. Roughly speaking those algorithms  fall into two buckets. One bucket contains algorithms that directly target the equilibrium constraints, using linear programming, and more generally algorithms for solving systems of polynomial equations and inequalities. The other bucket contains algorithms that make tighter use of the fixed point nature of Nash equilibrium, and the directed parity argument underlying its existence proofs. In all cases, our algorithms will have super-polynomial complexity, unless the game has special structure. #lecture-link("tfnp", none)[] and #lecture-link("ppad_completeness", none)[] explain the complexity-theoretic obstacles to polynomial-time algorithms.
 
 = Support Enumeration Algorithms
 
@@ -43,7 +43,7 @@ In any two-player game, there exists a Nash equilibrium whose mixed strategies u
 This follows from the correctness of the support enumeration algorithm. If there is a Nash equilibrium with supports $S_R$ and $S_C$, then the polytope of the corresponding LP is non-empty and any feasible solution is a Nash equilibrium. In particular, any vertex is a Nash equilibrium, and any vertex is a vector of rational numbers whose bit complexity is polynomial in the description of the LP, and hence the description of the game.
 ]
 
- As remarked in Lecture 3, however, the corollary is not true for $k$-player games where $k > 2$. Indeed, Nash's 1951 paper~#citep(label("Nash51:NonCooperative")) already gave an example of a 3-player game that only has irrational equilibria.
+ As illustrated by the #lecture-link("correlated", <sec-irrational-equilibria>)[irrational-equilibrium example], however, the corollary is not true for $k$-player games where $k > 2$. Indeed, Nash's 1951 paper~#citep(label("Nash51:NonCooperative")) already gave an example of a 3-player game that only has irrational equilibria.
 
 == $n$-player games
 #label("sec:support enumeration for n players")
@@ -108,7 +108,7 @@ In every symmetric game, there exists a symmetric Nash equilibrium.
 ]#label("thm:existence of symmetric equilibria")
 
 #proof[
-Recall Nash's function $f : times_i Delta \( A_i \) arrow.r times_i Delta \( A_i \)$, which maps some $x$ to a $y$ defined as follows, for all players $i$ and actions $a_i in A_i$:
+Recall the #lecture-link("nfgs_nash", <def-nash-improvement>)[Nash improvement function] $f : times_i Delta \( A_i \) arrow.r times_i Delta \( A_i \)$, which maps some $x$ to a $y$ defined as follows, for all players $i$ and actions $a_i in A_i$:
 
 $ y_i \( a_i \) = frac(x_i \( a_i \) + max \( 0 \, u_i \( a_i \; x_(- i) \) - u_i \( x \) \), 1 + sum_(a'_i in A_i) max \( 0 \, u_i \( a'_i \; x_(- i) \) - u_i \( x \) \)) . $
 
@@ -116,7 +116,7 @@ $ y_i \( a_i \) = frac(x_i \( a_i \) + max \( 0 \, u_i \( a_i \; x_(- i) \) - u_
 
 $ times_i Delta \( A_i \) ∩ { x_1 = x_2 = . . . = x_n } . $
 
-        Then the range of the function will be a subset of this same restricted set, since every player performs the same “update” in the function $f$. So $f$ maps points of the restricted set to points in the same set. Moreover, the set is convex, closed and bounded. So we can use Brouwer's fixed point theorem to show the existence of a fixed point in the restricted set. This fixed point is a Nash equilibrium as we saw in the proof of Nash's theorem in Lecture 1. And since it belongs to the restricted set, it must be a symmetric one.
+        Then the range of the function will be a subset of this same restricted set, since every player performs the same “update” in the function $f$. So $f$ maps points of the restricted set to points in the same set. Moreover, the set is convex, closed and bounded. So we can use Brouwer's fixed point theorem to show the existence of a fixed point in the restricted set. This fixed point is a Nash equilibrium by the #lecture-link("nfgs_nash", <thm-nash-fixed-points>)[fixed-point characterization of Nash equilibria]. And since it belongs to the restricted set, it must be a symmetric one.
 ]
 
  A symmetric Nash equilibrium $x = \( x_1 \, dots.h \, x_n \)$, where $x_1 = dots.h = x_n \,$ of a $n$-player $k$-action symmetric game can be found as follows:
@@ -207,9 +207,9 @@ $ norm(x_1)_1 dot.op hat(x)_1^T R y_2 + y_1^T C^T x_2 . $
 Is there a polynomial-time reduction from general $3$-player games to symmetric $3$-player games?
 ]
 
-= The Lemke-Howson Algorithm
+= The Lemke-Howson Algorithm <sec-lemke-howson>
 
-Switching gears from the previous sections, we turn to algorithms for computing equilibria that exploit the fixed point nature of  Nash equilibrium   at a deeper level. In particular, we describe the celebrated Lemke and Howson algorithm~#citep(label("LemkeHowson64")), which was proposed in 1964 as a method to compute an exact Nash equilibrium of a two-player game $\( R \, C \)$ whose entries are rational numbers. This is a feasible task, as there always exists a Nash equilibrium using rational probabilities, as we have seen earlier. Indeed, the correctness proof this algorithm not only proves this fact but also that a Nash equilibrium exists. As such, the correctness proof of this algorithm provides an alternative proof of the existence of Nash equilibria in two-player games, which does not make use of Brouwer's fixed point theorem. As we will see, the proof will be reminiscent of our proof of Sperner's lemma from Lecture 2, and there is a deeper reason for that, as we will see in future lectures.
+Switching gears from the previous sections, we turn to algorithms for computing equilibria that exploit the fixed point nature of  Nash equilibrium   at a deeper level. In particular, we describe the celebrated Lemke and Howson algorithm~#citep(label("LemkeHowson64")), which was proposed in 1964 as a method to compute an exact Nash equilibrium of a two-player game $\( R \, C \)$ whose entries are rational numbers. This is a feasible task, as there always exists a Nash equilibrium using rational probabilities, as we have seen earlier. Indeed, the correctness proof this algorithm not only proves this fact but also that a Nash equilibrium exists. As such, the correctness proof of this algorithm provides an alternative proof of the existence of Nash equilibria in two-player games, which does not make use of Brouwer's fixed point theorem. As we will see, the proof will be reminiscent of the #lecture-link("brouwer", <sec-sperner-proof>)[proof of Sperner's lemma], and there is a deeper reason for that, as the #lecture-link("tfnp", <sec-ppad-encoding>)[PPAD reduction] makes precise.
 
 == Preparation: symmetry and non-degeneracy
 
