@@ -8,7 +8,7 @@ use crate::{element_text, escape_attr, heading_text_from_html, heading_title_htm
 pub fn add_permalinks(body: &str) -> (String, HashMap<String, String>) {
     let mut dom = Html::parse_fragment(body);
     let targets = Selector::parse(
-        ".notes-heading, section.env.statement, figure.rendered-figure, .equation-line:has(> .eqno)",
+        ".notes-heading, section.env.statement, section.changelog, figure.rendered-figure, .equation-line:has(> .eqno)",
     )
     .unwrap();
     let all_ids = Selector::parse("[id]").unwrap();
@@ -41,6 +41,16 @@ pub fn add_permalinks(body: &str) -> (String, HashMap<String, String>) {
             let title = heading_text_from_html(&heading_title_html(&target));
             let description = format!("section: {title}");
             ("section".to_owned(), description, slugify(&title), target)
+        } else if target
+            .value()
+            .has_class("changelog", scraper::CaseSensitivity::CaseSensitive)
+        {
+            (
+                "changelog".to_owned(),
+                "changelog".to_owned(),
+                "changelog".to_owned(),
+                child(&target, ".changelog-title").unwrap_or(target),
+            )
         } else if target.value().name() == "section" {
             let kind = child(&target, ".env-kind")
                 .map(|el| element_text(&el))
@@ -117,7 +127,11 @@ pub fn add_permalinks(body: &str) -> (String, HashMap<String, String>) {
         }
         // Aligned equation rows use display:contents. Their number provides a
         // real box for scrolling; other aliases sit at the top of the block.
-        let anchor_host = if kind == "equation" { host } else { target };
+        let anchor_host = if kind == "equation" || kind == "changelog" {
+            host
+        } else {
+            target
+        };
         // Native line anchors are hidden metadata spans. Relocate them to a
         // visible box too, so both old and new URLs work without JavaScript.
         let native_anchors: Vec<_> = if kind == "equation" {
@@ -207,6 +221,49 @@ pub(crate) fn fragment_id(id: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn changelog_links_stay_stable_when_entries_change_and_keep_the_dates() {
+        let body = r#"<section class="changelog" data-label="changelog"><hr><p class="changelog-title"><strong>Changelog</strong></p><ul><li>2025-10-05: Fixed typos (thanks Eric Yang Yu!).</li></ul></section>"#;
+        let (html, headings) = add_permalinks(body);
+        let dom = Html::parse_fragment(&html);
+        let link = dom
+            .select(&Selector::parse(".changelog-title > a.permalink-gutter").unwrap())
+            .next()
+            .unwrap();
+        assert_eq!(link.value().attr("href"), Some("#changelog"));
+        assert_eq!(
+            link.value().attr("aria-label"),
+            Some("Permalink to changelog")
+        );
+        assert_eq!(
+            dom.select(&Selector::parse("#changelog").unwrap()).count(),
+            1
+        );
+        assert!(html.contains("2025-10-05: Fixed typos (thanks Eric Yang Yu!)."));
+        assert!(headings.is_empty());
+        assert_eq!(add_permalinks(&html).0, html);
+
+        let (updated, _) = add_permalinks(
+            &body.replace("</ul>", "<li>2026-09-12: Added a clarification.</li></ul>"),
+        );
+        assert!(updated.contains(r##"href="#changelog""##));
+
+        let (collision, _) = add_permalinks(&format!(
+            r#"<h2 class="notes-heading">Changelog</h2>{body}"#
+        ));
+        let dom = Html::parse_fragment(&collision);
+        let heading_link = dom
+            .select(&Selector::parse(".notes-heading > a.permalink").unwrap())
+            .next()
+            .unwrap();
+        assert_eq!(heading_link.value().attr("href"), Some("#changelog-2"));
+        let changelog_link = dom
+            .select(&Selector::parse(".changelog-title > a.permalink").unwrap())
+            .next()
+            .unwrap();
+        assert_eq!(changelog_link.value().attr("href"), Some("#changelog"));
+    }
 
     #[test]
     fn labeled_targets_keep_native_ids_and_links_and_expose_authored_labels() {

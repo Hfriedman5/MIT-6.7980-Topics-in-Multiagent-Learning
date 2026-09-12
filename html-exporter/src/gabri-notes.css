@@ -1388,6 +1388,7 @@ figcaption .figcaption-label {
     font-weight: var(--environment-label-weight)
 }
 
+.changelog-title,
 .notes-heading,
 .env.statement,
 .env.algorithm .env-title,
