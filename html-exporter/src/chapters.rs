@@ -24,6 +24,8 @@ pub(crate) struct SiteConfig {
     pub(crate) authors: Option<String>,
     #[serde(default)]
     pub(crate) index_href: Option<String>,
+    #[serde(default)]
+    pub(crate) github: Option<String>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
@@ -135,6 +137,7 @@ impl SiteConfig {
         validate_optional_nonempty(path, "site.title", &self.title)?;
         validate_optional_nonempty(path, "site.authors", &self.authors)?;
         validate_optional_nonempty(path, "site.index_href", &self.index_href)?;
+        validate_optional_nonempty(path, "site.github", &self.github)?;
         Ok(())
     }
 }

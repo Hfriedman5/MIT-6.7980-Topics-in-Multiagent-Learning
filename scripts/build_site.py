@@ -128,10 +128,8 @@ def build_chapter(chapter: dict) -> str:
                          html, count=1, flags=re.S)
     if count != 1:
         raise RuntimeError(f'Expected the converter stylesheet in {output}')
-    html = html.replace('../' + chapter['source'], outputs['source'])
     html = html.replace('https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/', 'assets/katex/')
     output.write_text(html)
-    (STAGE / outputs['source']).write_text(chapter_source_text(source, chapter))
     return f"Lecture {chapter['number']}: {source.stem}.html"
 
 
@@ -167,7 +165,6 @@ def main() -> None:
         shutil.rmtree(STAGE)
     (STAGE / 'assets').mkdir(parents=True)
     shutil.copytree(ROOT / 'html-exporter/assets', STAGE / 'assets', dirs_exist_ok=True)
-    (STAGE / 'source').mkdir()
     (STAGE / 'pdf').mkdir()
     (ROOT / '.build' / 'logs').mkdir(exist_ok=True)
     shutil.copy2(ROOT / 'html-exporter/src/gabri-notes.css', STAGE / 'assets/notes.css')
@@ -192,8 +189,15 @@ def main() -> None:
     if missing := required - {entry['output'] for entry in entries}:
         raise ValueError('Incomplete site: ' + ', '.join(sorted(missing)))
     shutil.copytree(STAGE, ROOT / 'html', dirs_exist_ok=True)
+    # Retire downloads from earlier builds, including in the local preview.
+    legacy_source = ROOT / 'html/source'
+    if legacy_source.is_symlink():
+        legacy_source.unlink()
+    elif legacy_source.exists():
+        shutil.rmtree(legacy_source)
     run(sys.executable, 'scripts/check_site.py', 'html')
     run('node', 'scripts/check_katex.cjs', 'html')
+    (ROOT / '.build/bundle-files.json').write_text(json.dumps(entries, indent=2) + '\n')
     if args.zip:
         target = ROOT / 'dist/6.7980-notes.zip'
         target.parent.mkdir(exist_ok=True)

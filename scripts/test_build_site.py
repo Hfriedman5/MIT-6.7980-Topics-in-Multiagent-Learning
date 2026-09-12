@@ -14,8 +14,7 @@ class LecturePdfBuildTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name).resolve()
         self.stage = self.root / '.build/site'
-        for path in ('source', 'pdf'):
-            (self.stage / path).mkdir(parents=True, exist_ok=True)
+        (self.stage / 'pdf').mkdir(parents=True)
         (self.root / '.build/logs').mkdir()
         self.source = self.root / 'content/lecture.typ'
         self.source.parent.mkdir(parents=True)
@@ -61,7 +60,7 @@ Lecture prose.
         with patch.object(build_site.subprocess, 'run', side_effect=export):
             build_site.build_chapter(self.chapter)
         self.assertEqual(len(calls), 1)
-        self.assertEqual((self.stage / 'source/lecture.typ').read_text(), self.original)
+        self.assertFalse((self.stage / 'source').exists())
 
     def test_missing_pdf_stops_before_exporting_a_dead_link(self):
         with patch.object(build_site.subprocess, 'run') as run:

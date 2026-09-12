@@ -72,13 +72,14 @@ class PublicFilesTests(unittest.TestCase):
         copy_public_files(self.config, self.root, destination)
         required = required_files(self.config)
         self.assertEqual(note_outputs(self.config['notes'][0]), {
-            'html': 'topic.html', 'pdf': 'pdf/topic.pdf', 'source': 'source/topic.typ'})
+            'html': 'topic.html', 'pdf': 'pdf/topic.pdf'})
         for path in destination.rglob('*'):
             if path.is_file():
                 name = path.relative_to(destination).as_posix()
                 self.assertIn(name, required)
                 validate_public_path(name, required)
-        for name in ('slides/private.pdf', 'assets/.env', '../index.html', 'fow/private.py'):
+        for name in ('slides/private.pdf', 'assets/.env', '../index.html', 'fow/private.py',
+                     'source/topic.typ'):
             with self.subTest(name=name), self.assertRaises(ValueError):
                 validate_public_path(name, required)
 

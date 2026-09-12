@@ -172,6 +172,8 @@ def main():
     expected = ['index.html'] + [Path(c['source']).stem + '.html' for c in config['notes']]
     issues = []
     pages = {}
+    if (folder / 'source').exists() or (folder / 'source').is_symlink():
+        issues.append('Retired source/ directory must not be served; rebuild the site.')
     image_count = 0
     for name in expected:
         path = folder / name

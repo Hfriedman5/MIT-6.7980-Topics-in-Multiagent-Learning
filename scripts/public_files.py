@@ -14,8 +14,7 @@ ASSET_SUFFIXES = {'.css', '.js', '.svg', '.png', '.jpg', '.jpeg', '.gif', '.webp
 
 def note_outputs(note: dict) -> dict[str, str]:
     source = Path(note['source'])
-    return {'html': source.stem + '.html', 'pdf': f'pdf/{source.stem}.pdf',
-            'source': f'source/{source.name}'}
+    return {'html': source.stem + '.html', 'pdf': f'pdf/{source.stem}.pdf'}
 
 
 def slide_output(source: str) -> str:

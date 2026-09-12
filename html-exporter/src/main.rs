@@ -1001,13 +1001,15 @@ fn render_chapter_citation_sidenote(
         )
         .unwrap();
     }
-    write!(
-        out,
-        "<a class=\"lecture-citation-link lecture-citation-github\" href=\"{}\" aria-label=\"View Typst source\">{}View source</a>",
-        escape_attr(&chapter_source_href(chapter)),
-        github_icon_svg()
-    )
-    .unwrap();
+    if let Some(repository) = &export_config.site.github {
+        write!(
+            out,
+            "<a class=\"lecture-citation-link lecture-citation-github\" href=\"{}\" aria-label=\"View Typst source on GitHub\">{}View source</a>",
+            escape_attr(&chapter_source_href(repository, chapter)),
+            github_icon_svg()
+        )
+        .unwrap();
+    }
     write!(
         out,
         "<details class=\"lecture-citation-details\">\
@@ -1021,8 +1023,16 @@ fn render_chapter_citation_sidenote(
     out
 }
 
-fn chapter_source_href(chapter: &ChapterNav) -> String {
-    format!("../{}", chapter.source)
+fn chapter_source_href(repository: &str, chapter: &ChapterNav) -> String {
+    let mut href = format!("{}/blob/main/", repository.trim_end_matches('/'));
+    for byte in chapter.source.bytes() {
+        if byte.is_ascii_alphanumeric() || b"-._~/".contains(&byte) {
+            href.push(char::from(byte));
+        } else {
+            write!(href, "%{byte:02X}").unwrap();
+        }
+    }
+    href
 }
 
 fn github_icon_svg() -> &'static str {
@@ -1815,6 +1825,26 @@ fn re_html_section() -> &'static Regex {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn source_link_opens_the_repository_file_on_github() {
+        let (mut book, _) = rail_fixture();
+        book.site.github = Some("https://github.com/example/course/".to_owned());
+        book.chapters[0].source = "content/nested/a note #1.typ".to_owned();
+        let html = render_chapter_citation_sidenote(
+            &book,
+            &book.chapters[0],
+            "Eight",
+            "Course",
+            Some("pdf/eight.pdf"),
+        );
+        assert!(html.contains(
+            r#"href="https://github.com/example/course/blob/main/content/nested/a%20note%20%231.typ""#
+        ));
+        assert!(html.contains("View source</a>"));
+        assert!(html.contains(r#"href="pdf/eight.pdf""#));
+        assert!(!html.contains(r#"href="source/"#));
+    }
 
     fn rail_fixture() -> (ExportConfig, Config) {
         let book = serde_json::from_value(serde_json::json!({

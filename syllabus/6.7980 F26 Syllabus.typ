@@ -119,7 +119,7 @@ We also explore modern topics: multiagent deep reinforcement learning; informati
 = Improving Material
 
 #course-text("improving-intro")[
-We would like to make the lecture notes available to as many people as possible. You can now read them in a browser, follow numbered links between lectures in HTML and PDF, and move between the notes and their source. We would like everyone's help to make this a useful resource for learners around the world.
+We would like to make the lecture notes available to as many people as possible. You can now read them in a browser, follow numbered links between lectures in HTML and PDF, and use “View source” to open each note's Typst file in the #link(course.github)[class GitHub repository]. We would like everyone's help to make this a useful resource for learners around the world.
 ]
 
 #v(2mm)

@@ -31,7 +31,7 @@ def with_course_data(config: dict, data: dict) -> dict:
     resolved = copy.deepcopy(config)
     info = data['info']
     resolved['course'] = data
-    resolved['site'].update({k: info[k] for k in ('event', 'title', 'term', 'year')})
+    resolved['site'].update({k: info[k] for k in ('event', 'title', 'term', 'year', 'github')})
     resolved['site']['authors'] = ' and '.join(p['name'] for p in info['instructors'])
     resolved['how_to_cite'].update({
         'authors': ' and '.join(p['citation_name'] for p in info['instructors']),

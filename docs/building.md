@@ -108,8 +108,12 @@ target requires Typst 0.15.1 and currently uses its experimental feature flag.
 `make bundle` also produces `dist/6.7980-notes.zip`.
 
 The generated website has a schedule, 18 lecture and supplementary pages,
-PDF downloads, downloadable chapter sources, a syllabus, and local browser
-assets. KaTeX 0.16.22 renders supported expressions; unsupported expressions
+PDF downloads, links to chapter sources on GitHub, a syllabus, and local browser
+assets. “View source” uses the syllabus's `course.github` repository, its `main`
+branch, and each note's repository-relative source path. Push source moves before
+publishing the site. Chapter sources are not copied into the website or ZIP;
+rebuilding removes the retired `html/source/` directory.
+KaTeX 0.16.22 renders supported expressions; unsupported expressions
 retain their Typst SVG rendering. No npm installation is needed for the course
 build: the browser runtime and its license are under `html-exporter/assets/katex/`.
 
