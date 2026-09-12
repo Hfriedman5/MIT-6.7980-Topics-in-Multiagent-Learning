@@ -117,6 +117,15 @@ KaTeX 0.16.22 renders supported expressions; unsupported expressions
 retain their Typst SVG rendering. No npm installation is needed for the course
 build: the browser runtime and its license are under `html-exporter/assets/katex/`.
 
+When authoring indexed functions, group the index explicitly: `u_(i)(a)` and
+`EE_(t)[x]`. Typst parses `u_i(a)` and `EE_t[x]` with the argument inside the
+subscript. `scripts/test_lecture_math.py` checks the compiled math trees of all
+configured notes for these mistakes. Use `cases(...)` for a brace spanning
+several rows, and positive spacing between derivations and their annotations;
+manual negative spacing can make the HTML overlap. KaTeX syntax validation does
+not detect missing operands or visual overlap, so changes to the converter also
+need a browser comparison with the native Typst rendering.
+
 After the Rust converter has been built, a quicker rebuild is:
 
 ```sh

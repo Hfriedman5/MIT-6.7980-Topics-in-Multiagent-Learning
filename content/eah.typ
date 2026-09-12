@@ -127,9 +127,9 @@ If you are curious to read more, the following papers contains extensions and re
 #appendix[
 = Appendix: Proof of Theorem~#ref(label("thm:hart schmeidler"), supplement: none)
 
-Let $s_i=sum_(a_i in A_i) nu_(i,a_i)$ be the total mass assigned to player $i$'s deviations. If $s_i>0$, set $mu_i(a_i)=nu_(i,a_i)/s_i$; if $s_i=0$, choose any distribution $mu_i$ on $A_i$. Let $mu=mu_1 times dots.h times mu_n$ be their product distribution.
+Let $s_i=sum_(a_i in A_i) nu_(i,a_i)$ be the total mass assigned to player $i$'s deviations. If $s_i>0$, set $mu_(i)(a_i)=nu_(i,a_i)/s_i$; if $s_i=0$, choose any distribution $mu_i$ on $A_i$. Let $mu=mu_1 times dots.h times mu_n$ be their product distribution.
 
 For $s_i>0$, averaging the deviating action according to $nu_(i,dot)/s_i$ is exactly the same as drawing it from $mu_i$, independently of the opponents. Therefore
-$ sum_(a'_i) nu_(i,a'_i) EE_(a tilde.op mu)[u_i(a'_i,a_(-i))-u_i(a_i,a_(-i))] = s_i(EE_(a tilde.op mu)[u_i(a)]-EE_(a tilde.op mu)[u_i(a)])=0. $
+$ sum_(a'_i) nu_(i,a'_i) EE_(a tilde.op mu)[u_(i)(a'_i,a_(-i))-u_(i)(a_i,a_(-i))] = s_(i)(EE_(a tilde.op mu)[u_(i)(a)]-EE_(a tilde.op mu)[u_(i)(a)])=0. $
 If $s_i=0$, the same expression is zero because all its coefficients vanish. Sum over players to obtain the theorem, with equality. This normalization also handles zero-mass players, for whom an unnormalized product of the $nu$ entries would not define a probability distribution.
 ]

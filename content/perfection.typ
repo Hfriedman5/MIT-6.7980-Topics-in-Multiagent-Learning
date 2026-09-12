@@ -161,9 +161,11 @@ Perhaps surprisingly, finding an EFPE or a QPE in a two-player game is not harde
 We can compute a limit point of solutions to @eq:efpe and @eq:qpe using the same machinery. As a first step, just like what we did for the Nash equilibrium, we convert the bilinear saddle-point formulations @eq:efpe, @eq:qpe into linear programs by dualizing the internal minimization problems. This gives us a linear program where the constraints matrix and the objective function depend polynomially on $epsilon.alt$. In particular, for both QPE and EFPE we end up with a linear program of the form
 
 $
-  P \( epsilon.alt \) : {max_x &&                   c \( epsilon.alt \)^top x \
-               upright("s.t.") && A \( epsilon.alt \) x = b \( epsilon.alt \) \
-                   upright("") &&                                 x gt.eq 0 .
+  P(epsilon.alt) : cases(
+    max_x & c(epsilon.alt)^top x,
+    upright("s.t.") & A(epsilon.alt) x = b(epsilon.alt),
+    & x gt.eq 0 .,
+  )
 $
 
 where $c \, A$ and $b$ are _polynomial_ functions of $epsilon.alt$ with rational coefficients.  We will call an object of that form a _trembling linear program (TLP)_, and a limit point of solutions to $P \( epsilon.alt \)$ as $epsilon.alt arrow.r 0^(+)$ a _limit solution_ of the TLP.  With this formalism, we can reframe the computation of an EFPE or a QPE as the problem of finding a limit solution to their corresponding TLPs.

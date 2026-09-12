@@ -199,7 +199,7 @@ With a simple modification to the analysis of RM, the same bound as RM can be pr
 If we replace the "hard" maximum of follow-the-leader with the "soft" maximum given by
 
 $
-  x_a^((t+1)) &= "softmax"_a(eta r^((t))) \
+  x_a^((t+1)) &= "softmax"_(a)(eta r^((t))) \
   &:= exp(eta r_a^((t))) / (sum_(j=1)^m exp(eta r^((t))[j])),
 $
 where $eta > 0$ is an inverse temperature parameter, then we obtain the _multiplicative weights update_ algorithm #citep(<freund1997decision>).

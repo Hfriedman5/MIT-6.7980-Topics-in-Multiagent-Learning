@@ -1,6 +1,6 @@
 @font-face {
     font-family: "Frutiger Notes";
-    src: url("fonts/Frutiger-Regular.ttf") format("truetype");
+    src: url("fonts/Frutiger-Regular.ttf?v=6a341a4de340") format("truetype");
     font-style: normal;
     font-weight: 400;
     font-display: swap
@@ -8,7 +8,7 @@
 
 @font-face {
     font-family: "Frutiger Notes";
-    src: url("fonts/Frutiger-Bold.ttf") format("truetype");
+    src: url("fonts/Frutiger-Bold.ttf?v=ffc7587273fb") format("truetype");
     font-style: normal;
     font-weight: 700;
     font-display: swap

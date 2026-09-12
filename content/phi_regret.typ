@@ -66,11 +66,11 @@ We now claim that the algorithm described above is a swap regret minimizer for $
     &sum_(t=1)^T u^((t))(hat(P) x^((t))) - u^((t)) (x^((t))) \
     &#h(1cm)= sum_(t=1)^T u^((t))(hat(P) x^((t))) - u^((t)) (
       P^((t)) x^((t))
-    ) &qquad qquad (x^((t)) = P^((t)) x^((t)))\
-    &#h(1cm)= sum_(t=1)^T [(sum_(i=1)^n x_i^((t)) u^((t))(hat(p)_i)) - (sum_(i=1)^n x_i^((t)) u^((t))\(p_i^((t))\))] & ("linearity of" u^((t)))\
-    &#h(1cm)= sum_(t=1)^T (sum_(i=1)^n v_i^((t))(hat(p)_i) - v_i^((t))\(p_i^((t))\)) & ("definition of" v_i^((t)))\
-    &#h(1cm)= sum_(i=1)^n (sum_(t=1)^T v_i^((t))(hat(p)_i) - v_i^((t))\(p_i^((t))\)) & #h(-15mm) ("switching summation order") \
-    &#h(1cm)<= sum_(i=1)^n "Reg"_i^((T)). & ("from" (#ref(<eq-def-Rv>)))
+    ) &quad (x^((t)) = P^((t)) x^((t)))\
+    &#h(1cm)= sum_(t=1)^T [(sum_(i=1)^n x_i^((t)) u^((t))(hat(p)_i)) - (sum_(i=1)^n x_i^((t)) u^((t))\(p_i^((t))\))] &quad ("linearity of" u^((t)))\
+    &#h(1cm)= sum_(t=1)^T (sum_(i=1)^n v_i^((t))(hat(p)_i) - v_i^((t))\(p_i^((t))\)) &quad ("definition of" v_i^((t)))\
+    &#h(1cm)= sum_(i=1)^n (sum_(t=1)^T v_i^((t))(hat(p)_i) - v_i^((t))\(p_i^((t))\)) &quad ("switching summation order") \
+    &#h(1cm)<= sum_(i=1)^n "Reg"_i^((T)). &quad ("from" (#ref(<eq-def-Rv>)))
   $
   Taking a maximum over all $hat(P) in Phi$ gives equality: each column $hat(p)_i$ can be chosen independently in $Delta^n$ to attain the corresponding external-regret maximum. This concludes the proof.
 ]
