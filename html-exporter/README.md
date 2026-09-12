@@ -32,6 +32,17 @@ numbers, dates, course facts, and citation metadata come from the syllabus.
 Use `make html` for publishing: it also updates the Typst note headers, compiles
 PDFs, copies slide attachments, and synchronizes the index and syllabus PDF.
 
+The desktop lecture rail keeps the course title and instructors visible.
+“In this lecture” opens with every section and subsection expanded by default.
+Use the chevrons to collapse subsections and the section titles to jump to them.
+The active marker follows the visible parent when its subsections are collapsed.
+“Browse lectures” reveals the full course list. Both disclosures work without
+JavaScript. With browser storage available, its open/closed state is remembered
+across the course, and each lecture remembers its own expanded subsections,
+including after reloading or reopening the browser.
+Previous/next links follow the available notes in course order;
+supplementary readings have their own sequence.
+
 Useful options:
 
 - `--root <dir>`: set the Typst project root.

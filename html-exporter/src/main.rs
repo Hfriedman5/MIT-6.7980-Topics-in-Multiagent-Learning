@@ -1026,6 +1026,10 @@ fn render_chapter_rail(
         .event
         .as_deref()
         .unwrap_or(DEFAULT_EVENT_NAME);
+    let eyebrow = match export_config.site.term.as_deref() {
+        Some(term) => format!("{event} · {term}"),
+        None => event.to_owned(),
+    };
     let title = export_config
         .site
         .title
@@ -1048,14 +1052,14 @@ fn render_chapter_rail(
             out,
             "<a class=\"course-event\" href=\"{}\">{}</a>",
             escape_attr(index),
-            escape_html(event)
+            escape_html(&eyebrow)
         )
         .unwrap();
     } else {
         write!(
             out,
             "<div class=\"course-event\">{}</div>",
-            escape_html(event)
+            escape_html(&eyebrow)
         )
         .unwrap();
     }
@@ -1075,12 +1079,13 @@ fn render_chapter_rail(
         )
         .unwrap();
     }
-    write!(
+    writeln!(
         out,
-        "<div class=\"course-authors\">{}</div></div>\n",
+        "<div class=\"course-authors\">{}</div></div>",
         escape_html(authors)
     )
     .unwrap();
+    out.push_str("<details class=\"lecture-browser\"><summary>Browse lectures</summary>\n<div class=\"lecture-browser-list\">\n");
     for (supplementary, label) in [(false, "Lectures"), (true, "Supplementary readings")] {
         if !export_config
             .chapters
@@ -1111,9 +1116,9 @@ fn render_chapter_rail(
             } else {
                 ""
             };
-            write!(
+            writeln!(
                 out,
-                "<a class=\"{}\" href=\"{}\"{}><span>{}</span>{}</a>\n",
+                "<a class=\"{}\" href=\"{}\"{}><span>{}</span>{}</a>",
                 class,
                 escape_attr(&chapter.href().expect("lecture href was validated")),
                 aria,
@@ -1123,25 +1128,78 @@ fn render_chapter_rail(
             .unwrap();
         }
     }
+    out.push_str("</div></details>\n");
     if !headings.is_empty() {
-        out.push_str(
-            "<div class=\"lecture-rail-heading lecture-rail-section-heading\">This Lecture</div>\n",
-        );
-        for heading in headings {
-            write!(
-                out,
-                "<a class=\"lecture-section-link lecture-section-l{}\" href=\"#{}\" data-section-link=\"{}\"><span class=\"lecture-section-no\">{}</span><span class=\"lecture-section-title\">{}</span></a>\n",
-                heading.level,
-                escape_attr(&heading.id),
-                escape_attr(&heading.id),
-                escape_html(&heading.number),
-                render_heading_title(heading, config.math_mode)
-            )
-            .unwrap();
+        out.push_str("<div class=\"lecture-rail-heading\">In this lecture</div>\n<div class=\"lecture-outline\">\n");
+        let mut remaining = headings;
+        while let Some((heading, rest)) = remaining.split_first() {
+            let child_count = rest
+                .iter()
+                .take_while(|child| child.level > heading.level)
+                .count();
+            let (children, rest) = rest.split_at(child_count);
+            if children.is_empty() {
+                out.push_str(&render_rail_section_link(heading, config.math_mode));
+            } else {
+                write!(
+                    out,
+                    "<details class=\"lecture-section-group\" open><summary aria-label=\"{}\">{}</summary>\n<div class=\"lecture-subsections\">\n",
+                    escape_attr(&format!("Subsections for {}", heading.text)),
+                    render_rail_section_link(heading, config.math_mode)
+                )
+                .unwrap();
+                for child in children {
+                    out.push_str(&render_rail_section_link(child, config.math_mode));
+                }
+                out.push_str("</div></details>\n");
+            }
+            remaining = rest;
         }
+        out.push_str("</div>\n");
+    }
+    let supplementary = export_config.chapters[current].supplementary;
+    let previous = export_config.chapters[..current]
+        .iter()
+        .rev()
+        .find(|chapter| chapter.supplementary == supplementary);
+    let next = export_config.chapters[current + 1..]
+        .iter()
+        .find(|chapter| chapter.supplementary == supplementary);
+    if previous.is_some() || next.is_some() {
+        out.push_str("<div class=\"lecture-rail-pagination\">\n");
+        for (chapter, relation, label) in
+            [(previous, "prev", "← Previous"), (next, "next", "Next →")]
+        {
+            if let Some(chapter) = chapter {
+                writeln!(
+                    out,
+                    "<a href=\"{}\" rel=\"{relation}\" title=\"{}\" aria-label=\"{}\">{label}</a>",
+                    escape_attr(&chapter.href().expect("lecture href was validated")),
+                    escape_attr(&chapter.short_title),
+                    escape_attr(&format!(
+                        "{label}: {} — {}",
+                        chapter.course_label(),
+                        chapter.short_title
+                    ))
+                )
+                .unwrap();
+            }
+        }
+        out.push_str("</div>\n");
     }
     out.push_str("</nav>\n");
     out
+}
+
+fn render_rail_section_link(heading: &Heading, math_mode: MathMode) -> String {
+    format!(
+        "<a class=\"lecture-section-link lecture-section-l{}\" href=\"#{}\" data-section-link=\"{}\"><span class=\"lecture-section-no\">{}</span><span class=\"lecture-section-title\">{}</span></a>\n",
+        heading.level,
+        escape_attr(&heading.id),
+        escape_attr(&heading.id),
+        escape_html(&heading.number),
+        render_heading_title(heading, math_mode)
+    )
 }
 
 fn render_toc(headings: &[Heading], math_mode: MathMode) -> String {
@@ -1187,13 +1245,43 @@ fn render_endnotes(notes: &[RenderedEndnote]) -> String {
 fn chapter_nav_script() -> &'static str {
     r##"<script>
 (() => {
+  const storagePrefix = `lecture-rail:v1:${new URL(".", window.location.href).href}:`;
+  const remember = (details, key) => {
+    if (!details) return;
+    key = storagePrefix + key;
+    try {
+      const saved = window.localStorage.getItem(key);
+      if (saved === "open" || saved === "closed") details.open = saved === "open";
+    } catch {
+      // Native disclosures still work when browser storage is unavailable.
+    }
+    let lastOpen = details.open;
+    details.addEventListener("toggle", () => {
+      if (details.open === lastOpen) return;
+      lastOpen = details.open;
+      try {
+        window.localStorage.setItem(key, details.open ? "open" : "closed");
+      } catch {
+        // Storage restrictions must not interrupt navigation.
+      }
+    });
+  };
+  remember(document.querySelector(".lecture-browser"), "browse");
+  for (const group of document.querySelectorAll(".lecture-section-group")) {
+    const id = group.querySelector("summary [data-section-link]")?.getAttribute("data-section-link");
+    if (id) remember(group, `section:${window.location.pathname}:${id}`);
+  }
+
   const links = Array.from(document.querySelectorAll("[data-section-link]"));
   if (!links.length) return;
   const byId = new Map(links.map((link) => [link.getAttribute("data-section-link"), link]));
   const sections = Array.from(byId.keys()).map((id) => document.getElementById(id)).filter(Boolean);
   const setActive = (id) => {
+    const current = byId.get(id);
+    const group = current?.closest(".lecture-section-group");
+    const visible = group && !group.open ? group.querySelector("summary [data-section-link]") : current;
     for (const link of links) {
-      const active = link.getAttribute("data-section-link") === id;
+      const active = link === visible;
       link.classList.toggle("is-active", active);
       if (active) link.setAttribute("aria-current", "location");
       else link.removeAttribute("aria-current");
@@ -1214,6 +1302,9 @@ fn chapter_nav_script() -> &'static str {
   document.addEventListener("scroll", update, { passive: true });
   window.addEventListener("resize", update);
   window.addEventListener("hashchange", update);
+  for (const group of document.querySelectorAll(".lecture-section-group")) {
+    group.addEventListener("toggle", update);
+  }
 })();
 </script>
 "##
@@ -1717,6 +1808,107 @@ fn re_html_section() -> &'static Regex {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn rail_fixture() -> (ExportConfig, Config) {
+        let book = serde_json::from_value(serde_json::json!({
+            "site": {"event": "MIT 6.7980", "term": "Fall 2026", "title": "Full course title",
+                     "authors": "Course authors", "index_href": "index.html"},
+            "how_to_cite": {"authors": "Course authors", "key_prefix": "notes",
+                            "booktitle": "Course", "title_template": "{label}: {title}",
+                            "year": 2026, "url_prefix": "https://example.com/"},
+            "notes": [
+                {"number": 8, "source": "eight.typ", "short_title": "Eight"},
+                {"number": 16, "source": "sixteen.typ", "short_title": "Sixteen"},
+                {"number": 18, "source": "eighteen.typ", "short_title": "Eighteen"},
+                {"number": "S1", "source": "s1.typ", "short_title": "Reading one", "supplementary": true},
+                {"number": "S2", "source": "s2.typ", "short_title": "Reading two", "supplementary": true}
+            ]
+        })).unwrap();
+        let config = Config {
+            input: PathBuf::from("sixteen.typ"),
+            output: PathBuf::from("sixteen.html"),
+            root: PathBuf::from("."),
+            title: None,
+            site_title: "Full course title".to_owned(),
+            authors: "Course authors".to_owned(),
+            index_href: None,
+            pdf_href: None,
+            export_config: None,
+            math_mode: MathMode::Katex,
+        };
+        (book, config)
+    }
+
+    #[test]
+    fn rail_disclosures_preserve_every_destination_and_heading_math() {
+        let (book, config) = rail_fixture();
+        let parts = HtmlParts::parse(
+            r#"<html><body>
+<h1 id="a" class="notes-heading" data-level="1" data-number="16.1">First section</h1>
+<h2 id="b" class="notes-heading" data-level="2" data-number="16.1.1">Child</h2>
+<h3 id="c" class="notes-heading" data-level="3" data-number="16.1.1.1">Grandchild</h3>
+<h1 id="d" class="notes-heading" data-level="1" data-number="16.2">Leaf section</h1>
+<h1 id="e" class="notes-heading" data-level="1" data-number="16.3"><span class="math" data-math-display="inline" data-typst-math="[Φ]" role="math"><svg></svg></span>-regret</h1>
+<h2 id="f" class="notes-heading" data-level="2" data-number="16.3.1">Last child</h2>
+</body></html>"#,
+        );
+        let rail = render_chapter_rail(&book, 1, &parts.headings, &config);
+        let html = Html::parse_fragment(&rail);
+        let select = |selector: &str| Selector::parse(selector).unwrap();
+        assert_eq!(html.select(&select(".lecture-browser[open]")).count(), 0);
+        assert_eq!(html.select(&select(".lecture-browser a")).count(), 5);
+        let current = html.select(&select("[aria-current=page]")).next().unwrap();
+        assert_eq!(current.value().attr("href"), Some("sixteen.html"));
+        let home = html.select(&select(".course-event")).next().unwrap();
+        assert_eq!(home.value().attr("href"), Some("index.html"));
+        assert_eq!(home.text().collect::<String>(), "MIT 6.7980 · Fall 2026");
+        let title = html.select(&select(".course-title")).next().unwrap();
+        assert_eq!(title.value().attr("href"), Some("index.html"));
+        assert_eq!(title.text().collect::<String>(), "Full course title");
+        let authors = html.select(&select(".course-authors")).next().unwrap();
+        assert_eq!(authors.text().collect::<String>(), "Course authors");
+        let destinations: Vec<_> = html
+            .select(&select("[data-section-link]"))
+            .map(|link| link.value().attr("href").unwrap())
+            .collect();
+        assert_eq!(destinations, ["#a", "#b", "#c", "#d", "#e", "#f"]);
+        let groups: Vec<_> = html.select(&select(".lecture-section-group")).collect();
+        assert_eq!(groups.len(), 2);
+        assert!(groups.iter().all(|group| group.value().attr("open").is_some()));
+        assert_eq!(
+            groups[0].select(&select(".lecture-subsections a")).count(),
+            2
+        );
+        assert_eq!(
+            groups[1].select(&select(".lecture-subsections a")).count(),
+            1
+        );
+        assert_eq!(html.select(&select(".lecture-outline > a")).count(), 1);
+        assert!(rail.contains(r"\(\Phi\)"));
+        assert!(!rail.contains("<svg>"));
+    }
+
+    #[test]
+    fn rail_pagination_follows_available_notes_within_each_category() {
+        let (book, config) = rail_fixture();
+        for (current, previous, next) in [
+            (0, None, Some("sixteen.html")),
+            (1, Some("eight.html"), Some("eighteen.html")),
+            (2, Some("sixteen.html"), None),
+            (3, None, Some("s2.html")),
+            (4, Some("s1.html"), None),
+        ] {
+            let html = Html::parse_fragment(&render_chapter_rail(&book, current, &[], &config));
+            for (relation, expected) in [("prev", previous), ("next", next)] {
+                let selector = Selector::parse(&format!("a[rel={relation}]")).unwrap();
+                let link = html.select(&selector).next();
+                assert_eq!(link.and_then(|link| link.value().attr("href")), expected);
+                if let Some(link) = link {
+                    assert!(link.value().attr("aria-label").unwrap().contains(": "));
+                }
+            }
+        }
+    }
 
     #[test]
     fn lecture_metadata_moves_below_title_and_before_toc_once() {

@@ -17,6 +17,8 @@ pub(crate) struct SiteConfig {
     #[serde(default)]
     pub(crate) event: Option<String>,
     #[serde(default)]
+    pub(crate) term: Option<String>,
+    #[serde(default)]
     pub(crate) title: Option<String>,
     #[serde(default)]
     pub(crate) authors: Option<String>,
@@ -129,6 +131,7 @@ impl ExportConfig {
 impl SiteConfig {
     fn validate(&self, path: &Path) -> Result<(), String> {
         validate_optional_nonempty(path, "site.event", &self.event)?;
+        validate_optional_nonempty(path, "site.term", &self.term)?;
         validate_optional_nonempty(path, "site.title", &self.title)?;
         validate_optional_nonempty(path, "site.authors", &self.authors)?;
         validate_optional_nonempty(path, "site.index_href", &self.index_href)?;
