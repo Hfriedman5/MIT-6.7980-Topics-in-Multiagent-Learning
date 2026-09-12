@@ -1110,7 +1110,11 @@ fn render_chapter_rail(
         escape_html(authors)
     )
     .unwrap();
-    out.push_str("<div class=\"lecture-browser\">\n<div class=\"lecture-browser-list\" role=\"region\" aria-label=\"Lectures and supplementary readings\" tabindex=\"0\">\n");
+    out.push_str("<div class=\"lecture-browser\">\n");
+    if export_config.chapters.iter().any(|chapter| !chapter.supplementary) {
+        out.push_str("<div class=\"lecture-rail-heading\">Lectures</div>\n");
+    }
+    out.push_str("<div class=\"lecture-browser-list\" role=\"region\" aria-label=\"Lectures and supplementary readings\" tabindex=\"0\">\n");
     for (supplementary, label) in [(false, "Lectures"), (true, "Supplementary readings")] {
         if !export_config
             .chapters
@@ -1119,12 +1123,9 @@ fn render_chapter_rail(
         {
             continue;
         }
-        let heading_class = if supplementary {
-            "lecture-rail-heading lecture-rail-section-heading"
-        } else {
-            "lecture-rail-heading"
-        };
-        writeln!(out, "<div class=\"{heading_class}\">{label}</div>").unwrap();
+        if supplementary {
+            writeln!(out, "<div class=\"lecture-rail-heading lecture-rail-section-heading\">{label}</div>").unwrap();
+        }
         for (idx, chapter) in export_config
             .chapters
             .iter()
@@ -1263,18 +1264,31 @@ fn chapter_nav_script() -> &'static str {
   };
   const lectureList = document.querySelector(".lecture-browser-list");
   const scrollHint = document.querySelector(".lecture-scroll-hint");
-  if (lectureList && scrollHint) {
+  if (lectureList) {
+    const currentLecture = lectureList.querySelector('[aria-current="page"]');
     const updateScrollHint = () => {
+      if (!scrollHint) return;
       const overflowing = lectureList.scrollHeight > lectureList.clientHeight + 1;
       const moreBelow = lectureList.scrollTop + lectureList.clientHeight < lectureList.scrollHeight - 1;
       scrollHint.hidden = !overflowing;
       scrollHint.textContent = moreBelow ? "Scroll for more ↓" : "Scroll for earlier ↑";
     };
-    updateScrollHint();
+    const updateLectureList = () => {
+      if (currentLecture && lectureList.clientHeight) {
+        const listBounds = lectureList.getBoundingClientRect();
+        const currentBounds = currentLecture.getBoundingClientRect();
+        const centered = lectureList.scrollTop + currentBounds.top - listBounds.top
+          - lectureList.clientTop + (currentBounds.height - lectureList.clientHeight) / 2;
+        lectureList.scrollTop = Math.max(0, Math.min(centered,
+          lectureList.scrollHeight - lectureList.clientHeight));
+      }
+      updateScrollHint();
+    };
+    updateLectureList();
     lectureList.addEventListener("scroll", updateScrollHint, { passive: true });
-    window.addEventListener("resize", updateScrollHint);
-    new ResizeObserver(updateScrollHint).observe(lectureList);
-    document.fonts.ready.then(updateScrollHint);
+    window.addEventListener("resize", updateLectureList);
+    new ResizeObserver(updateLectureList).observe(lectureList);
+    document.fonts.ready.then(updateLectureList);
   }
   for (const group of document.querySelectorAll(".lecture-section-group")) {
     const id = group.querySelector("summary [data-section-link]")?.getAttribute("data-section-link");
