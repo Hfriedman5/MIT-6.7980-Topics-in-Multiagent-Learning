@@ -7,6 +7,8 @@
 )
 #show: gabri_notes.with(..lecture)
 
+#let upsans = it => $upright(sans(#it))$
+
 Imperfect-information extensive-form games  model tree-form strategic interactions in which not all actions might be observed by all players. They represent an ample majority of strategic interactions encountered in the real world, ranging from recreational games such as poker, to negotiation, and auctions.
 
 = Game trees and information sets <sec-game-trees>
@@ -21,7 +23,7 @@ The standard representation of an imperfect-information extensive-form game is t
   ]
 ] <ex:kuhn>
 
-#paragraph-marker(shape: "triangle-up") *The rules of Kuhn poker*~~ In the game tree of Kuhn poker, the root history of the tree (the first move in the game) belongs to the _nature player_ $c$. It models a dealer that privately deals one card to each player from a shuffled deck containing cards Jack, Queen, King. The actions of the nature player correspond to the six possible assignments of two cards from the deck, which are annotated on the edges; for example, the leftmost edge $sans(J K)$ corresponds to the case in which Player 1 is dealt a Jack and Player 2 is dealt a King. Since the deck is shuffled, each of the six actions are selected with probability 1/6 by the nature player. No matter the action selected by the dealer, the game transitions to a history of Player 1, which marks the beginning of what in poker is called a “betting round”. First, Player 1 decides to either check (continue without betting any money) or bet \$1. Then,
+#paragraph-marker(shape: "triangle-up") *The rules of Kuhn poker*~~ In the game tree of Kuhn poker, the root history of the tree (the first move in the game) belongs to the _nature player_ $c$. It models a dealer that privately deals one card to each player from a shuffled deck containing cards Jack, Queen, King. The actions of the nature player correspond to the six possible assignments of two cards from the deck, which are annotated on the edges; for example, the leftmost edge $upsans(J K)$ corresponds to the case in which Player 1 is dealt a Jack and Player 2 is dealt a King. Since the deck is shuffled, each of the six actions are selected with probability 1/6 by the nature player. No matter the action selected by the dealer, the game transitions to a history of Player 1, which marks the beginning of what in poker is called a “betting round”. First, Player 1 decides to either check (continue without betting any money) or bet \$1. Then,
 
 - If Player 1 checks, Player 2 can either check, or bet \$1.
   - If Player 2 checks, the game terminates with a showdown: the player with the higher card receives from the other player whatever amount the other player bet, plus an ante amount of \$1.
@@ -49,7 +51,7 @@ To model imperfect information, the histories of each player $i in \[ n \]$ are 
 ]
 
 #example[
-  In Kuhn poker, each player observes their own private card and the actions of the opponent, but not the opponent's private card. The twelve information sets, six for Player 1 denoted $sans(A)$ through $sans(F)$, and six for Player 2 denoted $sans(P)$ through $sans(U)$, reflect this partial information. For example, Player 1's histories following actions $sans(Q K)$ and $sans(Q J)$ of the nature player (the dealer) are part of the same information set $sans(B)$, in that Player 1 cannot distinguish between the two histories, having observed only their private $sans(Q u e e n)$ card. As another example, Player 2's information set $sans(P)$ captures the uncertainty the player has on the underlying history after having observed a private $sans(K i n g)$ card, and a check from Player 1.
+  In Kuhn poker, each player observes their own private card and the actions of the opponent, but not the opponent's private card. The twelve information sets, six for Player 1 denoted $upsans(A)$ through $upsans(F)$, and six for Player 2 denoted $upsans(P)$ through $upsans(U)$, reflect this partial information. For example, Player 1's histories following actions $upsans(Q K)$ and $upsans(Q J)$ of the nature player (the dealer) are part of the same information set $upsans(B)$, in that Player 1 cannot distinguish between the two histories, having observed only their private $upsans(Q u e e n)$ card. As another example, Player 2's information set $upsans(P)$ captures the uncertainty the player has on the underlying history after having observed a private $upsans(K i n g)$ card, and a check from Player 1.
 ]
 
 == Perfect recall <sec-perfect-recall>
@@ -67,11 +69,11 @@ The game tree representation introduced above provides a description of the glob
 #example[Player 1's decision process in Kuhn poker][
   As an example, consider Player 1 in Kuhn poker @ex:kuhn. From the player's point of view, playing the game could be summarized as follows:
 
-  - As soon as the game starts, the player observes a private card that has been dealt to them; the set of possible signals is ${sans(J a c k) \, sans(Q u e e n) \, sans(K i n g)}$.
-  - No matter the card observed, the player now needs to select one action from the set ${sans(c h e c k) \, sans(b e t)}$.
+  - As soon as the game starts, the player observes a private card that has been dealt to them; the set of possible signals is ${upsans(J a c k) \, upsans(Q u e e n) \, upsans(K i n g)}$.
+  - No matter the card observed, the player now needs to select one action from the set ${upsans(c h e c k) \, upsans(b e t)}$.
 
-    - If the player $sans(b e t s)$, the player does not have a chance to act further
-    - Otherwise, if the player $sans(c h e c k s)$, the player will then observe whether the opponent $sans(c h e c k s)$ (at which point the interaction terminates) or $sans(b e t s)$. In the latter case, a new decision needs to be made, between $sans(f o l d i n g)$ the hand, or $sans(c a l l i n g)$ the bet. In either case, after the action has been selected, the interaction terminates.
+    - If the player $upsans(b e t s)$, the player does not have a chance to act further
+    - Otherwise, if the player $upsans(c h e c k s)$, the player will then observe whether the opponent $upsans(c h e c k s)$ (at which point the interaction terminates) or $upsans(b e t s)$. In the latter case, a new decision needs to be made, between $upsans(f o l d i n g)$ the hand, or $upsans(c a l l i n g)$ the bet. In either case, after the action has been selected, the interaction terminates.
 
   By arranging the structure of decisions and observations along a tree as follows, we obtain the tree-form decision process for Player 1.
 
@@ -91,10 +93,10 @@ The set of decision nodes $cal(J)_i$ of the player's TFDP coincides with the set
 #example[
   Consider Kuhn poker from the point of view of Player~1 (@fig:kuhn-tfdp).
 
-  - The trace of any history in $sans(A)$ is the sequence $\( sans(A) \)$.
-  - The trace of any history in $sans(E)$ is the sequence $(sans(B) \, sans(c h e c k) \, sans(E))$.
+  - The trace of any history in $upsans(A)$ is the sequence $\( upsans(A) \)$.
+  - The trace of any history in $upsans(E)$ is the sequence $(upsans(B) \, upsans(c h e c k) \, upsans(E))$.
 
-  From the point of view of Player~2, the trace of any history in $sans(R)$ is the sequence $\( sans(R) \)$.
+  From the point of view of Player~2, the trace of any history in $upsans(R)$ is the sequence $\( upsans(R) \)$.
 ]
 
 #example[
@@ -102,7 +104,7 @@ The set of decision nodes $cal(J)_i$ of the player's TFDP coincides with the set
     [
       Consider the following small game tree.
 
-      Taking the side of Player~1, the trace of the only history in $sans(B)$ is the sequence $(sans(A) \, sans(1) \, sans(B))$, the trace of any history in $sans(D)$ is $(sans(A) \, sans(2) \, sans(D))$, and the trace of the only history in $sans(A)$ is $(sans(A))$. Taking the side of Player~2, the trace of the only history in $sans(P)$ is $(sans(P))$, and the trace of the only history in $sans(Q)$ is $(sans(Q))$.
+      Taking the side of Player~1, the trace of the only history in $upsans(B)$ is the sequence $(upsans(A) \, upsans(1) \, upsans(B))$, the trace of any history in $upsans(D)$ is $(upsans(A) \, upsans(2) \, upsans(D))$, and the trace of the only history in $upsans(A)$ is $(upsans(A))$. Taking the side of Player~2, the trace of the only history in $upsans(P)$ is $(upsans(P))$, and the trace of the only history in $upsans(Q)$ is $(upsans(Q))$.
     ],
     [#image("figures/efg_intro/small_efg.svg", width: 210pt)],
     side: right,
@@ -189,8 +191,8 @@ A different conceptualization of a strategy for a player is as a choice of (inde
   Consider the game of Kuhn poker, and let $x \, y$ be behavioral strategies for both players. The expected utility function for Player 1 is given by
 
   $
-    u_1 (x \, y) & colon.eq (- 1) dot.op x_(sans(A \, c h k)) dot.op y_(sans(P \, c h k)) + (- 1) dot.op x_(sans(A \, c h k)) dot.op y_(sans(P \, b e t)) dot.op x_(sans(D \, f o l d))\
-    & #h(2em) + (- 2) dot.op x_(sans(A \, c h k)) dot.op y_(sans(P \, b e t)) dot.op x_(sans(D \, c a l l)) + dots.h.c .
+    u_1 (x \, y) & colon.eq (- 1) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, c h k)) + (- 1) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, b e t)) dot.op x_(upsans(D \, f o l d))\
+    & #h(2em) + (- 2) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, b e t)) dot.op x_(upsans(D \, c a l l)) + dots.h.c .
   $
 
   This is not a convex function of $x$, as it contains products of entries of $x$.
@@ -217,12 +219,12 @@ The _sequence-form representation_ #citep(<Romanovskii62:Reduction>, <Koller96:E
 Conversely, it is easy to see that any $x$ that satisfies the above constraints is the sequence-form representation of at least one behavioral strategy.
 
 #example[
-  Consider the tree-form decision process faced by Player 1 in the small game of @ex:small-efg. The decision process has four decision nodes $J = {sans(A) \, sans(B) \, sans(C) \, sans(D)}$ and nine sequences including the empty sequence $∅$. For decision node D, the parent sequence is $p_(sans(D)) = sans(A 2)$; for $sans(B)$ and $sans(C)$ it is $p_(sans(B)) = p_(sans(C)) = sans(A 1)$; for $sans(A)$ it is the empty sequence $p_(sans(A)) = ∅$. The constraints that define the sequence-form polytope @def:sf, besides nonnegativity, are
+  Consider the tree-form decision process faced by Player 1 in the small game of @ex:small-efg. The decision process has four decision nodes $J = {upsans(A) \, upsans(B) \, upsans(C) \, upsans(D)}$ and nine sequences including the empty sequence $∅$. For decision node D, the parent sequence is $p_(upsans(D)) = upsans(A 2)$; for $upsans(B)$ and $upsans(C)$ it is $p_(upsans(B)) = p_(upsans(C)) = upsans(A 1)$; for $upsans(A)$ it is the empty sequence $p_(upsans(A)) = ∅$. The constraints that define the sequence-form polytope @def:sf, besides nonnegativity, are
 
   #wrapped-figure(
     [
       $
-        cases(x_∅ = 1, x_(sans(A 1)) + x_(sans(A 2)) = x_∅, x_(sans(B 3)) + x_(sans(B 4)) = x_(sans(A 1)), x_(sans(C 5)) + x_(sans(C 6)) = x_(sans(A 1)), x_(sans(D 7)) + x_(sans(D 8)) + x_(sans(D 9)) = x_(sans(A 2)) .)
+        cases(x_∅ = 1, x_(upsans(A 1)) + x_(upsans(A 2)) = x_∅, x_(upsans(B 3)) + x_(upsans(B 4)) = x_(upsans(A 1)), x_(upsans(C 5)) + x_(upsans(C 6)) = x_(upsans(A 1)), x_(upsans(D 7)) + x_(upsans(D 8)) + x_(upsans(D 9)) = x_(upsans(A 2)) .)
       $
     ],
     [#image("figures/efg_intro/small_tfdp.png", width: 170pt)],
