@@ -132,6 +132,12 @@ class CourseIndexTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Invalid syllabus_ids'):
             resolve_readings(config, self.modules)
 
+    def test_all_authored_note_titles_match_syllabus_or_supplementary_list(self):
+        from build_site import chapter_source_text
+        for note in self.config['notes']:
+            with self.subTest(note=note['source']):
+                chapter_source_text(ROOT / note['source'], note)
+
     def test_course_overview_has_slides_but_no_notes_or_pending_label(self):
         html = render_index(self.config, self.modules)
         overview = re.search(r'<tr class="schedule-row">\s*<th[^>]*>00</th>.*?</tr>', html, re.S).group()

@@ -51,9 +51,9 @@ pub(crate) struct ChapterNav {
 
 impl ExportConfig {
     pub(crate) fn load(path: &Path) -> Result<Self, String> {
-        let yaml = fs::read_to_string(path)
+        let json = fs::read_to_string(path)
             .map_err(|err| format!("could not read export config {}: {err}", path.display()))?;
-        let book: Self = serde_yaml::from_str(&yaml)
+        let book: Self = serde_json::from_str(&json)
             .map_err(|err| format!("could not parse export config {}: {err}", path.display()))?;
         book.validate(path)?;
         Ok(book)
@@ -341,9 +341,9 @@ mod tests {
 
     #[test]
     fn supports_zero_and_supplementary_numbers() {
-        for (yaml_number, expected) in [("0", "0"), ("S3", "S3")] {
-            let chapter: ChapterNav = serde_yaml::from_str(&format!(
-                "number: {yaml_number}\nsource: notes.typ\nshort_title: Notes\n"
+        for (json_number, expected) in [("0", "0"), (r#""S3""#, "S3")] {
+            let chapter: ChapterNav = serde_json::from_str(&format!(
+                r#"{{"number": {json_number}, "source": "notes.typ", "short_title": "Notes"}}"#
             )).unwrap();
             assert_eq!(chapter.number, expected);
         }

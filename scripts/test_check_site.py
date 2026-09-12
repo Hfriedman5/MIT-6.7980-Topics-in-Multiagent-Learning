@@ -7,6 +7,13 @@ from check_site import (
 )
 
 
+class LectureTitleTests(unittest.TestCase):
+    def test_only_lecture_heading_contributes_to_title(self):
+        page = Page('<h1 class="lecture-title">Nash <em>and</em> learning</h1>'
+                    '<h1>Section one</h1><p>Other content</p>')
+        self.assertEqual(''.join(page.h1_text), 'Nash and learning')
+
+
 class ImageInventoryTests(unittest.TestCase):
     source = Path('/course/content/lecture.typ')
 

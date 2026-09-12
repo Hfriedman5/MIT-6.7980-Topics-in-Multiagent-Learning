@@ -32,14 +32,23 @@ The portable site is written to `html/`, and its ZIP to
 `dist/6.7980-notes.zip`. The site includes local fonts and KaTeX assets for
 offline reading.
 
+To edit a lecture, open `content/<topic>.typ` in VS Code with Tinymist. Each
+note compiles directly to PDF without compiler flags, for example:
+
+```sh
+typst compile content/nfgs_nash.typ
+make check-pdf
+```
+
+The workspace settings load the bundled Frutiger fonts for Tinymist.
+
 ## Repository layout
 
 | Path | Contents |
 | --- | --- |
-| [`content/content/`](content/content/) | Current lecture notes and supplementary readings |
+| [`content/`](content/) | Current lecture notes and supplementary readings |
 | [`content/meta/`](content/meta/) | Shared notation, bibliography, and HTML/PDF templates |
-| [`content/figures/`](content/figures/) | Figures and their editable sources |
-| [`content/assets/`](content/assets/) | Shared rendered lecture illustrations |
+| [`content/figures/`](content/figures/) | Figures and editable sources, grouped by topic |
 | [`syllabus/`](syllabus/) | Editable syllabus, schedule, and current PDF |
 | [`html-exporter/`](html-exporter/) | Rust converter, stylesheets, fonts, and KaTeX runtime |
 | [`scripts/`](scripts/) | Site generation, figure preparation, and validation |

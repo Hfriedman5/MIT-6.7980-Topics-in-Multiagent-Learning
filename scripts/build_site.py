@@ -29,8 +29,11 @@ def run(*args: str) -> None:
 
 
 def chapter_source_text(source: Path, chapter: dict | None = None) -> str:
-    """Derive note headers from the schedule without editing authored sources."""
+    """Validate authored titles and derive schedule numbers/dates for export."""
     content = source.read_text()
+    if re.search(r'gabri_notes_(?:bk|pdf)\.typ|"\.\./(?:meta|figures|assets)/|figures/L\d+/', content):
+        raise ValueError(f'{source.name}: obsolete source layout or notes style; '
+                         'use content/<topic>.typ with meta/gabri_notes.typ and figures/<topic>/.')
     if chapter is not None and 'date' in chapter:
         content, numbers = re.subn(r'lec_num:\s*(?:"[^"]+"|\d+)',
             lambda _: 'lec_num: ' + json.dumps(chapter['number']), content, count=1)
@@ -38,18 +41,31 @@ def chapter_source_text(source: Path, chapter: dict | None = None) -> str:
             lambda _: 'date: [' + chapter['date'] + ']', content, count=1)
         if numbers != 1 or dates != 1:
             raise ValueError(f'{source.name}: expected one lecture number and date in the note header.')
+    if chapter is not None and 'title' in chapter:
+        match = re.search(r'\btitle:\s*("(?:\\.|[^"\\])*"|\[[^\]]*\])', content)
+        if match is None:
+            raise ValueError(f'{source.name}: expected a literal lecture title in the note header.')
+        literal = match[1]
+        title = json.loads(literal) if literal.startswith('"') else literal[1:-1].strip()
+        if title != chapter['title']:
+            raise ValueError(
+                f'{source.name}: authored title {title!r} does not match '
+                f'syllabus/list title {chapter["title"]!r}. Edit the Typst title explicitly.')
     return content
 
 
-def prepare_pdf_source(source: Path, chapter: dict | None = None) -> Path:
-    """Keep PDF-only template selection and relocated paths out of chapter prose."""
+def relocate_source_paths(source: Path, content: str) -> str:
+    """Resolve lecture-local dependencies before moving a source into .build/."""
     def absolute_path(match: re.Match) -> str:
         target = (source.parent / match[1]).resolve().relative_to(ROOT)
         return '"/' + target.as_posix() + '"'
 
-    content = re.sub(r'"((?:\.\./)+[^"]+)"', absolute_path, chapter_source_text(source, chapter))
-    content = content.replace('/content/meta/gabri_notes_bk.typ',
-                              '/content/meta/gabri_notes_pdf.typ')
+    return re.sub(r'"((?:meta|figures)/[^"]+)"', absolute_path, content)
+
+
+def prepare_pdf_source(source: Path, chapter: dict | None = None) -> Path:
+    """Apply scheduled headers and relocate paths, keeping the authored PDF style."""
+    content = relocate_source_paths(source, chapter_source_text(source, chapter))
     target = ROOT / '.build' / 'pdf-source' / source.name
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(content)
@@ -60,11 +76,8 @@ def prepare_html_source(source: Path, chapter: dict) -> Path:
     content = chapter_source_text(source, chapter)
     if content == source.read_text():
         return source
-    def absolute_path(match: re.Match) -> str:
-        target = (source.parent / match[1]).resolve().relative_to(ROOT)
-        return '"/' + target.as_posix() + '"'
-    content = re.sub(r'"((?:\.\./)+[^"]+)"', absolute_path, content)
-    content = content.replace('/content/meta/gabri_notes_bk.typ',
+    content = relocate_source_paths(source, content)
+    content = content.replace('/content/meta/gabri_notes.typ',
                               '/content/meta/gabri_notes_html.typ')
     target = ROOT / '.build' / 'html-source' / source.name
     target.parent.mkdir(parents=True, exist_ok=True)

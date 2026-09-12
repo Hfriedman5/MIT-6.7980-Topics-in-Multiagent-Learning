@@ -4,9 +4,7 @@
 #let NN = bb($NN$)
 #let QQ = bb($QQ$)
 #let RR = bb($RR$)
-#let EE = math.op(bb($E$), limits: true)
 
-#let vx = $bold(x)$
 #let va = $bold(a)$
 #let vb = $bold(b)$
 #let vq = $bold(q)$

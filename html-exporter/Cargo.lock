@@ -1611,7 +1611,7 @@ dependencies = [
  "regex",
  "scraper",
  "serde",
- "serde_yaml",
+ "serde_json",
  "typst",
  "typst-html",
  "typst-kit",

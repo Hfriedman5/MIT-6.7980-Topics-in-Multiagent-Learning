@@ -1,28 +1,11 @@
 #import "@preview/cetz:0.4.1"
 
-#let sans(body) = { text(weight: "bold", font: "New Computer Modern")[#body] }
-
 #let item(title, body) = {
   set par(hanging-indent: 1cm)
   set list(indent: 1cm)
   strong(title + ":")
   sym.space
   body
-}
-
-#let dt(s) = {
-  (
-    [#s]
-      + if s.last() == "1" and (not s.ends-with(" 1") and not s.ends-with("11")) {
-        [#super[st]]
-      } else if s.last() == "2" and not s.ends-with("12") {
-        [#super[nd]]
-      } else if s.last() == "3" and not s.ends-with("13") {
-        [#super[rd]]
-      } else {
-        [#super[th]]
-      }
-  )
 }
 
 #let mybox(body, bg: black, fg: white) = {
@@ -33,18 +16,9 @@
     size: 7.5pt,
   )[#upper[#body]]]
 };
-#let math = {} // mybox(bg: blue)[math]}
-#let complexity = mybox(bg: green)[complexity]
-#let exam = { mybox(bg: red)[EXAM] }
-#let examOut = { mybox(bg: red)[EXAM OUT] }
-#let examDue = { mybox(bg: red)[EXAM DUE] }
 #let proj = mybox(bg: blue)[project]
-#let projP = mybox(bg: purple)[project]
 #let brk = { mybox(bg: luma(60%))[No class] }
 #let break-badge = mybox(bg: rgb("#7855a6"))[break]
-#let rev = { mybox(bg: luma(40%))[review] }
-#let hwout(n) = { mybox(bg: orange)[HW#n out] }
-#let hwdue(n) = {}//{mybox(bg:purple)[HW#n due]}
 #let email(addr) = {
   let w = .3
   let h = .2

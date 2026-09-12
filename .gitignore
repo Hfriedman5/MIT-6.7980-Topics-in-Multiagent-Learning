@@ -13,6 +13,7 @@
 !/website/
 !/docs/
 !/slides/
+!/.vscode/
 # Publish configured course slide PDFs, while keeping editable decks private.
 /slides/*
 !/slides/L00_course_intro.pdf
@@ -27,6 +28,7 @@
 **/*~
 **/.ipynb_checkpoints/
 content/.*-check/
+content/*.pdf
 syllabus/macros.pdf
 
 # Private migration records stay in the local workspace.

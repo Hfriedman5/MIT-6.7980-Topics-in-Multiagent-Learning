@@ -49,7 +49,7 @@ def schedule_modules(entries: list[dict], year: int) -> list[dict]:
 
 
 def resolve_readings(config: dict, modules: list[dict]) -> dict:
-    """Resolve stable lecture IDs to current session numbers and note dates."""
+    """Resolve stable lecture IDs to syllabus titles, numbers, and dates."""
     resolved = copy.deepcopy(config)
     rows = {r['id']: r for m in modules for r in m['rows'] if r['kind'] == 'lecture'}
     supplement_number = 0
@@ -62,10 +62,13 @@ def resolve_readings(config: dict, modules: list[dict]) -> dict:
             chapter['number'] = f'S{supplement_number}'
             chapter['syllabus_numbers'] = []
             chapter['date'] = config['site']['term']
+            chapter['title'] = chapter['short_title']
             continue
         if not ids or len(ids) != len(set(ids)) or not set(ids) <= rows.keys():
             raise ValueError(f"Invalid syllabus_ids for {chapter['source']}: {ids}")
         sessions = sorted((rows[id] for id in ids), key=lambda r: r['number'])
+        chapter['title'] = sessions[0]['title']
+        chapter['short_title'] = chapter['title']
         chapter['syllabus_numbers'] = [r['number'] for r in sessions]
         chapter['number'] = sessions[0]['number']
         day = date.fromisoformat(sessions[0]['iso_date'])

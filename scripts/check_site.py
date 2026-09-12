@@ -21,10 +21,14 @@ class Page(HTMLParser):
         self.image_sources = []
         self.image_rendering_issues = []
         self.open_elements = []
+        self.h1_text = []
+        self.in_lecture_title = False
         self.feed(text)
 
     def handle_starttag(self, tag, attributes):
         attrs = dict(attributes)
+        if tag == 'h1':
+            self.in_lecture_title = 'lecture-title' in attrs.get('class', '').split()
         marker = attrs.get('data-image-source',
                            self.open_elements[-1][1] if self.open_elements else None)
         if tag not in self.void_tags:
@@ -58,10 +62,16 @@ class Page(HTMLParser):
                         f'{location} {dimension}={value!r}')
 
     def handle_endtag(self, tag):
+        if tag == 'h1':
+            self.in_lecture_title = False
         for index in range(len(self.open_elements) - 1, -1, -1):
             if self.open_elements[index][0] == tag:
                 del self.open_elements[index:]
                 break
+
+    def handle_data(self, data):
+        if self.in_lecture_title:
+            self.h1_text.append(data)
 
 
 def zero_dimension(value):
@@ -157,7 +167,8 @@ def dropped_content_warnings(text):
 def main():
     root = Path(__file__).resolve().parents[1]
     folder = (root / (sys.argv[1] if len(sys.argv) > 1 else 'html')).resolve()
-    config = json.loads((root / 'html-export.json').read_text())
+    from course_index import load_course
+    config, _ = load_course(root / 'html-export.json')
     expected = ['index.html'] + [Path(c['source']).stem + '.html' for c in config['notes']]
     issues = []
     pages = {}
@@ -182,6 +193,9 @@ def main():
         source_text = source.read_text()
         image_count += len(source_image_paths(source_text))
         if page := pages.get(folder / name):
+            title = ' '.join(''.join(page.h1_text).split())
+            if title != chapter['title']:
+                issues.append(f'{name}: title {title!r} does not match canonical title {chapter["title"]!r}')
             issues.extend(image_inventory_issues(source, source_text, page, name, root=root))
     for log in sorted((root / '.build/logs').glob('*.log')):
         issues.extend(f'{log.relative_to(root)}: dropped content: {warning}'
@@ -196,6 +210,7 @@ def main():
           'no zero-size images or dropped-content warnings.')
     print(f'Checked {link_audit.citation_count} How to cite URLs against the generated pages; '
           f'{len(link_audit.external)} external URLs require online deployment verification.')
+    print(f'Checked {len(config["notes"])} note titles against the syllabus and supplementary list.')
 
 
 if __name__ == '__main__':

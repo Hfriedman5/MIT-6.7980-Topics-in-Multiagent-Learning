@@ -118,8 +118,6 @@ impl LocalWorld {
         let main = RootedPath::new(VirtualRoot::Project, main_path).intern();
 
         let mut inputs = Dict::new();
-        inputs.insert("html".into(), "true".into_value());
-        inputs.insert("combined".into(), "false".into_value());
         inputs.insert("html-math".into(), math_mode.as_typst_input().into_value());
         let features = [Feature::Html].into_iter().collect();
         let library = Library::builder()
@@ -134,8 +132,10 @@ impl LocalWorld {
         let packages = SystemPackages::new(SystemDownloader::new("notes-html-exporter/0.1"));
         let files = SystemFiles::new(FsRoot::new(root), packages);
         let time = match env::var("SOURCE_DATE_EPOCH") {
-            Ok(value) => Time::fixed_timestamp(value.parse().map_err(|_| "invalid SOURCE_DATE_EPOCH")?)
-                .map_err(|err| err.to_string())?,
+            Ok(value) => {
+                Time::fixed_timestamp(value.parse().map_err(|_| "invalid SOURCE_DATE_EPOCH")?)
+                    .map_err(|err| err.to_string())?
+            }
             Err(_) => Time::system(),
         };
 
@@ -219,38 +219,15 @@ fn format_diagnostic(diagnostic: &SourceDiagnostic) -> String {
 }
 
 fn use_html_notes_style(source: &str) -> String {
-    let source = source
+    source
         .replace(
             r#"#import "meta/gabri_notes.typ": *"#,
             r#"#import "meta/gabri_notes_html.typ": *"#,
         )
         .replace(
-            r#"#import "meta/gabri_notes_bk.typ": *"#,
-            r#"#import "meta/gabri_notes_html.typ": *"#,
+            r#"#import "/content/meta/gabri_notes.typ": *"#,
+            r#"#import "/content/meta/gabri_notes_html.typ": *"#,
         )
-        .replace(
-            r#"#import "../meta/gabri_notes.typ": *"#,
-            r#"#import "../meta/gabri_notes_html.typ": *"#,
-        )
-        .replace(
-            r#"#import "../meta/gabri_notes_bk.typ": *"#,
-            r#"#import "../meta/gabri_notes_html.typ": *"#,
-        )
-        .replace("import cetz.plot", "");
-    strip_colored_math_text_wrappers(&remove_html_top_placements(&source))
-}
-
-fn remove_html_top_placements(source: &str) -> String {
-    re_placement_top_arg().replace_all(source, "").to_string()
-}
-
-fn strip_colored_math_text_wrappers(source: &str) -> String {
-    let source = re_colored_math_text_function()
-        .replace_all(source, r#"$$$body$$"#)
-        .to_string();
-    re_colored_math_text_block()
-        .replace_all(&source, r#"$$$body$$"#)
-        .to_string()
 }
 
 #[derive(Clone, Debug)]
@@ -270,11 +247,6 @@ struct StatementAnchor {
     id: String,
 }
 
-struct CrossrefBlock {
-    href: String,
-    body_html: String,
-}
-
 struct HtmlParts {
     meta: DocumentMeta,
     header_html: String,
@@ -290,7 +262,6 @@ impl HtmlParts {
         let body_html = select_first(&dom, "body")
             .map(|body| body.inner_html())
             .unwrap_or_else(|| raw_html.to_owned());
-        let body_html = rewrite_crossref_links_and_remove(body_html);
         let cleaned_dom = Html::parse_document(&format!("<html><body>{body_html}</body></html>"));
         let meta = extract_document_meta(&cleaned_dom);
         let header_html = select_first(&cleaned_dom, ".lecture-metadata")
@@ -475,8 +446,10 @@ fn heading_title_html(element: &ElementRef) -> String {
     // The TOC wraps this title in its own link. Keep formatting and math,
     // but remove inner links to avoid invalid nested anchors and stale loc-IDs.
     static ANCHOR_TAG: OnceLock<Regex> = OnceLock::new();
-    ANCHOR_TAG.get_or_init(|| Regex::new(r"</?a\b[^>]*>").unwrap())
-        .replace_all(&title, "").to_string()
+    ANCHOR_TAG
+        .get_or_init(|| Regex::new(r"</?a\b[^>]*>").unwrap())
+        .replace_all(&title, "")
+        .to_string()
 }
 
 fn heading_text_from_html(html: &str) -> String {
@@ -549,73 +522,6 @@ fn select_first<'a>(dom: &'a Html, selector: &str) -> Option<ElementRef<'a>> {
     dom.select(&selector).next()
 }
 
-fn rewrite_crossref_links_and_remove(body: String) -> String {
-    let (body, targets) = remove_crossrefs_and_collect_targets(&body);
-    rewrite_href_targets(body, &targets)
-}
-
-fn remove_crossrefs_and_collect_targets(body: &str) -> (String, HashMap<String, String>) {
-    let mut cleaned = String::new();
-    let mut targets = HashMap::new();
-    let mut stack: Vec<CrossrefBlock> = Vec::new();
-    let mut last = 0usize;
-
-    for captures in re_crossrefs_marker().captures_iter(body) {
-        let Some(marker) = captures.get(0) else {
-            continue;
-        };
-        let segment = &body[last..marker.start()];
-        if let Some(block) = stack.last_mut() {
-            block.body_html.push_str(segment);
-        } else {
-            cleaned.push_str(segment);
-        }
-
-        let kind = captures.name("kind").map_or("", |m| m.as_str());
-        if kind == "start" {
-            let attrs = captures.name("attrs").map_or("", |m| m.as_str());
-            stack.push(CrossrefBlock {
-                href: data_attr(attrs, "href").unwrap_or_default().to_owned(),
-                body_html: String::new(),
-            });
-        } else if let Some(block) = stack.pop() {
-            targets.extend(collect_crossref_targets(&block.body_html, &block.href));
-        } else {
-            cleaned.push_str(marker.as_str());
-        }
-        last = marker.end();
-    }
-
-    let tail = &body[last..];
-    if let Some(block) = stack.last_mut() {
-        block.body_html.push_str(tail);
-    } else {
-        cleaned.push_str(tail);
-    }
-    while let Some(block) = stack.pop() {
-        targets.extend(collect_crossref_targets(&block.body_html, &block.href));
-    }
-
-    (cleaned, targets)
-}
-
-fn collect_crossref_targets(body: &str, href: &str) -> HashMap<String, String> {
-    let id_selector = Selector::parse("[id]").unwrap();
-    let mut targets = HashMap::new();
-    let crossref_dom = Html::parse_fragment(body);
-    for element in crossref_dom.select(&id_selector) {
-        let Some(old_id) = element.value().attr("id") else {
-            continue;
-        };
-        let Some(anchor) = stable_anchor_for(&element) else {
-            continue;
-        };
-        targets.insert(old_id.to_owned(), format!("{href}#{anchor}"));
-    }
-
-    targets
-}
-
 fn collect_statement_anchors(body: &str) -> Vec<StatementAnchor> {
     let dom = Html::parse_fragment(body);
     let selector = Selector::parse("section.env.statement").unwrap();
@@ -634,33 +540,6 @@ fn collect_statement_anchors(body: &str) -> Vec<StatementAnchor> {
     anchors
 }
 
-fn stable_anchor_for(element: &ElementRef<'_>) -> Option<String> {
-    if has_class(element, "notes-heading") {
-        return stable_heading_id(element);
-    }
-    if has_class(element, "statement") {
-        return stable_statement_id(element);
-    }
-    None
-}
-
-fn stable_heading_id(element: &ElementRef<'_>) -> Option<String> {
-    let secno_selector = Selector::parse(".secno").unwrap();
-    let number = element
-        .value()
-        .attr("data-number")
-        .map(normalize_ws)
-        .filter(|number| !number.is_empty())
-        .or_else(|| {
-            element
-                .select(&secno_selector)
-                .next()
-                .map(|secno| normalize_ws(&secno.text().collect::<Vec<_>>().join(" ")))
-        })?;
-    let text = heading_text_from_html(&heading_title_html(element));
-    Some(slugify(&format!("{number}-{text}")))
-}
-
 fn stable_statement_id(element: &ElementRef<'_>) -> Option<String> {
     let kind_selector = Selector::parse(".env-kind").unwrap();
     let number_selector = Selector::parse(".env-number").unwrap();
@@ -675,15 +554,6 @@ fn stable_statement_id(element: &ElementRef<'_>) -> Option<String> {
         .map(|number| element_text(&number))
         .filter(|number| !number.is_empty())?;
     Some(slugify(&format!("{kind} {number}")))
-}
-
-fn has_class(element: &ElementRef<'_>, class_name: &str) -> bool {
-    element
-        .value()
-        .attr("class")
-        .unwrap_or_default()
-        .split_whitespace()
-        .any(|class| class == class_name)
 }
 
 fn attrs_has_class(attrs: &str, class_name: &str) -> bool {
@@ -794,8 +664,10 @@ fn unwrap_generated_biblioref_links(body: String) -> String {
                 let inner = captures.name("inner").map_or("", |m| m.as_str());
                 // Typst 0.15 full citations repeat the alphanumeric key.
                 // Our visible bibliography/sidenote already supplies that key.
-                PREFIX.get_or_init(|| Regex::new(r"^\[[^\]\n<]{1,40}\]").unwrap())
-                    .replace(inner, "").to_string()
+                PREFIX
+                    .get_or_init(|| Regex::new(r"^\[[^\]\n<]{1,40}\]").unwrap())
+                    .replace(inner, "")
+                    .to_string()
             }
         })
         .to_string()
@@ -947,7 +819,11 @@ fn render_document(
     let browser_title = if let (Some(export_config), Some(current)) = (export_config, current) {
         format!(
             "{} · {} · {}",
-            export_config.site.event.as_deref().unwrap_or(DEFAULT_EVENT_NAME),
+            export_config
+                .site
+                .event
+                .as_deref()
+                .unwrap_or(DEFAULT_EVENT_NAME),
             export_config.chapters[current].course_label(),
             title
         )
@@ -985,7 +861,12 @@ fn render_document(
     }
     html.push_str(">\n");
     if let (Some(export_config), Some(_)) = (export_config, current) {
-        if let Some(index) = export_config.site.index_href.as_ref().or(config.index_href.as_ref()) {
+        if let Some(index) = export_config
+            .site
+            .index_href
+            .as_ref()
+            .or(config.index_href.as_ref())
+        {
             write!(html,
                 "<nav class=\"compact-course-nav\" aria-label=\"Course\"><a href=\"{}\">← Course home · {}</a></nav>\n",
                 escape_attr(index), escape_html(export_config.site.event.as_deref().unwrap_or(DEFAULT_EVENT_NAME))).unwrap();
@@ -1677,14 +1558,6 @@ fn extract_href_attr(attrs: &str) -> Option<&str> {
         .map(|m| m.as_str())
 }
 
-fn data_attr<'a>(attrs: &'a str, name: &str) -> Option<&'a str> {
-    let needle = format!("data-{name}=\"");
-    let start = attrs.find(&needle)? + needle.len();
-    let rest = &attrs[start..];
-    let end = rest.find('"')?;
-    Some(&rest[..end])
-}
-
 fn set_id_attr(attrs: &str, id: &str) -> String {
     if re_id_attr().is_match(attrs) {
         re_id_attr()
@@ -1724,16 +1597,6 @@ fn re_notes_meta() -> &'static Regex {
     })
 }
 
-fn re_crossrefs_marker() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| {
-        Regex::new(
-            r#"(?s)<span\b(?P<attrs>[^>]*\bclass="[^"]*\bcrossrefs-(?P<kind>start|end)\b[^"]*"[^>]*)>\s*</span>"#,
-        )
-        .unwrap()
-    })
-}
-
 fn re_hidden_bibliography() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| {
@@ -1770,31 +1633,6 @@ fn re_anchor_link() -> &'static Regex {
 fn re_img_src() -> &'static Regex {
     static RE: OnceLock<Regex> = OnceLock::new();
     RE.get_or_init(|| Regex::new(r#"<img\b[^>]*\bsrc="([^"]+)""#).unwrap())
-}
-
-fn re_placement_top_arg() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r#"(?m)^\s*placement:\s*top,\s*\n"#).unwrap())
-}
-
-fn re_colored_math_text_function() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| {
-        Regex::new(
-                r#"text\((?:red|blue|green|purple|brown)(?:\.darken\([^)]*\))?(?:\s*,\s*size:\s*[^,$)]+)?\s*,\s*\$(?P<body>[^$]+)\$\)"#,
-        )
-        .unwrap()
-    })
-}
-
-fn re_colored_math_text_block() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| {
-        Regex::new(
-                r#"text\((?:red|blue|green|purple|brown)(?:\.darken\([^)]*\))?(?:\s*,\s*size:\s*[^,$)]+)?\s*\)\s*\[\$(?P<body>[^$]+)\$\]"#,
-        )
-        .unwrap()
-    })
 }
 
 fn re_open_paragraph_tag() -> &'static Regex {
@@ -1926,74 +1764,16 @@ mod tests {
     }
 
     #[test]
-    fn relative_notes_import_is_swapped_to_html_style() {
-        let source = r#"#import "../meta/gabri_notes.typ": *
-
-#let body() = [Figure body]
-"#;
-
-        let rewritten = use_html_notes_style(source);
-
-        assert!(rewritten.contains(r#"#import "../meta/gabri_notes_html.typ": *"#));
-        assert!(!rewritten.contains(r#"#import "../meta/gabri_notes.typ": *"#));
-    }
-
-    #[test]
-    fn bk_notes_import_is_swapped_to_html_style() {
-        let source = r#"#import "../meta/gabri_notes_bk.typ": *
+    fn relocated_notes_import_is_swapped_to_html_style() {
+        let source = r#"#import "/content/meta/gabri_notes.typ": *
 
 #show: gabri_notes.with(lec_num: 1, title: "Intro")
 "#;
 
         let rewritten = use_html_notes_style(source);
 
-        assert!(rewritten.contains(r#"#import "../meta/gabri_notes_html.typ": *"#));
-        assert!(!rewritten.contains(r#"#import "../meta/gabri_notes_bk.typ": *"#));
-    }
-
-    #[test]
-    fn old_cetz_plot_import_is_removed_for_html_style() {
-        let source = r#"cetz.canvas({
-  import cetz.plot
-  plot.plot({})
-})"#;
-
-        let rewritten = use_html_notes_style(source);
-
-        assert!(!rewritten.contains("import cetz.plot"));
-        assert!(rewritten.contains("plot.plot"));
-    }
-
-    #[test]
-    fn top_figure_placement_is_removed_for_html_style() {
-        let source = r#"#figure(
-  placement: top,
-  image("times.jpg"),
-)"#;
-
-        let rewritten = use_html_notes_style(source);
-
-        assert!(!rewritten.contains("placement: top"));
-        assert!(rewritten.contains(r#"image("times.jpg")"#));
-    }
-
-    #[test]
-    fn colored_math_text_wrappers_are_removed_for_html_style() {
-        let source = r#"
-#let reda = text(red.darken(30%))[$a$]
-#let reda2 = text(blue.darken(60%), $a_2$)
-#let fj = text(brown, $f^j$)
-content((1, 1))[#text(red, size: 8pt, $nor(x)$)]
-text(blue)[ordinary prose]
-"#;
-
-        let rewritten = use_html_notes_style(source);
-
-        assert!(rewritten.contains(r#"#let reda = $a$"#));
-        assert!(rewritten.contains(r#"#let reda2 = $a_2$"#));
-        assert!(rewritten.contains(r#"#let fj = $f^j$"#));
-        assert!(rewritten.contains(r#"content((1, 1))[#$nor(x)$]"#));
-        assert!(rewritten.contains(r#"text(blue)[ordinary prose]"#));
+        assert!(rewritten.contains(r#"#import "/content/meta/gabri_notes_html.typ": *"#));
+        assert!(!rewritten.contains(r#"#import "/content/meta/gabri_notes.typ": *"#));
     }
 
     #[test]
@@ -2195,8 +1975,12 @@ See <a href="#loc-6">Theorem 1</a> and <a class="citation" href="#bib-a" role="d
 <a href="#loc-34" role="doc-biblioref">Full citation</a>
 </template></body></html>"##;
         let mut parts = HtmlParts::parse(raw);
-        parts.rewrite_local_links(&HashMap::from([("loc-6".to_owned(), "#theorem-1".to_owned())]));
-        let (body, notes) = postprocess_body(parts.body_html, &parts.endnotes, MathMode::Svg).unwrap();
+        parts.rewrite_local_links(&HashMap::from([(
+            "loc-6".to_owned(),
+            "#theorem-1".to_owned(),
+        )]));
+        let (body, notes) =
+            postprocess_body(parts.body_html, &parts.endnotes, MathMode::Svg).unwrap();
         for html in [&body, &notes[0].body_html] {
             assert!(html.contains("href=\"#theorem-1\""));
             assert!(html.contains("href=\"#bib-a\""));

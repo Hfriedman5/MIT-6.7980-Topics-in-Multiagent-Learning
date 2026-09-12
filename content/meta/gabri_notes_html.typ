@@ -1,6 +1,6 @@
-#import "@preview/cetz:0.5.2"
-#import "@preview/cetz-plot:0.1.4"
-#import "@preview/cetz-plot:0.1.4": plot
+// HTML components selected explicitly by the exporter.
+#assert(not ("web" in sys.inputs or "combined" in sys.inputs or "html" in sys.inputs),
+  message: "Legacy web/combined/html inputs are unsupported. The exporter selects the HTML target explicitly.")
 #import "linalg.typ": *
 #import "lovelace_html.typ": *
 #import "equate_html.typ": equate, share-align
@@ -22,77 +22,8 @@
   body
 })
 
-#let email(addr) = {
-  let w = .3
-  let h = .2
-  box(
-    cetz.canvas({
-      import cetz.draw: *
-      rect((0, 0), (w, h), stroke: .2mm)
-      line((0, h), (w / 2, h / 2.5), (w, h), stroke: .2mm)
-    }),
-  )
-  [~]
-  link("mailto:" + addr, raw(addr))
-}
-
 #let bpar(body) = {
   [#paragraph-marker() #strong(body + ".")~~]
-}
-#let sf = text.with(font: "Frutiger")
-#let swallow = it => html.div(hidden: true, it)
-#let place(..args) = {
-  let positional = args.pos()
-  let named = args.named()
-  let class = "placed-figure"
-  if positional.len() > 1 {
-    let align = repr(positional.first())
-    if align.contains("right") {
-      class += " placed-figure-right"
-    } else if align.contains("left") {
-      class += " placed-figure-left"
-    }
-  }
-  let body = if positional.len() > 0 {
-    positional.last()
-  } else {
-    []
-  }
-  let attrs = (class: class)
-  if named.at("dy", default: none) != none {
-    attrs.insert("style", "--place-dy:" + repr(named.dy))
-  }
-  html.elem("aside", attrs: attrs)[
-    #html.frame({
-      show math.equation: eq => eq
-      body
-    })
-  ]
-}
-#let stack(..args) = {
-  let named = args.named()
-  let dir = repr(named.at("dir", default: "ttb"))
-  let class = "html-stack"
-  if dir.contains("ltr") {
-    class += " html-stack-row"
-  }
-  html.elem("div", attrs: (class: class))[
-    #for child in args.pos() {
-      html.elem("div", attrs: (class: "html-stack-item"))[#child]
-    }
-  ]
-}
-#let crossrefs-active = state("crossrefs-active", false)
-#let crossrefs(file) = if sys.inputs.at("combined", default: "false") == "false" {
-  crossrefs-active.update(true)
-  html.elem("span", attrs: (
-    class: "crossrefs-start",
-    hidden: "",
-    "data-source": file,
-    "data-href": file.replace(regex("\.typ$"), ".html"),
-  ))[]
-  include ("../" + file)
-  html.elem("span", attrs: (class: "crossrefs-end", hidden: ""))[]
 }
 #let lecture-bib = state("lecture-bib", ())
 #let lecnum = state("lecnum", none)
@@ -199,18 +130,13 @@
   lec_num: none,
   date: none,
   title: none,
-  strtitle: none,
-  show_outline: false,
   extrathanks: none,
   instructor: none,
 ) = {
-  context if not crossrefs-active.get() {
-    lecture-bib.update(())
-  }
+  lecture-bib.update(())
   html-footnote-counter.update(0)
   counter(heading).update(0)
   set text(font: "Georgia", size: 9.5pt)
-  // set text(font: "Times New Roman", size: 10.2pt)
   set par(justify: true)
   set list(indent: 4.05mm)
   set enum(indent: 4.05mm)
@@ -373,26 +299,32 @@
   show image: it => context if target() == "paged" {
     it
   } else {
-    let proportional = type(it.width) in (ratio, relative)
+    // Image widths are relative lengths even when the ratio is zero (e.g. 6cm).
+    // Fixed-width images already produce a tight frame without a reference canvas.
+    let proportional = it.width != auto and it.width.ratio != 0%
     let visual = it
+    let css-width = ""
     if proportional {
       // An unconstrained SVG frame gives percentage-sized images zero width.
       // Resolve a vector canvas first; CSS applies the original proportion.
-      let options = it.fields()
-      let source = options.remove("source")
-      options.insert("width", if type(it.width) == ratio {
-        it.width * 585pt
-      } else {
-        it.width.ratio * 585pt + it.width.length
-      })
-      visual = image(source, ..options)
+      let width = it.width.ratio * 585pt + it.width.length
+      // Anchor the artwork before trimming the reference canvas. Otherwise a
+      // figure's inherited center alignment shifts it outside the SVG viewBox.
+      // Keeping the original image preserves its resolved path and alt text.
+      visual = pad(right: width - 585pt, box(width: 585pt, {
+        set align(left)
+        it
+      }))
+      // Match html.frame's font-relative sizing for the absolute component.
+      let ems = it.width.length.to-absolute() / (1em).to-absolute()
+      css-width = "width: calc(" + repr(it.width.ratio) + " + " + str(ems) + "em);"
     }
     html.elem("span", attrs: (
       class: "lecture-image",
       role: "img",
       "aria-label": if it.alt != none { it.alt } else { "Lecture illustration" },
       "data-image-source": repr(it.source),
-      style: if proportional { "width: " + repr(it.width) + ";" } else { "" },
+      style: css-width,
     ))[#_html-media-frame(visual)]
   }
 
@@ -422,7 +354,7 @@
     }
   }
 
-  context if not crossrefs-active.get() {
+  context {
     if instructor != none or date != none {
       html.elem("div", attrs: (class: "lecture-metadata"))[
         #if instructor != none {
@@ -522,39 +454,31 @@
 }
 
 #let citep(..keys) = context {
-  if crossrefs-active.get() {
-    []
-  } else {
-    let keys = keys.pos()
-    let supplement = if keys.len() > 0 and type(keys.last()) == content { keys.pop() } else { none }
-    for key in keys {
-      citation_register(key)
-    }
-    [\[]
-    for (i, key) in keys.enumerate() {
-      if i > 0 {
-        [; ]
-      }
-      citation_link(key, text(fill: blue.darken(40%), citation_label_text(key, cited_keys: lecture-bib.final())))
-    }
-    if supplement != none { [, #supplement] }
-    [\]]
+  let keys = keys.pos()
+  let supplement = if keys.len() > 0 and type(keys.last()) == content { keys.pop() } else { none }
+  for key in keys {
+    citation_register(key)
   }
+  [\[]
+  for (i, key) in keys.enumerate() {
+    if i > 0 {
+      [; ]
+    }
+    citation_link(key, text(fill: blue.darken(40%), citation_label_text(key, cited_keys: lecture-bib.final())))
+  }
+  if supplement != none { [, #supplement] }
+  [\]]
 }
 
 #let citet(key, ..supplement) = context {
-  if crossrefs-active.get() {
-    []
-  } else {
-    citation_register(key)
-    let author_part = html.elem("span", attrs: (class: "citation-author cite-authors"))[
-      #citation_author_text(key)
-    ]
-    let label = text(fill: blue.darken(40%), citation_label_text(key, cited_keys: lecture-bib.final(), ..supplement))
-    html.elem("span", attrs: (class: "citation-text"))[
-      #author_part#text(" [")#citation_link(key, label)#text("]")
-    ]
-  }
+  citation_register(key)
+  let author_part = html.elem("span", attrs: (class: "citation-author cite-authors"))[
+    #citation_author_text(key)
+  ]
+  let label = text(fill: blue.darken(40%), citation_label_text(key, cited_keys: lecture-bib.final(), ..supplement))
+  html.elem("span", attrs: (class: "citation-text"))[
+    #author_part#text(" [")#citation_link(key, label)#text("]")
+  ]
 }
 
 #let changelog(body) = html.elem("section", attrs: (class: "changelog"))[
@@ -563,7 +487,7 @@
   #body
 ]
 
-#let lec_bibliography = (path, title: auto) => context if not crossrefs-active.get() {
+#let lec_bibliography = (path, title: auto) => context {
   show cite: set text(black)
   set heading(numbering: none)
   let bib-title = if title != none and title != auto {
@@ -596,14 +520,8 @@
       ]
     }
   ]
-  // [
-  //   // #show cite: set text(fill: red)
-  //   #cnt
-  // ]
 
-  if sys.inputs.at("combined", default: "false") == "false" {
-    swallow[#bibliography("refs.bib", title: none)]
-  }
+  html.div(hidden: true, bibliography("refs.bib", title: none))
 }
 
 #let appendix(body) = (
@@ -648,19 +566,6 @@
 #let info-box(body, title: none) = alertbox(body, kind: "info", title: title)
 #let warning-box(body, title: none) = alertbox(body, kind: "warning", title: title)
 #let highlight-box(body, title: none) = alertbox(body, kind: "highlight", title: title)
-#let html-figure-asset(body) = body
-#let html-image(src, alt: none, width: none) = {
-  let style = "max-width: 100%; height: auto;"
-  if width != none {
-    style += " width: " + repr(width) + ";"
-  }
-  html.elem("img", attrs: (
-    class: "html-image",
-    src: src,
-    alt: html-text(alt),
-    style: style,
-  ))
-}
 #let wrapped-figure(text-body, figure-body, side: right, text-width: 65%) = {
   let class = "wrapped-figure"
   let side-text = repr(side)
@@ -717,9 +622,8 @@
       outlined: false,
       caption: none,
       supplement: Name,
-      // breakable: true,
       {
-        let counter_name = "shared" // name
+        let counter_name = "shared"
         thmcounters.update(x => {
           x.insert(counter_name, x.at(counter_name, default: 0) + 1)
           x
@@ -827,28 +731,15 @@
   grid(columns: (1cm, auto), row-gutter: 3.8mm, column-gutter: 2.3mm, ..rows)
 }
 
-// #let proofdir(marker, body) = list(indent: 0mm, marker: marker, block(width: 100%, breakable: true, body))
 #let proofdir(marker, body) = [#marker~~#body]
 
 // Math notation
-#let display(body) = body
-#let boxeq(inset: 2mm, bl: 2mm, body, punct: "") = (
-  $
-    #box(baseline: bl, stroke: .15mm + luma(20%), inset: ("y": inset, "x": 2mm), $display(#body)$)" "#punct
-  $
-)
 #let qquad = $quad quad$
 #let dif = $d$
 #let nor(pt, domain: $Omega$) = $𝓝_(domain)(pt)$
 #let span = $op("span")$
 #let colspan = $op("colspan")$
 #let ip(a, b) = $lr(chevron.l #a, #b chevron.r)$
-#let infconv = math.op(
-  box(
-    baseline: .8mm,
-    text(size: 7.5pt, stack(dir: ttb, $+$, v(-.4mm) + sym.or)),
-  ),
-)
 #let _html-math-undisplay(body) = {
   if type(body) == content and body.func() == math.equation and body.has("body") {
     body.body
@@ -858,7 +749,6 @@
 }
 
 #let opt(dir, var, obj, ..constraints) = {
-  // assert(dir == math.min or dir == math.max)
   let data = (($limits(dir)_(var)$, $&$ + _html-math-undisplay(obj)),)
   for (i, cntnt) in constraints.pos().enumerate(start: 0) {
     if i == 0 {
@@ -1066,5 +956,3 @@
 #let cU = $𝓤$
 #let cX = $𝓧$
 #let cY = $𝓨$
-// [#math.cal("N")#h(-.8mm)#math.cal("P")]
-// #let coNP = [co-#NP]

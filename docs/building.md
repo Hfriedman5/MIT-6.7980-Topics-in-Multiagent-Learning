@@ -4,6 +4,37 @@ Run commands from the repository root. The Makefile uses `python3` by default;
 set `PYTHON=/path/to/python3` if needed. The converter's Cargo lockfile pins
 Typst 0.15.1; use the matching Typst CLI for consistent output.
 
+## Editing individual lectures
+
+Open the repository folder in VS Code and install the recommended Tinymist
+extension. Each lecture and supplementary reading is a standalone
+`content/<topic>.typ` document that imports `meta/gabri_notes.typ`, the default
+PDF style. Its styles, figures, and bibliography all live below `content/`,
+inside Typst's default project root. No root override, input variables, target
+flags, or generated source file is needed:
+
+```sh
+typst compile content/nfgs_nash.typ
+```
+
+The checked-in `.vscode/settings.json` selects the paged target and loads the
+bundled Frutiger fonts via
+[Tinymist's fontPaths setting](https://myriad-dreamin.github.io/tinymist/config/vscode.html#tinymistfontpaths).
+For standalone CLI compilation on another machine, install those fonts for the
+same typography; Typst can still compile using fallback fonts.
+
+`make check-pdf` compiles every authored note without compiler flags or
+`TYPST_*` environment overrides, writing PDFs and diagnostics under
+`.build/standalone-pdfs/`. This check also runs as part of `make check`.
+PDFs created alongside the lecture sources by the editor or CLI are ignored by
+Git; the site build writes its published PDFs under `html/pdf/`.
+
+The old nested source layout, numbered figure paths, and `gabri_notes_bk.typ`
+and `gabri_notes_pdf.typ` imports are rejected by the build. The former `web`,
+`html`, and `combined` compiler inputs are rejected by both styles. Combined
+document cross-reference injection and the exporter's old source-rewriting
+shims have been removed; each note is compiled independently.
+
 ## Build pipeline
 
 `make html` builds the Rust converter, regenerates the editable dynamics and
@@ -26,9 +57,23 @@ python3 scripts/build_site.py --skip-build --zip
 Compiler diagnostics are saved under `.build/logs/`. Build products in `.build/`,
 `html/`, `dist/`, and `html-exporter/target/` are not versioned.
 
+All lecture and supplementary PDFs share `content/meta/gabri_notes.typ`.
+The print style uses A4 pages, 1.3-inch side margins, 1.6-inch top/bottom margins,
+10.2pt New Computer Modern body text, and Frutiger Bold headings. A ruled opening
+panel carries the course, date, lecture title, and instructor. Each footer keeps
+the full authored title beside the lecture identifier and a right-aligned
+current/total page count. Long titles wrap without hyphenation; section markers
+vary by heading level. Headings have more space above than below: 9/5mm for
+sections, 7.5/4.5mm for subsections, and 6/4.5mm for deeper levels. Unnumbered
+headings follow the same hierarchy. Block spacing collapses adjacent gaps,
+and headings stay with the following text. Build with the
+bundled font directory as shown in the build scripts. The HTML exporter selects
+`gabri_notes_html.typ` and its CSS explicitly; the authored notes always use the
+working PDF style.
+
 ## Source files
 
-- Edit `content/content/*.typ` for explanations, equations, and proofs.
+- Edit `content/*.typ` for explanations, equations, and proofs.
 - Edit `html-export.json` for note documents, supplementary reading order, stable syllabus mappings, slides, and export settings.
 - Edit `syllabus/6.7980 F26 Syllabus.typ` for course facts, formatted prose, and the ordered lecture/module outline.
 - Edit `syllabus/fall-2026-calendar.typ` for verified class dates and fixed academic-calendar exceptions.
@@ -36,7 +81,7 @@ Compiler diagnostics are saved under `.build/logs/`. Build products in `.build/`
 - Edit `html-exporter/src/course.css` for the homepage layout.
 - Edit `html-exporter/src/gabri-notes.css` for the lecture layout.
 - Edit `content/meta/gabri_notes_html.typ` for semantic HTML components.
-- Edit `content/meta/gabri_notes_pdf.typ` for the native PDF layout.
+- Edit `content/meta/gabri_notes.typ` for the native PDF layout.
 - Edit `content/meta/lovelace_html.typ` for HTML pseudocode.
 
 `how_to_cite.url_prefix` in `html-export.json` sets the published base URL for
@@ -47,6 +92,8 @@ downloadable bundle work without a web server at that address.
 The syllabus calls `schedule(class-dates, outline)`. Its outline contains
 `lecture("stable-id", [Title], description: [...], instructor: [...])`,
 `module[Part title]`, and `no-class(title: [...], description: [...])` entries.
+Lecture numbers and dates are generated from the linked syllabus rows. Authored note titles must match the corresponding syllabus title (or `short_title` for supplementary notes). Edit both the syllabus and the Typst header when renaming a lecture: the build rejects mismatches and never substitutes a different title into the note. Author `short_title` only for supplementary notes. Tests cover title agreement and rejection of divergence; the site checker also validates rendered HTML titles.
+
 Lectures consume the next class date and receive a zero-based lecture number.
 An undated `no-class` consumes a class date without advancing that number;
 module headings consume neither. Use `standalone: true` on a lecture to start
@@ -74,7 +121,7 @@ slots, starting September 10. October 13 follows a Monday schedule and November
 The website reads `<course-schedule>` metadata evaluated by Typst, so it uses
 the same assigned dates as the PDF and supports nested Typst text without a
 second schedule parser. `html-export.json` maps notes to stable `syllabus_ids`.
-The build derives their current numbers, dates, and ordering, and writes a
+The build derives their current titles, numbers, dates, and ordering, and writes a
 resolved exporter configuration to `.build/html-export.json`. The authored
 `notes` list contains no `number`, `syllabus_numbers`, or `date` fields; these
 fields are generated and should not be edited in `.build/` either.
@@ -88,8 +135,7 @@ For example, a scheduled note and an independent slide attachment are configured
 {
   "notes": [
     {
-      "source": "content/content/nfgs_nash.typ",
-      "short_title": "Setting and equilibria: the Nash equilibrium",
+      "source": "content/nfgs_nash.typ",
       "syllabus_ids": ["nash"]
     }
   ],
@@ -135,7 +181,12 @@ refreshes the generated configuration without rewriting the website or PDFs.
 
 ## Figures
 
-All active figure dependencies live inside `content/`.
+All active figure dependencies live in `content/figures/<topic>/`, normally
+matching the lecture's Typst filename. Shared figures retain their owning topic:
+for example, `kernelized.typ` reuses `figures/efg_intro/nf_strategies.svg`.
+Folder names never depend on lecture numbers. There is one rendered asset per
+figure, next to its editable source when available; no separate assets copy is
+needed.
 
 ```sh
 python3 scripts/build_dynamics.py       # OGD/MWU and optimism figures
@@ -158,7 +209,7 @@ Use `wrapped-figure` for prose alongside a compact diagram:
 #wrapped-figure(side: right, text-width: 55%)[
   Explain the learning process here.
 ][
-  #image("../figures/L04/self_play.svg", width: 300pt)
+  #image("figures/learning_intro/self_play.svg", width: 300pt)
 ]
 ```
 

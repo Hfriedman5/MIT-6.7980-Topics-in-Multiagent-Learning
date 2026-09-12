@@ -23,7 +23,7 @@ python3 scripts/course_index.py --resolve-only
 cargo run --manifest-path html-exporter/Cargo.toml -- \
   --root . \
   --config .build/html-export.json --math katex \
-  'content/content/nfgs_nash.typ' \
+  'content/nfgs_nash.typ' \
   .build/nfgs_nash.html
 ```
 

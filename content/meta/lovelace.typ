@@ -115,7 +115,7 @@
   indentation: 1em,
   hooks: 0pt,
   line-gap: .8em,
-  booktabs-stroke: black + 2pt,
+  booktabs-stroke: black + 1.2pt,
   booktabs: false,
   title: none,
   numbered-title: none,
@@ -224,7 +224,6 @@
             y: prec.y + title-correction,
             colspan: max-x + 1 - prec.x,
             rowspan: 1,
-            // stroke: none,
             prec.body,
           )
         } else if prec.kind == "number" and line-numbering != none {
@@ -233,9 +232,8 @@
             y: prec.y + title-correction,
             colspan: 1,
             rowspan: 1,
-            // stroke: none,
             box(width: .8em, {
-              set text(fill: luma(50%), font: "New Computer Modern Sans 08")
+              set text(fill: luma(50%), font: "New Computer Modern")
               box(prec.body)
             }),
           )
@@ -295,7 +293,6 @@
   )
 
   grid(
-    // stroke: blue,
     columns: (auto,) * (max-x + line-number-correction) + (if max-width { 1fr} else {auto},),
     align: left,
     column-gutter: indentation / 2,
@@ -370,4 +367,3 @@
   }
   pseudocode(..config.named(), ..transformed)
 }
-

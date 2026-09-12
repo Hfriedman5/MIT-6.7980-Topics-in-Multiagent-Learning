@@ -16,109 +16,100 @@
   },
   "notes": [
     {
-      "source": "content/content/nfgs_nash.typ",
-      "short_title": "Setting and equilibria: the Nash equilibrium",
+      "source": "content/nfgs_nash.typ",
       "supplementary": false,
       "syllabus_ids": [
         "nash"
       ]
     },
     {
-      "source": "content/content/brouwer.typ",
-      "short_title": "Existence proofs: Nash, Brouwer, and Sperner",
+      "source": "content/brouwer.typ",
       "supplementary": false,
       "syllabus_ids": [
         "brouwer"
       ]
     },
     {
-      "source": "content/content/correlated.typ",
-      "short_title": "Properties and relaxations of the Nash equilibrium",
+      "source": "content/correlated.typ",
       "supplementary": false,
       "syllabus_ids": [
         "nash-properties"
       ]
     },
     {
-      "source": "content/content/learning_intro.typ",
-      "short_title": "Foundations of learning in games",
+      "source": "content/learning_intro.typ",
       "supplementary": false,
       "syllabus_ids": [
         "learning-foundations"
       ]
     },
     {
-      "source": "content/content/learning1.typ",
-      "short_title": "Learning algorithms (I)",
+      "source": "content/learning1.typ",
       "supplementary": false,
       "syllabus_ids": [
         "learning-algorithms"
       ]
     },
     {
-      "source": "content/content/bandit.typ",
-      "short_title": "Bandit feedback",
+      "source": "content/bandit.typ",
       "supplementary": false,
       "syllabus_ids": [
         "bandit"
       ]
     },
     {
-      "source": "content/content/efg_intro.typ",
-      "short_title": "Foundations of extensive-form games",
+      "source": "content/efg_intro.typ",
       "supplementary": false,
       "syllabus_ids": [
         "efg-modeling"
       ]
     },
     {
-      "source": "content/content/learning_efg.typ",
-      "short_title": "Learning in extensive-form games",
+      "source": "content/learning_efg.typ",
       "supplementary": false,
       "syllabus_ids": [
         "efg-learning"
       ]
     },
     {
-      "source": "content/content/ppad_completeness.typ",
-      "short_title": "PPAD-hardness of Nash equilibrium",
+      "source": "content/ppad_completeness.typ",
       "supplementary": false,
       "syllabus_ids": [
         "ppad"
       ]
     },
     {
-      "source": "content/content/eah.typ",
+      "source": "content/eah.typ",
       "short_title": "A second look at the minimax theorem",
       "supplementary": true,
       "syllabus_ids": []
     },
     {
-      "source": "content/content/nash_algorithms.typ",
+      "source": "content/nash_algorithms.typ",
       "short_title": "Centralized algorithms for Nash equilibrium computation",
       "supplementary": true,
       "syllabus_ids": []
     },
     {
-      "source": "content/content/learning2.typ",
+      "source": "content/learning2.typ",
       "short_title": "Learning algorithms (II)",
       "supplementary": true,
       "syllabus_ids": []
     },
     {
-      "source": "content/content/perfection.typ",
+      "source": "content/perfection.typ",
       "short_title": "Sequential irrationality and perfect equilibria",
       "supplementary": true,
       "syllabus_ids": []
     },
     {
-      "source": "content/content/stochastic_games.typ",
+      "source": "content/stochastic_games.typ",
       "short_title": "Markov (aka stochastic) games",
       "supplementary": true,
       "syllabus_ids": []
     },
     {
-      "source": "content/content/phi_regret.typ",
+      "source": "content/phi_regret.typ",
       "short_title": "Phi-regret minimization",
       "supplementary": true,
       "syllabus_ids": []
