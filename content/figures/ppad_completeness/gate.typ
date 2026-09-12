@@ -17,8 +17,6 @@
       content((-1.1, 0), anchor: "east")[$x_1$]
     } else if num == 2 {
       line((-1, .3), (-.3, .1))
-      // content((-.45, .3), anchor: "south")[#set text(7pt);#sf[1]]
-      // content((-.45, -.3), anchor: "north")[#set text(7pt);#sf[2]]
       line((-1, -.3), (-.3, -.1))
       content((-1.1, .4), anchor: "east")[$x_1$]
       content((-1.1, -.3), anchor: "east")[$x_2$]

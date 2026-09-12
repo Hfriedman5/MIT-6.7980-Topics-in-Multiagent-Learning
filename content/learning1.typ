@@ -256,7 +256,7 @@ Finally, we turn our attention to the third way of obtaining no-regret algorithm
 The regularization term $-psi(xhat)$ _limits the amount of variation between consecutive strategies_. This makes intuitive sense: if $eta -> 0$, $vx^((t))$ is constant (and equal to $argmin_(xhat in Delta(A)) psi(xhat)$). When $eta = oo$, we recover the follow-the-leader algorithm, where strategies can jump arbitrarily. For intermediate $eta$, as you might expect, the amount of variation between strategies at consecutive times is bounded above by a quantity proportional to $eta$:
 $
   norm( vx^((t+1)) - vx^((t)) ) <= eta norm( vg^((t)) )_*,
-$ 
+$
 where $norm(dot.c)_*$ is the _dual_ norm of $norm(dot.c)$.
 
 We will see the regret bound for FTRL in the general case in @ftrl-omd-general-case.
@@ -379,7 +379,6 @@ The next plots illustrate the behavior of OGD and MWU in a simple $2 times 2$ ga
 
 #lec_bibliography("meta/refs.bib")
 
-#changelog[
-  - 2025-10-05: Fixed typos (thanks George Cao!).
-  - 2025-11-30: Fixed typo in summation $t -> tau$ (thanks Sophie Wang!).
+#acknowledgments[
+  Thanks to George Cao and Sophie Wang for corrections.
 ]

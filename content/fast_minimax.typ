@@ -1,5 +1,3 @@
-// Follows Farina's January 2026 SIGecom Exchanges article.
-// The CCE motivation also draws on Fall 2024 Lectures/L15/L15.typ.
 #import "meta/gabri_notes.typ": *
 
 #let lecture = (
@@ -150,7 +148,7 @@ Take $Phi_i$ to be the constant maps $s_i mapsto a_i$ for $a_i in S_i$. The mean
 $ s_i=EE_(a_i tilde.op nu_i)[a_i] quad "when" quad w_i>0. $
 For a finite normal-form game, write $nu_(i,a)$ for the mass of deviation to action $a$. The response is the product distribution with marginals
 $ p_i (a)=frac(nu_(i,a),w_i), quad w_i=sum_a nu_(i,a). $
-Choose any marginal when $w_i=0$. This is the normalized Hart--Schmeidler construction from the #lecture-link("eah", <sec-cce-existence>)[minimax supplement] and the archived Fall 2024 Lecture 15. It avoids allocating a variable to every joint action. A final mixture of these product distributions is generally correlated.
+Choose any marginal when $w_i=0$. This is the normalized Hart--Schmeidler construction from the #lecture-link("eah", <sec-cce-existence>)[minimax supplement]. It avoids allocating a variable to every joint action. A final mixture of these product distributions is generally correlated.
 
 == Correlated equilibria: stationary distributions
 

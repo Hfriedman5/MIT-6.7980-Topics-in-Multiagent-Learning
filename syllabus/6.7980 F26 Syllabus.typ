@@ -50,9 +50,9 @@
 #show heading: set block(above: 6mm, below: 5mm)
 
 #align(center)[
-  #text(font: "Frutiger", size: 24pt, weight: "bold")[#course.title]
+  #text(size: 24pt)[*#course.title*]
   #v(3mm)
-  #text(font: "Frutiger", weight: "bold", size: 16pt)[#course.event --- #course.term]
+  #text(size: 16pt)[*#course.event --- #course.term*]
 ]
 #v(6mm)
 

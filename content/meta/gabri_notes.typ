@@ -43,8 +43,8 @@
 #let qquad = $quad quad$
 #let proofdir(marker, body) = [#marker~~#body]
 #let bpar(body) = [#strong(body) #h(0.5em)]
-#let changelog(body) = block(above: 3em, stroke: (top: 0.15mm + luma(80%)), inset: (top: 8pt))[
-  #text(size: 9pt, fill: luma(40%))[#strong[Changelog]]
+#let acknowledgments(body) = block(above: 3em, stroke: (top: 0.15mm + luma(80%)), inset: (top: 8pt))[
+  #text(size: 9pt, fill: luma(40%))[*Acknowledgments*]
   #v(0.4em)
   #text(size: 9pt, body)
 ]
@@ -160,7 +160,7 @@
     #v(8mm)
     #align(center)[
       #set par(justify: false)
-      #text(size: 16pt, hyphenate: false)[#strong[#lecture-label(lec_num)#v(-2mm)*#title*]]
+      #text(size: 16pt, hyphenate: false)[*#lecture-label(lec_num)#v(-2mm)#strong(title)*]
     ]
     #v(3mm)
     Instructor: #instructor
@@ -216,7 +216,7 @@
   inset: (left: 4mm, y: 1mm),
   breakable: true,
 )[
-  #emph[#name#if args.pos().len() > 0 { [ #args.pos().first()] }.]
+  _#name#if args.pos().len() > 0 { [ #args.pos().first()] }._
   #h(0.2em)#body #h(1fr) $square$
 ]
 #let proof = proof-environment("Proof")

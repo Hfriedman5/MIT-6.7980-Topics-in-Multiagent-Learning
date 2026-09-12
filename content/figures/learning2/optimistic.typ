@@ -25,7 +25,7 @@
     import cetz.draw: *
 
     dynplot(A, B, entropy-prox, optimistic: true, eta: 0.25, quiver_scale: 0.8, highlight: (NE,))
-    content((.5, 1.085))[#set text(9pt);#text(blue, weight: "bold")[Optimistic] MWU]
+    content((.5, 1.085))[#set text(9pt);#text(blue)[*Optimistic*] MWU]
     content((.5, -5mm))[$x^((t))_2$]
     content((-5mm, .5), angle: 90deg)[$y^((t))_2$]
   }),
@@ -41,7 +41,7 @@
     import cetz.draw: *
 
     dynplot(A, B, euc-prox, optimistic: true, eta: 0.1, quiver_scale: 0.8, highlight: (NE,))
-    content((.5, 1.085))[#set text(9pt);#text(blue, weight: "bold")[Optimistic] OGD]
+    content((.5, 1.085))[#set text(9pt);#text(blue)[*Optimistic*] OGD]
     content((.5, -5mm))[$x^((t))_2$]
     content((-5mm, .5), angle: 90deg)[$y^((t))_2$]
   }),

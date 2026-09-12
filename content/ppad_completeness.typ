@@ -1,4 +1,3 @@
-// Adapted from the Fall 2024 Lecture 18 notes.
 #import "meta/gabri_notes.typ": *
 
 #let eps = math.epsilon.alt

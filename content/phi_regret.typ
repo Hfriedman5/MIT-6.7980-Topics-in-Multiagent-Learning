@@ -78,11 +78,8 @@ We now claim that the algorithm described above is a swap regret minimizer for $
 = The general case: Gordon-Greenwald-Marks's reduction <sec-ggm>
 
 Blum-Mansour's swap regret minimization algorithm is a special case of a much more general construction. #citet(<gordon2008no>) show that $Phi$-regret minimization for a strategy set $cX$ can be constructed starting from the following two ingredients:
-#enum(numbering: "1.")[
-  an _external_ regret minimization for the set $Phi$; and
-][
-  a _fixed point oracle_ $Phi$, that is, an algorithm that given any $phi.alt in Phi$ outputs a fixed point $phi.alt(vx) = vx in cX$.
-]
++ an _external_ regret minimization for the set $Phi$; and
++ a _fixed point oracle_ $Phi$, that is, an algorithm that given any $phi.alt in Phi$ outputs a fixed point $phi.alt(vx) = vx in cX$.
 
 Intuitively, the external regret minimizer for $Phi$ has the role of tracking which transformation $phi.alt$ the decision maker should focus on at each time. The linear utility function $U^((t)) : Phi -> RR$ observed by the external regret minimizer is constructed from the last-output strategy $x^((t))$ and the utility function $u^((t))$ observed at time $t$, according to the formula
 #set math.equation(numbering: "(1)")

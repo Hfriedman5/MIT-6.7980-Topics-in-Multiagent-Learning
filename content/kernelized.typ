@@ -122,7 +122,7 @@ For $|V|>1$, choosing $eta=sqrt(frac(2 log |V|, M^2 T))$ gives $"Reg"_T <= M sqr
 
 == Main result
 
-An explicit implementation of #ref(<algo:vertex-mwu>) uses time and storage proportional to $|V|$. The main result replaces this dependence by evaluations of a function determined by the combinatorial structure of $V$.
+An explicit implementation of @algo:vertex-mwu uses time and storage proportional to $|V|$. The main result replaces this dependence by evaluations of a function determined by the combinatorial structure of $V$.
 
 #block(breakable: false)[
   #theorem[Kernelization][
@@ -136,7 +136,7 @@ We call the implementation _kernelized MWU_ (KMWU) or _kernelized OMWU_ (KOMWU).
   If $K_V$ can be evaluated efficiently, then vertex MWU/OMWU can be simulated efficiently even when $|V|$ is exponential in $d$.
 ]
 
-The next three subsections prove #ref(<thm:kernelization>): first define the kernel, then encode the entire weight vector implicitly, and finally recover its expectation.
+The next three subsections prove @thm:kernelization: first define the kernel, then encode the entire weight vector implicitly, and finally recover its expectation.
 
 == The 0/1-polyhedral kernel
 
@@ -157,7 +157,7 @@ For the hypercube, for instance, this sum includes one monomial for each subset 
 
 == Keeping track of the distribution over vertices
 
-The update in #ref(<algo:vertex-mwu>) adds a linear score to the exponent of each vertex's weight. Those scores can be stored in just $d$ coordinates.
+The update in @algo:vertex-mwu adds a linear score to the exponent of each vertex's weight. Those scores can be stored in just $d$ coordinates.
 
 #block(breakable: false)[
   #theorem[Implicit weights][
@@ -216,7 +216,7 @@ Encoding the distribution is only half the task. `NextStrategy()` must also reco
   Dividing by the normalizer gives the probability that coordinate $k$ is zero. Its complement is the expected value of that binary coordinate.
 ]
 
-Together, #ref(<thm:implicit-weights>) and #ref(<thm:kernel-mean>) prove #ref(<thm:kernelization>). Maintain $b_t$, evaluate one common normalizer and $d$ coordinate-exclusion kernels, return the resulting mean, and update $b_t$ after observing the gradient. No explicit vector indexed by $V$ is needed.
+Together, @thm:implicit-weights and @thm:kernel-mean prove @thm:kernelization. Maintain $b_t$, evaluate one common normalizer and $d$ coordinate-exclusion kernels, return the resulting mean, and update $b_t$ after observing the gradient. No explicit vector indexed by $V$ is needed.
 
 = Examples of efficiently computable kernels
 
@@ -292,9 +292,9 @@ Here $Z_I=K_(I)(b_t,bold(1))$ and the total normalizer is $product_(I in R)Z_I$.
 
 A forward pass starts with $x_(t,∅)=1$ and visits information sets from ancestors to descendants, setting
 $ x_(t,I a)=x_(t,p(I)) frac(B_(I a), Z_I). $
-Every child information set in $C(I,a)$ inherits the same preceding-sequence realization weight $x_(t,I a)$. We do not divide that weight among observations. The product decomposition used in #ref(<thm:sequence-kernel>) proves that these are exactly the coordinate marginals of $lambda_t$. In particular, $sum_(a in A(I)) x_(t,I a)=x_(t,p(I))$.
+Every child information set in $C(I,a)$ inherits the same preceding-sequence realization weight $x_(t,I a)$. We do not divide that weight among observations. The product decomposition used in @thm:sequence-kernel proves that these are exactly the coordinate marginals of $lambda_t$. In particular, $sum_(a in A(I)) x_(t,I a)=x_(t,p(I))$.
 
-The backward and forward passes each take linear time. After observing the gradient, update the $d$ coordinates of $b_t$ as before. This computes all the expectations required by #ref(<algo:vertex-mwu>) without repeating a separate traversal for each coordinate.
+The backward and forward passes each take linear time. After observing the gradient, update the $d$ coordinates of $b_t$ as before. This computes all the expectations required by @algo:vertex-mwu without repeating a separate traversal for each coordinate.
 
 #block(breakable: false)[
   #example[A branch with a continuation][

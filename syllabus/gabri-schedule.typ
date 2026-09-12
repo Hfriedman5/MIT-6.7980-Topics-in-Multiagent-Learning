@@ -173,7 +173,7 @@
       cells += (
         [#entry.number],
         [#schedule-date(entry.date)#if entry.badge != [] [#linebreak()#entry.badge]],
-        [*#entry.title*#if not hide-instructors and entry.instructor != [] [#h(1fr)#box[#text(size: 8.5pt, style: "italic")[#entry.instructor]]]#if entry.description != [] [#desc(entry.description)]],
+        [*#entry.title*#if not hide-instructors and entry.instructor != [] [#h(1fr)#box[#text(size: 8.5pt)[_#(entry.instructor)_]]]#if entry.description != [] [#desc(entry.description)]],
       )
     }
   }

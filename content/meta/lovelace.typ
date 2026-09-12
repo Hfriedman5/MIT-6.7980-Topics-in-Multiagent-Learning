@@ -1,9 +1,7 @@
 #let line-label(it) = {
   if type(it) == str {
     it = label(it)
-  } else if type(it) == label {
-    // nothing
-  } else {
+  } else if type(it) != label {
     panic("line-label requires either a string or a label.")
   }
 
