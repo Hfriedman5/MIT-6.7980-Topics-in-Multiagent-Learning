@@ -1,4 +1,4 @@
-"""Compile probes for Lovelace's HTML layout and logical line numbering."""
+"""Compile probes for Lovelace's algorithm figures and HTML line layout."""
 from html.parser import HTMLParser
 import json
 from pathlib import Path
@@ -12,6 +12,28 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 LIBRARY = ROOT / 'content/meta/lovelace_html.typ'
 HELPER = ROOT / 'content/meta/gabri_notes_html.typ'
+
+ALGORITHM_FIGURES = '''
+#pseudocode(numbered-title: [First], [Initialize.]) <first>
+#figure(table(columns: 1, [Other content]), caption: [An unrelated table.])
+#pseudocode-list(numbered-title: [Second], caption: [Second caption.])[
+  + Continue.
+] <second>
+#pseudocode(numbered-title: [Third], caption: [Third caption.], [Continue.]) <third>
+#pseudocode-list(numbered-title: [Fourth])[
+  + Finish.
+] <fourth>
+See @first, @second, @third, and @fourth.
+#context {
+  let algorithms = query(figure.where(kind: "algorithm"))
+  assert(algorithms.len() == 4)
+  for (index, algorithm) in algorithms.enumerate() {
+    assert(algorithm.counter.at(algorithm.location()) == (index + 1,))
+    assert(str(algorithm.label) == ("first", "second", "third", "fourth").at(index))
+    assert((algorithm.caption == none) == (index in (0, 3)))
+  }
+}
+'''
 
 
 class Element:
@@ -167,13 +189,11 @@ class HtmlPseudocodeTests(unittest.TestCase):
     def test_course_helper_preserves_math_and_algorithm_reference(self):
         page = self.compile('''
 #show: gabri_notes.with(lec_num: 99, title: [Pseudocode probe])
-#figure(kind: "algorithm", supplement: [Algorithm],
-  pseudocode-list(booktabs: true, numbered-title: [Regret matching])[
-    + *function* `NextStrategy()`
-      + *if* $r != 0$
-        + *return* $x <- display(r / norm(r)_1)$
-  ],
-) <algorithm-probe>
+#pseudocode-list(booktabs: true, numbered-title: [Regret matching])[
+  + *function* `NextStrategy()`
+    + *if* $r != 0$
+      + *return* $x <- display(r / norm(r)_1)$
+] <algorithm-probe>
 See @algorithm-probe.
 ''', helper=True)
         rows = self.row_data(page)
@@ -190,6 +210,51 @@ See @algorithm-probe.
         self.assertTrue(target)
         self.assertTrue(any(element.attrs.get('id') == target
                             for element in page.elements()))
+
+    def test_both_apis_own_one_figure_with_captions_and_reference_targets(self):
+        page = self.compile(
+            '#show: gabri_notes.with(lec_num: 99, title: [Algorithm figures])\n'
+            + ALGORITHM_FIGURES, helper=True)
+        figures = [element for element in page.elements()
+                   if element.tag == 'figure' and element.find('algorithm')]
+        self.assertEqual(len(figures), 4)
+        for figure in figures:
+            self.assertEqual(len(figure.find('algorithm')), 1)
+            self.assertFalse(any(element.tag == 'figure' for element in figure.elements()))
+        captions = [element.text().strip() for figure in figures
+                    for element in figure.elements() if element.tag == 'figcaption']
+        self.assertEqual(captions, ['Algorithm 2. Second caption.', 'Algorithm 3. Third caption.'])
+        references = [element for element in page.elements()
+                      if element.tag == 'a' and element.text().startswith('Algorithm')]
+        self.assertEqual([element.text().replace('\u00a0', ' ') for element in references],
+                         ['Algorithm 1', 'Algorithm 2', 'Algorithm 3', 'Algorithm 4'])
+        self.assertEqual([element.attrs['href'] for element in references],
+                         ['#' + figure.attrs['id'] for figure in figures])
+
+
+@unittest.skipUnless(shutil.which('typst') and shutil.which('pdftotext'),
+                     'Typst CLI and Poppler are required for PDF algorithm probes')
+class PagedPseudocodeTests(unittest.TestCase):
+    def test_both_apis_preserve_numbered_titles_captions_and_references(self):
+        with tempfile.TemporaryDirectory(prefix='notes-algorithm-test-') as folder:
+            source = Path(folder) / 'probe.typ'
+            output = source.with_suffix('.pdf')
+            source.write_text(
+                f'#import {json.dumps(str(ROOT / "content/meta/lovelace.typ"))}: *\n'
+                '#set page(width: 450pt, height: auto, margin: 20pt)\n'
+                + ALGORITHM_FIGURES)
+            result = subprocess.run(
+                ['typst', 'compile', '--root', ROOT.anchor, str(source), str(output)],
+                capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertNotIn('did not converge', result.stderr)
+            text = ' '.join(subprocess.check_output(['pdftotext', str(output), '-'],
+                                                   text=True).split())
+            for number, title in enumerate(('First', 'Second', 'Third', 'Fourth'), 1):
+                self.assertIn(f'Algorithm {number}: {title}', text)
+            self.assertIn('Algorithm 2: Second caption.', text)
+            self.assertIn('Algorithm 3: Third caption.', text)
+            self.assertIn('See Algorithm 1, Algorithm 2, Algorithm 3, and Algorithm 4.', text)
 
 
 if __name__ == '__main__':

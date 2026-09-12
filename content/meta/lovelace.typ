@@ -108,6 +108,8 @@
   }
 }
 
+// Both public entry points return a referenceable algorithm figure. Callers
+// attach labels to the pseudocode call and pass any caption directly.
 #let pseudocode(
   line-numbering: "1",
   line-number-supplement: "Line",
@@ -120,6 +122,7 @@
   title: none,
   numbered-title: none,
   max-width: false,
+  caption: none,
   ..children,
 ) = {
   children = children.pos().map(normalize-line)
@@ -292,13 +295,18 @@
     ),
   )
 
-  grid(
-    columns: (auto,) * (max-x + line-number-correction) + (if max-width { 1fr} else {auto},),
-    align: left,
-    column-gutter: indentation / 2,
-    row-gutter: line-gap,
-    ..cells,
-    ..decoration,
+  figure(
+    kind: "algorithm",
+    supplement: [Algorithm],
+    caption: caption,
+    grid(
+      columns: (auto,) * (max-x + line-number-correction) + (if max-width { 1fr} else {auto},),
+      align: left,
+      column-gutter: indentation / 2,
+      row-gutter: line-gap,
+      ..cells,
+      ..decoration,
+    ),
   )
 }
 

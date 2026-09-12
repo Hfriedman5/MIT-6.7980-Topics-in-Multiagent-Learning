@@ -99,36 +99,28 @@ The algorithm is presented in pseudocode in @algo-rm.
 
 #wrapped-figure(
 [
-#figure(
-  kind: "algorithm",
-  supplement: [Algorithm],
-  pseudocode-list(booktabs: true, numbered-title: [Regret Matching])[
-    + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
-    + *function* `NextStrategy()`
-      + *if* $[r^((t-1))]^+ != 0$
-        + *return* $x^((t)) <- display(([r^((t-1))]^+) / norm([r^((t-1))]^+)_1)$
-      + *else*
-        + *return* $x^((t)) <-$ any point in $Delta(A)$
-    + *function* `ObserveUtility`($g^((t))$)
-      + $r^((t)) <- r^((t-1)) + g^((t)) - ip(g^((t)), x^((t))) bold(1)$
-  ],
-) <algo-rm>
+#pseudocode-list(booktabs: true, numbered-title: [Regret Matching])[
+  + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
+  + *function* `NextStrategy()`
+    + *if* $[r^((t-1))]^+ != 0$
+      + *return* $x^((t)) <- display(([r^((t-1))]^+) / norm([r^((t-1))]^+)_1)$
+    + *else*
+      + *return* $x^((t)) <-$ any point in $Delta(A)$
+  + *function* `ObserveUtility`($g^((t))$)
+    + $r^((t)) <- r^((t-1)) + g^((t)) - ip(g^((t)), x^((t))) bold(1)$
+] <algo-rm>
 ],
 [
-#figure(
-  kind: "algorithm",
-  supplement: [Algorithm],
-  pseudocode-list(booktabs: true, numbered-title: [Regret Matching#super[+]])[
-    + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
-    + *function* `NextStrategy()`
-      + *if* $[r^((t-1))]^+ != 0$
-        + *return* $x^((t)) <- display(([r^((t-1))]^+) / norm([r^((t-1))]^+)_1)$
-      + *else*
-        + *return* $x^((t)) <-$ any point in $Delta(A)$
-    + *function* `ObserveUtility`($g^((t))$)
-      + $r^((t)) <- [r^((t-1)) + g^((t)) - ip(g^((t)), x^((t))) bold(1)]^+$
-  ],
-) <algo-rmp>
+#pseudocode-list(booktabs: true, numbered-title: [Regret Matching#super[+]])[
+  + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
+  + *function* `NextStrategy()`
+    + *if* $[r^((t-1))]^+ != 0$
+      + *return* $x^((t)) <- display(([r^((t-1))]^+) / norm([r^((t-1))]^+)_1)$
+    + *else*
+      + *return* $x^((t)) <-$ any point in $Delta(A)$
+  + *function* `ObserveUtility`($g^((t))$)
+    + $r^((t)) <- [r^((t-1)) + g^((t)) - ip(g^((t)), x^((t))) bold(1)]^+$
+] <algo-rmp>
 ],
 side: right, text-width: 50%,
 )
@@ -214,17 +206,13 @@ where $eta > 0$ is an inverse temperature parameter, then we obtain the _multipl
 This algorithm is presented in @algo-mwu.
 ],
 [
-#figure(
-  kind: "algorithm",
-  supplement: [Algorithm],
-  pseudocode-list(booktabs: true, numbered-title: [Multiplicative Weights Update])[
-    + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
-    + *function* `NextStrategy()`
-      + *return* $x^((t)) <- "softmax"(eta r^((t-1)))$
-    + *function* `ObserveUtility`($g^((t))$)
-      + $r^((t)) <- r^((t-1)) + g^((t)) - ip(g^((t)), x^((t))) bold(1)$
-  ],
-) <algo-mwu>
+#pseudocode-list(booktabs: true, numbered-title: [Multiplicative Weights Update])[
+  + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
+  + *function* `NextStrategy()`
+    + *return* $x^((t)) <- "softmax"(eta r^((t-1)))$
+  + *function* `ObserveUtility`($g^((t))$)
+    + $r^((t)) <- r^((t-1)) + g^((t)) - ip(g^((t)), x^((t))) bold(1)$
+] <algo-mwu>
 ],
 side: right, text-width: 47%,
 )

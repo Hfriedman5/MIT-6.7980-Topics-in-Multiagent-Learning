@@ -223,6 +223,30 @@ fills it, while `width: 60%` uses 60% of it. In PDFs, fixed and automatic image
 widths are also preserved, and oversized images shrink to fit without changing
 their aspect ratio. Smaller images remain centered in the figure column.
 
+## Algorithms
+
+The vendored Lovelace renderers create the numbered algorithm figure inside
+`pseudocode` and `pseudocode-list`. Attach a label to the call and pass an optional
+`caption` directly:
+
+```typst
+#pseudocode-list(
+  booktabs: true,
+  numbered-title: [Example algorithm],
+  caption: [An optional explanation of the algorithm.],
+)[
+  + Initialize the state.
+  + Update the state.
+] <algo-example>
+
+See @algo-example.
+```
+
+Both entry points create exactly one `figure(kind: "algorithm")`, including when
+the caption is omitted. Do not add an outer figure. `numbered-title` supplies the
+title within the algorithm; `caption` supplies its figure caption. Numbering,
+references, and the existing HTML figure and side-caption layout are preserved.
+
 ## Typography and verification
 
 The build loads the bundled regular and bold Frutiger faces from

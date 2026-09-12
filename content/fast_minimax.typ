@@ -44,18 +44,21 @@ Fix an accuracy parameter $eta>0$. After collecting responses $y_1,...,y_T$, def
 $ P_T={x in X : f(x,y_t)<=v-eta/2 quad forall t=1,...,T}. $
 Initially there are no response constraints, so $P_0=X$. Every point of $X$ fails at least one of the infinitely many possible constraints: its own defense response has payoff at least $v$. The ellipsoid method finds a small collection of constraints that is sufficient for our accuracy target.
 
-#figure(kind: "algorithm", supplement: [Algorithm], caption: [Collecting defense responses. All separating cuts are represented in the affine hull of X.])[
-  #pseudocode-list(booktabs: true, max-width: true, numbered-title: [Fast minimax construction])[
-    + Start with an ellipsoid containing $X$ and an empty response list.
-    + *While* its volume exceeds the threshold specified below:
-      + Let $c_t$ be the current ellipsoid center.
-      + If $c_t in.not X$, obtain a separating cut for $X$.
-      + Otherwise, query $y_t=h(c_t)$ and save $y_t$ and $f(dot,y_t)$.
-      + In this second case, use the central cut $f(x,y_t)<=f(c_t,y_t)$.
-      + Replace the ellipsoid by the usual ellipsoid enclosing the retained half.
-    + Compute weights $lambda in Delta(T)$ maximizing $min_(x in X) sum_t lambda_t f(x,y_t)$ to the required accuracy.
-    + Return the mixture $y^(*)=sum_t lambda_t y_t$.
-  ]
+#pseudocode-list(
+  booktabs: true,
+  max-width: true,
+  numbered-title: [Fast minimax construction],
+  caption: [Collecting defense responses. All separating cuts are represented in the affine hull of X.],
+)[
+  + Start with an ellipsoid containing $X$ and an empty response list.
+  + *While* its volume exceeds the threshold specified below:
+    + Let $c_t$ be the current ellipsoid center.
+    + If $c_t in.not X$, obtain a separating cut for $X$.
+    + Otherwise, query $y_t=h(c_t)$ and save $y_t$ and $f(dot,y_t)$.
+    + In this second case, use the central cut $f(x,y_t)<=f(c_t,y_t)$.
+    + Replace the ellipsoid by the usual ellipsoid enclosing the retained half.
+  + Compute weights $lambda in Delta(T)$ maximizing $min_(x in X) sum_t lambda_t f(x,y_t)$ to the required accuracy.
+  + Return the mixture $y^(*)=sum_t lambda_t y_t$.
 ]
 
 Here $T$ counts saved responses, which can be fewer than the ellipsoid iterations. The oracle is called only at centers belonging to $X$. Since $f(c_t,y_t)>=v$, the response cut retains all of $P_t$. Cuts separating $X$ also retain it. Thus, the final ellipsoid contains $P_T$. If $f(dot,y_t)$ is constant, this response already guarantees at least $v$ everywhere and we can stop immediately.

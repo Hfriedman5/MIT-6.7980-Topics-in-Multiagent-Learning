@@ -92,20 +92,19 @@ Fix one player and drop the player index. Against fixed opponents, write the uti
 
 We can run MWU on the simplex $Delta(V)$ by maintaining a weight for each deterministic strategy. The vector we play is the expectation of that distribution. We call this algorithm _vertex MWU_; replacing the observed gradient by an optimistic correction gives vertex OMWU.
 
-#figure(
-  kind: "algorithm",
-  supplement: [Algorithm],
+#pseudocode-list(
+  booktabs: true,
+  max-width: true,
+  numbered-title: [Vertex MWU/OMWU],
   caption: [Vertex MWU/OMWU. Both the expectation and the weight update appear to require enumerating all vertices.],
 )[
-  #pseudocode-list(booktabs: true, max-width: true, numbered-title: [Vertex MWU/OMWU])[
-    + Initialize $lambda_1$ uniformly on $V$, set $g_0=0$, and set $t=1$.
-    + *function* `NextStrategy()`:
-      + Return $x_t=sum_(v in V) lambda_(t)(v)v$.
-    + *function* `ObserveUtility`$(g_t)$:
-      + Set $h_t=g_t$ (MWU) or $h_t=2g_t-g_(t-1)$ (OMWU).
-      + For every $v in V$, set $lambda_(t+1)(v) prop lambda_(t)(v) exp(eta ip(h_t, v))$.
-      + Normalize the weights to sum to one, then increment $t$.
-  ]
+  + Initialize $lambda_1$ uniformly on $V$, set $g_0=0$, and set $t=1$.
+  + *function* `NextStrategy()`:
+    + Return $x_t=sum_(v in V) lambda_(t)(v)v$.
+  + *function* `ObserveUtility`$(g_t)$:
+    + Set $h_t=g_t$ (MWU) or $h_t=2g_t-g_(t-1)$ (OMWU).
+    + For every $v in V$, set $lambda_(t+1)(v) prop lambda_(t)(v) exp(eta ip(h_t, v))$.
+    + Normalize the weights to sum to one, then increment $t$.
 ] <algo:vertex-mwu>
 
 The regret of the played means is exactly the regret of these distributions over vertices, since $ip(g_t, x_t)=sum_v lambda_(t)(v) ip(g_t, v)$. The comparator can be any point of $X$: a linear function attains its maximum at a vertex.

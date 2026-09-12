@@ -122,45 +122,40 @@ given $k in cal(K)$ and $s in S_k$ , $rho \( k \, s \)$ returns the next decisio
 
 Pseudocode for CFR is given in #ref(label("algo:cfr")). Note that the implementation is parametric on the regret minimization algorithms $R_j$ run locally at each decision point. Any regret minimizer $R_j$ for simplex domains can be used to solve the local regret minimization problems. Popular options are the regret matching algorithm, and the regret matching plus algorithm (Lecture 5).
 
-#figure(
-  kind: "algorithm",
-  supplement: [Algorithm],
-  caption: none,
-  pseudocode-list(numbered-title: [CFR regret minimizer])[
-    - *Data:* $R_j$, regret minimizer for $Delta(A_j)$; one for each decision point $j in cal(J)$ of the TFDP.
-    + *Function NextStrategy()*
-      - _Step 1: ask each of the $R_j$ for their next strategy local at each decision point._
-      + *For each* decision point $j in cal(J)$:
-        + $b_j^((t)) in Delta(A_j) arrow.l R_j."NextStrategy"()$
-      - _Step 2: we construct the sequence-form representation of the strategy that plays according to the distribution $b_j^((t))$ at each decision point $j in cal(J)$._
-      + $x^((t)) = 0 in RR^Sigma$
-      + *For each* decision point $j in cal(J)$ in _top-down traversal_ order in the TFDP:
-        + *For each* action $a in A_j$:
-          + *If* $p_j = emptyset$:
-            + $x^((t))[j a] arrow.l b_j^((t))[a]$
-          + *Else*:
-            + $x^((t))[j a] arrow.l x^((t))[p_j] dot b_j^((t))[a]$
-      - _You should convince yourself that the vector $x^((t))$ we just filled in above is a valid sequence-form strategy, that is, it satisfies the required consistency constraints we saw in Lecture 7. In symbols, $x^((t)) in cal(Q)$._
-      + *Return* $x^((t))$
-    + *Function ObserveUtility($g^((t)) in RR^(abs(Sigma))$)*
-      - _Step 1: we compute the expected utility for each subtree rooted at each node $v in cal(J) union cal(K)$._
-      + $V^((t)) arrow.l$ empty dictionary. _Eventually, it will map keys $cal(J) union cal(K) union {bot}$ to real numbers._
-      + $V^((t))[bot] arrow.l 0$
-      + *For each* node in the tree $v in cal(J) union cal(K)$ in _bottom-up traversal_ order in the TFDP:
-        + *If* $v in cal(J)$:
-          + Let $j arrow.l v$.
-          + $V^((t))[j] arrow.l sum_(a in A_j) b_j^((t))[a] dot (g^((t))[j a] + V^((t))[rho(j, a)])$
-        + *Else*:
-          + Let $k arrow.l v$.
-          + $V^((t))[k] arrow.l sum_(s in S_k) V^((t))[rho(k, s)]$
-      - _Step 2: at each decision point $j in cal(J)$, we now construct a local utility vector $g_j^((t))$ called counterfactual utility._
-      + *For each* decision point $j in cal(J)$:
-        + $g_j^((t)) arrow.l 0 in RR^(A_j)$
-        + *For each* action $a in A_j$:
-          + $g_j^((t))[a] arrow.l g^((t))[j a] + V^((t))[rho(j, a)]$
-        + $R_j."ObserveUtility"(g_j^((t)))$
-  ],
-) <algo:cfr>
+#pseudocode-list(numbered-title: [CFR regret minimizer])[
+  - *Data:* $R_j$, regret minimizer for $Delta(A_j)$; one for each decision point $j in cal(J)$ of the TFDP.
+  + *function NextStrategy()*
+    - _Step 1: ask each of the $R_j$ for their next strategy local at each decision point._
+    + *for each* decision point $j in cal(J)$:
+      + $b_j^((t)) in Delta(A_j) arrow.l R_j."NextStrategy"()$
+    - _Step 2: we construct the sequence-form representation of the strategy that plays according to the distribution $b_j^((t))$ at each decision point $j in cal(J)$._
+    + $x^((t)) = 0 in RR^Sigma$
+    + *for each* decision point $j in cal(J)$ in _top-down traversal_ order in the TFDP:
+      + *for each* action $a in A_j$:
+        + *if* $p_j = emptyset$:
+          + $x^((t))[j a] arrow.l b_j^((t))[a]$
+        + *else*:
+          + $x^((t))[j a] arrow.l x^((t))[p_j] dot b_j^((t))[a]$
+    - _You should convince yourself that the vector $x^((t))$ we just filled in above is a valid sequence-form strategy, that is, it satisfies the required consistency constraints we saw in Lecture 7. In symbols, $x^((t)) in cal(Q)$._
+    + *return* $x^((t))$
+  + *function ObserveUtility($g^((t)) in RR^(abs(Sigma))$)*
+    - _Step 1: we compute the expected utility for each subtree rooted at each node $v in cal(J) union cal(K)$._
+    + $V^((t)) arrow.l$ empty dictionary. _Eventually, it will map keys $cal(J) union cal(K) union {bot}$ to real numbers._
+    + $V^((t))[bot] arrow.l 0$
+    + *for each* node in the tree $v in cal(J) union cal(K)$ in _bottom-up traversal_ order in the TFDP:
+      + *if* $v in cal(J)$:
+        + Let $j arrow.l v$.
+        + $V^((t))[j] arrow.l sum_(a in A_j) b_j^((t))[a] dot (g^((t))[j a] + V^((t))[rho(j, a)])$
+      + *else*:
+        + Let $k arrow.l v$.
+        + $V^((t))[k] arrow.l sum_(s in S_k) V^((t))[rho(k, s)]$
+    - _Step 2: at each decision point $j in cal(J)$, we now construct a local utility vector $g_j^((t))$ called counterfactual utility._
+    + *for each* decision point $j in cal(J)$:
+      + $g_j^((t)) arrow.l 0 in RR^(A_j)$
+      + *for each* action $a in A_j$:
+        + $g_j^((t))[a] arrow.l g^((t))[j a] + V^((t))[rho(j, a)]$
+      + $R_j."ObserveUtility"(g_j^((t)))$
+] <algo:cfr>
 
 == Learning using self-play
 
