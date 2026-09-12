@@ -43,8 +43,8 @@
 #let qquad = $quad quad$
 #let proofdir(marker, body) = [#marker~~#body]
 #let bpar(body) = [#strong(body) #h(0.5em)]
-#let acknowledgments(body) = block(above: 3em, stroke: (top: 0.15mm + luma(80%)), inset: (top: 8pt))[
-  #text(size: 9pt, fill: luma(40%))[*Acknowledgments*]
+#let changelog(body) = block(above: 3em, stroke: (top: 0.15mm + luma(80%)), inset: (top: 8pt))[
+  #text(size: 9pt, fill: luma(40%))[*Changelog*]
   #v(0.4em)
   #text(size: 9pt, body)
 ]

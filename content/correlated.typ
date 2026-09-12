@@ -267,6 +267,6 @@ The distinction between correlated and coarse correlated equilibrium is in when 
 
 #lec_bibliography("meta/refs.bib", title: none)
 
-#acknowledgments[
-  Thanks to Eric Yang Yu for corrections.
+#changelog[
+  - 2025-10-05: Fixed typos (thanks Eric Yang Yu!).
 ]

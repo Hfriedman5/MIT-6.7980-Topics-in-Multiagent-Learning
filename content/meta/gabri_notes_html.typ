@@ -521,9 +521,9 @@
   ]
 }
 
-#let acknowledgments(body) = html.elem("section", attrs: (class: "acknowledgments"))[
+#let changelog(body) = html.elem("section", attrs: (class: "changelog"))[
   #html.elem("hr")
-  *Acknowledgments*
+  *Changelog*
   #body
 ]
 

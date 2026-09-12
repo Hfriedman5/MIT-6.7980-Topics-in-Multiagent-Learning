@@ -379,6 +379,7 @@ The next plots illustrate the behavior of OGD and MWU in a simple $2 times 2$ ga
 
 #lec_bibliography("meta/refs.bib")
 
-#acknowledgments[
-  Thanks to George Cao and Sophie Wang for corrections.
+#changelog[
+  - 2025-10-05: Fixed typos (thanks George Cao!).
+  - 2025-11-30: Fixed typo in summation $t -> tau$ (thanks Sophie Wang!).
 ]
