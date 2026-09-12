@@ -1,5 +1,5 @@
 // Schematic inclusions among search complexity classes.
-#set page(width: auto, height: auto, margin: .5mm)
+#set page(width: auto, height: auto, margin: .5mm, fill: none)
 #set text(font: "New Computer Modern", size: 9pt)
 #import "@preview/cetz:0.4.1"
 
