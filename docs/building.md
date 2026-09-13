@@ -300,7 +300,8 @@ python3 scripts/build_diagrams.py       # self-play, bandits, and PPAD diagrams
 
 These commands run during the full site build. Editable dynamics and diagram
 sources live under `content/figures/`; the dynamics helpers are in
-`content/meta/dyns.typ`. Generated SVGs are used by both rendering paths.
+`content/meta/dyns.typ`. Generated SVGs are used by both HTML and lecture PDF
+rendering; standalone figure PDFs are neither needed nor generated.
 
 The optional `prepare_kuhn_figure.py` and `prepare_kuhn_alternatives.py` scripts
 require Pillow. They preserve white node interiors and verify that compositing

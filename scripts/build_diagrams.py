@@ -9,10 +9,10 @@ ROOT = Path(__file__).resolve().parents[1]
 def build_diagrams(root: Path = ROOT) -> None:
     for topic, name in (('learning_intro', 'self_play'), ('bandit', 'bandit')):
         source = root / 'content/figures' / topic / (name + '.typ')
-        for output in (source.with_suffix('.svg'), source.with_suffix('.pdf')):
-            subprocess.run([
-                'typst', 'compile', '--root', str(root), str(source), str(output),
-            ], cwd=root, check=True)
+        subprocess.run([
+            'typst', 'compile', '--root', str(root), str(source),
+            str(source.with_suffix('.svg')),
+        ], cwd=root, check=True)
         print(f'Diagram: {topic}/{name}', flush=True)
 
     source = root / 'content/figures/perfection/uniform_game.typ'
