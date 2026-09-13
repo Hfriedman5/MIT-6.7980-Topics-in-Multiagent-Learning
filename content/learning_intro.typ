@@ -254,7 +254,7 @@ The very _existence_ of regret minimizers is a powerful enough fact to imply the
 
 The previous result is in fact a direct corollary of the more general connection between $Phi$-regret minimization and the set of coarse-correlated equilibria in multiplayer general-sum games. We present a general form of this connection in the next theorem.
 
-#theorem[Formal version of #ref(<thmce-informal>, supplement: "Theorems") and#ref(<thmcce-informal>, supplement: "")][
+#theorem[Formal version of #ref(<thmce-informal>, supplement: "Theorems") and #ref(<thmcce-informal>, supplement: "")][
   Let $vx^((t))_1, ..., vx^((t))_n$ the strategies played by the players at any time $t$, and let $Phi"-Reg"_i^((t))$ denote the internal regret incurred by Player $i$ up to time $t$. Consider now the average correlated distribution of play up to any time $T$, that is, the distribution $mu^((T))$ that selects a time $overline(t)$ uniformly at random from the set ${1,...,T }$, and selects actions $(a_1,..., a_n)$ independendently according to the $vx_i^((overline(t)))$, that is,
   $
     mu^((T)) := 1 / T sum_(t=1)^T vx_1^((t))⊗...⊗ vx_n^((t)).
