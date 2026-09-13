@@ -7,7 +7,5 @@
   let name = note.source.split("/").last().trim(".typ", at: end)
   let output = if format == "html" { name + ".html" } else { "pdf/" + name + ".pdf" }
   let source = "../.build/" + format + "-source/" + name + ".typ"
-  import source as chapter
-  let header = chapter.lecture
-  document(output, title: lecture-title(header.lec_num, header.title), include source)
+  document(output, title: lecture-title(note.number, note.title), include source)
 }

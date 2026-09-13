@@ -1,12 +1,10 @@
 #import "meta/gabri_notes.typ": *
-
-#let lecture = (
+#show: gabri_notes.with(
   instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)],
   lec_num: "S3",
   date: [Fall 2026],
   title: "Learning algorithms (II)",
 )
-#show: gabri_notes.with(..lecture)
 
 #let va = $a$
 #let vb = $b$
@@ -61,22 +59,26 @@ At least three variants can be defined.
   $
     vx^((t+1)) := argmax_(vx in X) {ip(sum_(tau = 1)^t vg^((tau)), vx) - 1 / eta psi(vx)}
   $,
+
   [*FTRL* \ Predictive],
   $
     vx^((t+1)) := argmax_(vx in X) { ip(#html-math-color(darkblue, $vm^((t+1))$) + sum_(tau = 1)^t vg^((tau)), vx) - 1 / eta psi(vx) }
   $,
+
   [*OMD* \ Non-predictive],
   $
     vx^((t+1)) := argmax_(vx in X) {ip(vg^((t)), vx) - 1 / eta upright("D")_psi (vx || vx^((t)))}
   $,
+
   [*OMD* \ Predictive / non-reflected],
   $
-      vz^((t+1)) &:= argmax_(vz in X) {ip(vg^((t)), vz) - 1 / eta upright("D")_psi (vz || vz^((t)))} \
-      vx^((t+1)) &:= argmax_(vx in X) { ip(#html-math-color(darkblue, $vm^((t+1))$), vx) - 1 / eta upright("D")_psi (vx || vz^((t+1))) }
+    vz^((t+1)) &:= argmax_(vz in X) {ip(vg^((t)), vz) - 1 / eta upright("D")_psi (vz || vz^((t)))} \
+    vx^((t+1)) &:= argmax_(vx in X) { ip(#html-math-color(darkblue, $vm^((t+1))$), vx) - 1 / eta upright("D")_psi (vx || vz^((t+1))) }
   $,
+
   [*OMD* \ Predictive / reflected],
   $
-      vx^((t+1)) := argmax_(vx in X) { ip(vg^((t)) + #html-math-color(darkblue)[$vm^((t+1)) - vm^((t))$], vx) - 1 / eta upright("D")_psi (vx || vx^((t))) }
+    vx^((t+1)) := argmax_(vx in X) { ip(vg^((t)) + #html-math-color(darkblue)[$vm^((t+1)) - vm^((t))$], vx) - 1 / eta upright("D")_psi (vx || vx^((t))) }
   $,
 )
 
@@ -102,8 +104,8 @@ all times $t$. This corresponds to predicting that the feedback is slow-changing
   The non-reflected OMD algorithm instantiated with squared Euclidean norm $psi(x) = 1/2 norm(x)_2^2$ gives rise to the (non-reflected) _optimistic online gradient ascent_ algorithm, whose update rule is
   #set math.equation(numbering: "(1)")
   $
-    vz^((t+1)) &:= #text(size: 14pt, $Pi$)_(cX)(vz^((t)) + eta vg^((t))), qquad qquad
-    vx^((t+1)) &:= #text(size: 14pt, $Pi$)_(cX)(vz^((t+1)) + eta vg^((t))).
+    vz^((t+1)) & := #text(size: 14pt, $Pi$) _(cX)(vz^((t)) + eta vg^((t))), qquad qquad
+                 vx^((t+1)) & := #text(size: 14pt, $Pi$) _(cX)(vz^((t+1)) + eta vg^((t))).
   $ <eq-ogda>
   #set math.equation(numbering: none)
 ]
@@ -122,17 +124,24 @@ In two-player games, optimism serves as a form of _negative_ momentum that pushe
   $ U_1 := mat(2, 1; 0, 2). $
   The multiplicative weights update algorithm was set up with constant learning rate $eta = 0.25$, while the online gradient descent algorithm was set up with learning rate $eta = 0.1$.
   #wrapped-figure(
-  [
-    The optimistic version of online projected gradient descent (OGD) was non-reflected. The purple dot indicates the starting strategy. The gray dotted line tracks the profile of _average_ strategies.
+    [
+      The optimistic version of online projected gradient descent (OGD) was non-reflected. The purple dot indicates the starting strategy. The gray dotted line tracks the profile of _average_ strategies.
 
-    As mentioned, the optimistic dynamics exhibit a "push" towards equilibrium, due to the negative momentum effect, which results in convergence towards the unique Nash equilibrium
-    $ x^* &= (2/3, 1/3), \
-      y^* &= (1/3, 2/3). $
-  ],
-  [
-    #image("figures/learning2/optimistic.svg", width: 100%, alt: "Comparison of optimistic and non-optimistic MWU and OGD trajectories.")
-  ],
-  side: left, text-width: 36%,
+      As mentioned, the optimistic dynamics exhibit a "push" towards equilibrium, due to the negative momentum effect, which results in convergence towards the unique Nash equilibrium
+      $
+        x^* & = (2/3, 1/3), \
+        y^* & = (1/3, 2/3).
+      $
+    ],
+    [
+      #image(
+        "figures/learning2/optimistic.svg",
+        width: 100%,
+        alt: "Comparison of optimistic and non-optimistic MWU and OGD trajectories.",
+      )
+    ],
+    side: left,
+    text-width: 36%,
   )
 ]
 
@@ -226,11 +235,15 @@ last-iterate convergence of OMWU were in the air, just "one good trick" away. Af
 
 #example[Poor last-iterate convergence of FTRL, #citep(<Cai2024Jun>)][
   Consider the two-player zero-sum game with utility matrix for Player 1 given by
-  $ mU(delta) := mat(1/2 + delta, 1/2 ; 0 , 1). $
+  $ mU(delta) := mat(1/2 + delta, 1/2; 0, 1). $
   The game admits the unique Nash equilibrium $(x^*, y^*)$, where $ x^* = (1/(1+delta), delta/(1+delta)) qquad "and" qquad y^* = (1/(2(1+delta)), (1+2delta)/(2(1+delta))). $
   In particular, when $delta$ is small, the equilibrium strategy for Player 1 is approximately $x^* = (1 - delta, delta)$ and thus very close to the boundary of the strategy polytope of the player. This proximity to the boundary affects the performance of all known instantiations of the the optimistic FTRL algorithm. To see this numerically, the next four plots show the evolution of three optimistic FTRL variants (entropic, Euclidean, and logarithmic) and the optimistic gradient ascent algorithm, in the game defined by $delta = 10^(-2).$
 
-  #align(center, image("figures/learning2/plots.svg", width: 100%, alt: "Entropic, Euclidean and logarithmic optimistic FTRL compared with optimistic gradient ascent near a boundary equilibrium."))
+  #align(center, image(
+    "figures/learning2/plots.svg",
+    width: 100%,
+    alt: "Entropic, Euclidean and logarithmic optimistic FTRL compared with optimistic gradient ascent near a boundary equilibrium.",
+  ))
 
   The dynamics for the the first two algorithms get _extremely_ close to the boundary---for example, when using OMWU, iterates reached strategies with $1 - e^(-50) < x_1 < 1$.
 ]

@@ -1,4 +1,11 @@
 #import "meta/gabri_notes.typ": *
+#show: gabri_notes.with(
+  lec_num: 20,
+  date: [Tue, Nov 24, 2026],
+  title: "PPAD-hardness of Nash equilibrium",
+  instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)],
+  extrathanks: [Some of the content of the lecture was adapted from material from Costis Daskalakis.],
+)
 
 #let eps = math.epsilon.alt
 
@@ -8,14 +15,6 @@
   (width, width, width)
 }
 
-#let lecture = (
-  lec_num: 20,
-  date: [Tue, Nov 24, 2026],
-  title: "PPAD-hardness of Nash equilibrium",
-  instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)],
-  extrathanks: [Some of the content of the lecture was adapted from material from Costis Daskalakis.],
-)
-#show: gabri_notes.with(..lecture)
 
 We continue the discussion from #lecture-link("tfnp", none)[] by giving a glimpse of how the PPAD-hardness of finding $eps$-approximate Nash equilibria was shown by #citet(<dgp09>).
 
@@ -35,20 +34,36 @@ In particular, we will restrict our attention to functions constructed through c
 - Variable nodes $v_1, ..., v_n$;
 - Gate nodes $g_1, ..., g_m$ of six possible types:
   #table(
-    columns: (2.65cm, 2.85cm, 1fr),
+    columns: (2.65cm, 4cm, 1fr),
+    align: (horizon + left, horizon + center, horizon + left),
     inset: (x: 2mm, y: 2.5mm),
     stroke: .2mm,
-    align: horizon,
     table.header[*Gate*][*Symbol*][*Input-output relationship*],
-    [Assignment], [#image("figures/ppad_completeness/gate_assignment.svg", width: 2.25cm, alt: "Assignment gate.")], [$y = x_1$],
-    [Constant], [#image("figures/ppad_completeness/gate_constant.svg", width: 2.25cm, alt: "Constant gate.")], [$y=a$],
-    [Addition], [#image("figures/ppad_completeness/gate_addition.svg", width: 2.25cm, alt: "Addition gate.")], [$y=min{1, x_1+x_2}$],
-    [Subtraction], [#image("figures/ppad_completeness/gate_subtraction.svg", width: 2.25cm, alt: "Subtraction gate.")], [$y=max{0, x_1-x_2}$],
-    [Scaling], [#image("figures/ppad_completeness/gate_multiplication.svg", width: 2.25cm, alt: "Multiplication gate.")], [$y=max{0,min{1, a dot x_1}}$],
+    [Assignment],
+    [#image("figures/ppad_completeness/gate_assignment.svg", width: 3cm, alt: "Assignment gate.")],
+    [$y = x_1$],
+
+    [Constant], [#image("figures/ppad_completeness/gate_constant.svg", width: 3cm, alt: "Constant gate.")], [$y=a$],
+    [Addition],
+    [#image("figures/ppad_completeness/gate_addition.svg", width: 3cm, alt: "Addition gate.")],
+    [$y=min{1, x_1+x_2}$],
+
+    [Subtraction],
+    [#image("figures/ppad_completeness/gate_subtraction.svg", width: 3cm, alt: "Subtraction gate.")],
+    [$y=max{0, x_1-x_2}$],
+
+    [Scaling],
+    [#image("figures/ppad_completeness/gate_multiplication.svg", width: 3cm, alt: "Multiplication gate.")],
+    [$y=max{0,min{1, a dot x_1}}$],
+
     [Comparison],
-    [#image("figures/ppad_completeness/gate_comparison.svg", width: 2.25cm, alt: "Comparison gate.")],
-    [$y=display(cases(1\, qquad& "if" x_1 > x_2,
-    0\, & "if" x_1<x_2, "any"\, & "if" x_1 = x_2. ))$
+    [#image("figures/ppad_completeness/gate_comparison.svg", width: 3cm, alt: "Comparison gate.")],
+    [$y=display(
+        cases(
+          1\, qquad& "if" x_1 > x_2,
+          0\, & "if" x_1<x_2, "any"\, & "if" x_1 = x_2.
+        )
+      )$
 
       When the inputs are equal, this gate does not restrict the output.
     ],
@@ -68,7 +83,11 @@ The table gives ideal gate relations. To state a finite search problem appropria
 #example[
   In the diagram below, the exact relations force $a=b=c=1/2$; with positive tolerance, assignments need only satisfy the approximate relations.
   #figure[
-    #image("figures/ppad_completeness/circuit.svg", width: 5cm, alt: "A cyclic arithmetic circuit containing a one-half constant, a comparison gate, and an assignment gate.")
+    #image(
+      "figures/ppad_completeness/circuit.svg",
+      width: 6cm,
+      alt: "A cyclic arithmetic circuit containing a one-half constant, a comparison gate, and an assignment gate.",
+    )
   ]
 ]
 
@@ -91,53 +110,59 @@ The idea is to use _gadgets_: constructions that simulate the behavior of the ga
 
 == Addition gate
 
-Consider any game that contains the following interaction between four players $x, y, z, w$, each of which has two actions, denoted ${0,1}$. With a slight abuse of notation, we will call $x,y,z,w $ the probability of playing action $1$; hence, $x, y, z, w in [0,1].$
+Consider any game that contains the following interaction between four players $x, y, z, w$, each of which has two actions, denoted ${0,1}$. With a slight abuse of notation, we will call $x,y,z,w$ the probability of playing action $1$; hence, $x, y, z, w in [0,1].$
 
 #example[Addition gadget game][
   Consider any game that contains as a substructure the gadget shown in the diagram below, and payoffs set as follows.
 
-  #figure(caption: [Addition gadget game. The dashed blue edges denote possible edges in the game, which do not affect the result in @thm-gadget-addition.])[
-    #image("figures/ppad_completeness/addition_gadget.svg", width: 4cm, alt: "Addition gadget: input players x and y influence w, and w and the output player z influence each other.")
+  #figure(
+    caption: [Addition gadget game. The dashed blue edges denote possible edges in the game, which do not affect the result in @thm-gadget-addition.],
+  )[
+    #image(
+      "figures/ppad_completeness/addition_gadget.svg",
+      width: 4cm,
+      alt: "Addition gadget: input players x and y influence w, and w and the output player z influence each other.",
+    )
   ]
 
-    #block(width: 100%, breakable: false)[
+  #block(width: 100%, breakable: false)[
     #paragraph-marker(shape: "triangle-right") _Payoffs of player $w$._~ The payoff of player $w$ is defined as follows.
     If $w$ plays $0$, her payoff does not depend on $z$'s strategy, but only on $x$ and $y$, according to the payoff table
     #align(center)[#context table(
-        columns: payoff-table-columns(),
-        align: center,
-        fill: none,
-        stroke: .2mm,
-        [], [$y=0$], [$y=1$],
-        [$x=0$], [0], [1],
-        [$x=1$], [1], [2],
-      )]
-    ]
+      columns: payoff-table-columns(),
+      align: center,
+      fill: none,
+      stroke: .2mm,
+      [     ], [$y=0$], [$y=1$],
+      [$x=0$], [$0$], [$1$],
+      [$x=1$], [$1$], [$2$],
+    )]
+  ]
 
-    #block(width: 100%, breakable: false)[
+  #block(width: 100%, breakable: false)[
     If $w$ plays $1$, her payoff does not depend on $x$ and $y$'s strategy and depends on $z$'s according to the table
     #align(center)[#context table(
-        columns: payoff-table-columns(),
-        align: center,
-        fill: none,
-        stroke: .2mm,
-        [], [$z=0$], [$z=1$],
-        [], [0], [1],
-      )]
-    ]
+      columns: payoff-table-columns(),
+      align: center,
+      fill: none,
+      stroke: .2mm,
+      [], [$z=0$], [$z=1$],
+      [], [$0$], [$1$],
+    )]
+  ]
 
-    #block(width: 100%, breakable: false)[
+  #block(width: 100%, breakable: false)[
     #paragraph-marker(shape: "triangle-right") _Payoffs of player $z$._~ The payoff of player $z$ is defined according to the table
     #align(center)[#context table(
-        columns: payoff-table-columns(),
-        align: center,
-        fill: none,
-        stroke: .2mm,
-        [], [$z=0$], [$z=1$],
-        [$w=0$], [1\/2], [1],
-        [$w=1$], [1\/2], [0],
-      )]
-    ]
+      columns: payoff-table-columns(),
+      align: center,
+      fill: none,
+      stroke: .2mm,
+      [     ], [$z=0$], [$z=1$],
+      [$w=0$], [$1\/2$], [$1$],
+      [$w=1$], [$1\/2$], [$0$],
+    )]
+  ]
 
   #paragraph-marker(shape: "triangle-right") _Other payoffs and considerations_.~~
   The utilities of players $x$ and $y$ are independent of the strategies of $w$ and $z$.

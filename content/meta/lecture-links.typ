@@ -1,9 +1,23 @@
 // Bundle references use Typst's live labels, counters, and link destinations.
 // A single-file preview cannot introspect another document; it uses that
-// note's exported header for a lecture-level web link instead.
+// note's directly authored show-rule arguments for a lecture-level web link.
 #let lecture-title(number, title) = {
   let kind = if str(number).starts-with("S") { "Supplementary Reading" } else { "Lecture" }
   [#kind~#number, “#title”]
+}
+
+// Read only the literal number and title required by a standalone link. This
+// avoids importing a destination's body (and its own cross-lecture links).
+// Like the site builder, this accepts a quoted or plain bracketed title.
+#let lecture-header(source) = {
+  let call = source.match(regex("(?ms)^#show:\\s*gabri_notes\\.with\\((.*?)\\)\\s*$"))
+  assert(call != none, message: "Expected a direct #show: gabri_notes.with(...) header.")
+  let arguments = call.captures.first()
+  let number = arguments.match(regex("\\blec_num:\\s*(\"[^\"]+\"|[0-9]+)\\s*(?:,|$)"))
+  let title = arguments.match(regex("\\btitle:\\s*(\"(?:\\\\.|[^\"\\\\])*\"|\\[[^\\]]*\\])\\s*(?:,|$)"))
+  assert(number != none and title != none,
+    message: "Expected literal lec_num and title arguments in the note header.")
+  (lec_num: eval(number.captures.first()), title: eval(title.captures.first()))
 }
 
 #let lecture-link(note, destination, body) = context {
@@ -30,8 +44,7 @@
     let body = if body == [] { reference } else { [#body (#reference)] }
     link(dest, if target() == "html" { body } else { text(fill: blue.darken(40%), body) })
   } else {
-    import ("../" + note + ".typ") as chapter
-    let other = chapter.lecture
+    let other = lecture-header(read("../" + note + ".typ"))
     let reference = lecture-title(other.lec_num, other.title)
     let body = if body == [] { reference } else { [#body (#reference)] }
     let relative = note + ".html" + if anchor == none { "" } else { "#" + anchor }

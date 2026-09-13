@@ -1,12 +1,10 @@
 #import "meta/gabri_notes.typ": *
-
-#let lecture = (
+#show: gabri_notes.with(
   instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)],
   lec_num: 6,
   date: [Thu, Oct 1, 2026],
   title: "Learning with bandit feedback",
 )
-#show: gabri_notes.with(..lecture)
 
 #let va = $a$
 #let vb = $b$
@@ -26,15 +24,21 @@ The #lecture-link("learning_intro", <def-external-regret>)[regret-minimization m
 
 = Setup and general considerations
 
-Like in our prior lectures, we will study _linear_ settings, where our sequential decision-maker chooses a strategy $x^((t)) in X$ in some strategy set satisfying $X subset.eq RR^n$. In the full-information setting that we have already studied, the feedback that our decision maker receives, at every round $t$, is a utility function $u^((t)): x |-> ip(g^((t)),x)$, from which they can compute their realized utility, $w^((t)) := ip(g^((t)),x^((t)))$, for the strategy they played as well as the counterfactual utility they would have received from any strategy they could have played. In the _bandit_ setting, the decision-maker only receives as feedback their realized utility $w^((t))$ as opposed to their complete utility function $u^((t))$.
+Like in our prior lectures, we will study _linear_ settings, where our sequential decision-maker chooses a strategy $x^((t)) in X$ in some strategy set satisfying $X subset.eq RR^n$. In the full-information setting that we have already studied, the feedback that our decision maker receives, at every round $t$, is a utility function $u^((t)): x |-> ip(g^((t)), x)$, from which they can compute their realized utility, $w^((t)) := ip(g^((t)), x^((t)))$, for the strategy they played as well as the counterfactual utility they would have received from any strategy they could have played. In the _bandit_ setting, the decision-maker only receives as feedback their realized utility $w^((t))$ as opposed to their complete utility function $u^((t))$.
 
 As a general principle, algorithms for the _bandit_ setting are constructed from regret minimizers for the full-information setting. Indeed, the key idea is to construct an _estimator_ $tilde(g)^((t))$ of the (unobserved) utility gradient $g^((t))$, and feed that into a full-information regret minimizer. The estimator is constructed from the observed utility $w^((t))$ and the chosen strategy $x^((t))$.
 
 The utility function can still be picked adversarially by the environment. However, to get guarantees, it is necessary to reduce the power of the environment by letting the utility $u^((t))$ only depend on $x^((1)), ..., x^((t-1))$ but _not_ on $x^((t))$. In other words, the environment can pick the utility adaptively, but must decide the utility _before_ the learner picks the strategy, and not after. This restriction still allows convergence to equilibria if bandit algorithms are used by players to iteratively update their strategies in games.
 
 Typically, the construction of bandit algorithms follows the template shown in @fig-bandit.
-#figure(caption: [General template for bandit learning algorithms. $X$ is the space of strategies of the learner. The output of the "strategy sampler" is a strategy from a restricted set of strategies. The name "strategy sampler" is generally a misnomer, but it is fitting in the widely-studied setting where $X=Delta(A)$ for some finite set of actions $A$. In this case, a common instantiation of the strategy sampler is to take as input a distribution $p^((t)) in Delta(A)$ and sample an action $a^((t)) ~ p^((t))$. In this case, $x^((t))$ would be a single-atom distribution with an atom at $a^((t))$. But, in general, we allow for more general $X$'s and more general samplers.])[
-  #image("figures/bandit/bandit.svg", width: 100%, alt: "Bandit algorithm template: observed utility enters a gradient estimator, then a full-information regret minimizer, exploration mixture, and strategy sampler.")
+#figure(
+  caption: [General template for bandit learning algorithms. $X$ is the space of strategies of the learner. The output of the "strategy sampler" is a strategy from a restricted set of strategies. The name "strategy sampler" is generally a misnomer, but it is fitting in the widely-studied setting where $X=Delta(A)$ for some finite set of actions $A$. In this case, a common instantiation of the strategy sampler is to take as input a distribution $p^((t)) in Delta(A)$ and sample an action $a^((t)) ~ p^((t))$. In this case, $x^((t))$ would be a single-atom distribution with an atom at $a^((t))$. But, in general, we allow for more general $X$'s and more general samplers.],
+)[
+  #image(
+    "figures/bandit/bandit.svg",
+    width: 100%,
+    alt: "Bandit algorithm template: observed utility enters a gradient estimator, then a full-information regret minimizer, exploration mixture, and strategy sampler.",
+  )
 ] <fig-bandit>
 
 Some loss-based algorithms obtain pseudoregret bounds without an explicit exploration mixture. High-probability guarantees require additional control of estimation errors; a uniform mixture alone does not provide that guarantee. We explain the difference next.
@@ -93,7 +97,7 @@ $ tilde(g)^((t)) := (w^((t)) / p^((t))_(a^((t)))) e_(a^((t))) in RR^A. $
 Exp3 (short for "exponential weights for exploration and exploitation") adapts #lecture-link("learning1", <sec-mwu>)[multiplicative weights] to bandit feedback and was introduced by #citet(<auer2002nonstochastic>). We use a loss-form variant that needs no explicit exploration mixture. Convert rewards $g^((t))_a in [0,1]$ into losses $ell^((t))_a=1-g^((t))_a$. This changes neither realized regret nor pseudoregret.
 
 Start with positive weights $W_(1,a)=1$. At time $t$, sample action $a^((t))$ from $p^((t))_a=W_(t,a)/sum_b W_(t,b)$ and observe its loss. Set
-$ hat(ell)^((t))=frac(1-w^((t)),p^((t))_(a^((t)))) e_(a^((t))), quad W_(t+1,a)=W_(t,a) exp(-eta hat(ell)^((t))_a). $
+$ hat(ell)^((t))=frac(1-w^((t)), p^((t))_(a^((t)))) e_(a^((t))), quad W_(t+1,a)=W_(t,a) exp(-eta hat(ell)^((t))_a). $
 Equivalently, the full-information utility learner receives $-hat(ell)^((t))$. The sign matters: exponentially weighting an unbounded positive reward estimate is not justified by the following argument.
 
 #theorem[Loss-form Exp3][
@@ -103,7 +107,9 @@ Equivalently, the full-information utility learner receives $-hat(ell)^((t))$. T
 ]
 #proofsketch[
   Because the estimates are nonnegative, $exp(-z)<=1-z+z^2/2$ applies for every $z=eta hat(ell)^((t))_a$, even if an estimate is large. The exponential-weights potential bound against each fixed action $a$ is
-  $ sum_t ip(p^((t)),hat(ell)^((t))) - sum_t hat(ell)^((t))_a <= frac(log K, eta) + eta/2 sum_t sum_b p^((t))_b (hat(ell)^((t))_b)^2. $
+  $
+    sum_t ip(p^((t)), hat(ell)^((t))) - sum_t hat(ell)^((t))_a <= frac(log K, eta) + eta/2 sum_t sum_b p^((t))_b (hat(ell)^((t))_b)^2.
+  $
   Conditional unbiasedness identifies the expected loss terms, while
   $ EE_(t)[sum_b p^((t))_b (hat(ell)^((t))_b)^2]=sum_b (ell^((t))_b)^2 <= K. $
   Take expectations and then maximize over the fixed comparator. This proves pseudoregret; it does not interchange a random hindsight maximum with expectation.
@@ -129,12 +135,12 @@ A simplified analysis can also be found in #citep(<zimmert2021tsallis>).
 Exp3.P uses both uniform exploration and an upper-confidence correction to reward estimates #citep(<auer2002nonstochastic>). For $K=|A|>=2$, let $y^((t))$ be normalized positive weights and sample from
 $ p^((t))=(1-gamma)y^((t))+gamma bold(1)/K. $
 With the reward estimator $tilde(g)$ defined earlier, update the weights by
-$ W_(t+1,a)=W_(t,a) exp(eta (tilde(g)^((t))_a + frac(alpha,p^((t))_a sqrt(K T)))). $
+$ W_(t+1,a)=W_(t,a) exp(eta (tilde(g)^((t))_a + frac(alpha, p^((t))_a sqrt(K T)))). $
 The positive bonus accounts for uncertainty; uniform exploration bounds inverse sampling probabilities. This is a different estimator/update from the loss-form Exp3 above.
 
 #theorem[Exp3.P #citep(<auer2002nonstochastic>)][
   Initialize all weights equally. For horizon $T>=1$ and $delta in (0,1)$, choose
-  $ gamma=min{3/5,2sqrt(frac(3K log K,5T))}, quad eta=gamma/(3K), quad alpha=2sqrt(log(K T/delta)). $
+  $ gamma=min{3/5,2sqrt(frac(3K log K, 5T))}, quad eta=gamma/(3K), quad alpha=2sqrt(log(K T/delta)). $
   Then, with probability at least $1-delta$,
   $ "Reg"^((T)) <= O(sqrt(K T log(K T/delta)) + log(K T/delta)). $
 ]

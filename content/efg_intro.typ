@@ -1,11 +1,10 @@
 #import "meta/gabri_notes.typ": *
-#let lecture = (
+#show: gabri_notes.with(
   lec_num: 7,
   date: [Tue, Oct 6, 2026],
   title: "Modeling extensive-form games",
   instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)],
 )
-#show: gabri_notes.with(..lecture)
 
 #let upsans = it => $upright(sans(#it))$
 

@@ -1,12 +1,10 @@
 #import "meta/gabri_notes.typ": *
-
-#let lecture = (
+#show: gabri_notes.with(
   instructor: [Max Fishelson (`maxfish@mit.edu`)],
   lec_num: "S6",
   date: [Fall 2026],
   title: "Phi-regret minimization",
 )
-#show: gabri_notes.with(..lecture)
 
 #let va = $a$
 #let vb = $b$
@@ -41,7 +39,11 @@ In order to construct a swap regret minimizer for $cX = Delta^n$, we start with 
 
 The process can be depicted pictorially as in @fig-bm.
 #figure(caption: [Blum-Mansour's swap regret minimization algorithm for $Delta^n$.])[
-  #image("figures/phi_regret/blum_mansour.svg", width: 100%, alt: "Blum-Mansour construction: an external regret minimizer per action and a fixed-point oracle.")
+  #image(
+    "figures/phi_regret/blum_mansour.svg",
+    width: 100%,
+    alt: "Blum-Mansour construction: an external regret minimizer per action and a fixed-point oracle.",
+  )
 ] <fig-bm>
 
 We now claim that the algorithm described above is a swap regret minimizer for $Delta^n$.
@@ -96,8 +98,14 @@ The final construction is as follows:
 
 Graphically, we can summarize the process as in the following block diagram.
 
-#figure(caption: [Gordon-Greenwald-Marks's reduction from $Phi$-regret minimization to external regret minimization for $Phi$ plus a fixed point oracle for $Phi$.])[
-  #image("figures/phi_regret/gordon.svg", width: 100%, alt: "General Phi-regret reduction: utility construction, external regret minimization over transformations, and fixed-point computation.")
+#figure(
+  caption: [Gordon-Greenwald-Marks's reduction from $Phi$-regret minimization to external regret minimization for $Phi$ plus a fixed point oracle for $Phi$.],
+)[
+  #image(
+    "figures/phi_regret/gordon.svg",
+    width: 100%,
+    alt: "General Phi-regret reduction: utility construction, external regret minimization over transformations, and fixed-point computation.",
+  )
 ] <fig-ggm>
 
 #theorem[#citep(<gordon2008no>)][
@@ -109,7 +117,7 @@ Graphically, we can summarize the process as in the following block diagram.
 ]
 #proof[
   The proof of correctness of the above construction is deceptively simple.
-  Since $cR$ outputs transformations $phi.alt^((1)),phi.alt^((2)),... in  Phi$ and receives utilities $phi.alt |->  u^((1))(phi.alt(vx^((1)))), phi.alt |-> u^((2)) (phi.alt (vx^((2))) ), ...$, its cumulative regret $R^((T))$ is by definition
+  Since $cR$ outputs transformations $phi.alt^((1)),phi.alt^((2)),... in Phi$ and receives utilities $phi.alt |-> u^((1))(phi.alt(vx^((1)))), phi.alt |-> u^((2)) (phi.alt (vx^((2))) ), ...$, its cumulative regret $R^((T))$ is by definition
   $
     "Reg"_Phi^((T)) = max_(hat(phi.alt) in Phi) {
       sum_(t=1)^T (u^((t))(hat(phi.alt) (vx^((t)))) - u^((t))(phi.alt^((t))(vx^((t)))))

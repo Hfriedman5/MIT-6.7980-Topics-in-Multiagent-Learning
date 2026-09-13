@@ -1,12 +1,10 @@
 #import "meta/gabri_notes.typ": *
-
-#let lecture = (
+#show: gabri_notes.with(
   lec_num: "S7",
   date: [Fall 2026],
   title: "Fast computation via the minimax theorem",
   instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)],
 )
-#show: gabri_notes.with(..lecture)
 
 The minimax theorem converts a response to each opponent strategy into a single strategy that works against every opponent. How many responses must we compute to carry out this conversion? This lecture follows #citet(<farina2026defense>), with particular attention to computing $Phi$-equilibria. The central tool is a generalization of Ellipsoid-Against-Hope: select a small collection of responses, then compute a suitable mixture of them.
 
@@ -32,9 +30,11 @@ Minimax says that a uniform guarantee exists when a defense oracle exists. The c
 Simulate an opponent with a #lecture-link("learning_intro", <def-external-regret>)[regret bound] for linear losses. At round $t$, let it choose $x_t$, return $y_t=h(x_t)$, and give it loss $f(dot,y_t)$. Its regret is
 $ R_T=sum_(t=1)^T f(x_t,y_t)-min_(x in X) sum_(t=1)^T f(x,y_t). $
 For $macron(y)=T^(-1) sum_t y_t$, affinity gives
-$ min_(x in X) f(x,macron(y))
-  =frac(1,T) sum_(t=1)^T f(x_t,y_t)-frac(R_T,T)
-  >=v-frac(R_T,T). $
+$
+  min_(x in X) f(x,macron(y))
+  =frac(1, T) sum_(t=1)^T f(x_t,y_t)-frac(R_T, T)
+  >=v-frac(R_T, T).
+$
 In particular, $R_T<=C sqrt(T)$ gives accuracy $epsilon.alt$ after $T>=C^2/epsilon.alt^2$ calls. This is a useful constructive argument, but each additional bit of accuracy multiplies the iteration budget. The fast construction changes both the queried opponent strategies and the final mixture weights.
 
 = Collecting a finite certificate
@@ -71,7 +71,7 @@ Suppose every response payoff $f(dot,y_t)$ is $L$-Lipschitz in these coordinates
 
 #lemma[Thickness from slack][
   If some $x^(*) in X$ satisfies $f(x^(*),y_t)<=v-eta$ for every saved response, then $P_T$ contains a ball of radius
-  $ rho=frac(r eta,4L R). $
+  $ rho=frac(r eta, 4L R). $
 ]
 #proof[
   Set $delta=eta/(4L R)$ and $z=(1-delta)x^(*)+delta c$. Convexity and the inner ball imply $B(z,delta r) subset.eq X$. Every point $w$ of this ball satisfies
@@ -80,7 +80,7 @@ Suppose every response payoff $f(dot,y_t)$ is $L$-Lipschitz in these coordinates
 ]
 
 A central-cut ellipsoid update reduces volume by a factor at most $exp(-1/(2(d+1)))$ for $d>=2$; in dimension one, bisect the interval. Starting with radius $R$, after
-$ K=O(d^2 log(R/rho))=O(d^2 log(frac(4L R^2,r eta))) $
+$ K=O(d^2 log(R/rho))=O(d^2 log(frac(4L R^2, r eta))) $
 updates the containing ellipsoid has volume less than a ball of radius $rho$. The lemma rules out any $x^(*)$ satisfying all the stronger inequalities. Hence
 $ min_(x in X) max_(t=1,...,T) f(x,y_t)>v-eta. $
 The minimum is attained because $X$ is compact. This is the finite certificate we need. A rational implementation uses the standard finite-precision ellipsoid machinery and appropriate encoding bounds; the calculation above describes its geometric core.
@@ -90,14 +90,16 @@ The minimum is attained because $X$ is compact. This is the finite certificate w
 Write $a=v-eta$ and consider the compact convex payoff image
 $ C={ (f(x,y_1),...,f(x,y_T)) : x in X } subset.eq RR^T. $
 The certificate says that $C$ is disjoint from $Q={q in RR^T:q_t<=a " for every " t}$. Strong separation gives a nonzero vector $lambda$ with
-$ inf_(q in C) ip(lambda,q)>sup_(q in Q) ip(lambda,q). $
+$ inf_(q in C) ip(lambda, q)>sup_(q in Q) ip(lambda, q). $
 The right side is finite only if every $lambda_t>=0$, because $Q$ is unbounded in each negative coordinate direction. Normalize so that $sum_t lambda_t=1$. The supremum then equals $a$, proving
 $ min_(x in X) sum_t lambda_t f(x,y_t)>v-eta. $
 This argument uses separation in a finite-dimensional payoff space; it supplies the quantifier exchange rather than assuming the minimax theorem we are constructing.
 
 Computationally, solve
-$ max_(lambda in Delta(T),z in RR) z quad "subject to" quad
-  z<=sum_t lambda_t f(x,y_t) quad forall x in X. $
+$
+  max_(lambda in Delta(T),z in RR) z quad "subject to" quad
+  z<=sum_t lambda_t f(x,y_t) quad forall x in X.
+$
 A linear-optimization oracle for $X$ separates these constraints: minimize the right side and either return a violating $x$ or certify feasibility. For rational polytopes this is an LP with oracle access. More generally, standard well-bounded convex optimization gives approximate weights under the corresponding oracle and precision assumptions. Optimizing to additive error $eta$ yields a guarantee of at least $v-2eta$. Set $eta=epsilon.alt/2$.
 
 Thus, the number of defense calls is at most $O(d^2 log(8L R^2/(r epsilon.alt)))$. Total running time also includes separation over $X$, recovery of the weights, encoding lengths, and oracle costs. The output is stored as a list of responses with weights. Uniform averaging has no such guarantee for the ellipsoid's responses.
@@ -113,8 +115,10 @@ Consider an $n$-player game with compact convex strategy sets $S_i$ and utilitie
 ]
 
 The opponent of the mediator selects a distribution $nu$ over pairs $(i,phi_i)$. Its payoff is the expected deviation gain
-$ G(mu,nu)=EE_((i,phi_i) tilde.op nu) EE_(s tilde.op mu)
-  [u_i (phi_i (s_i),s_(-i))-u_i (s)]. $
+$
+  G(mu,nu)=EE_((i,phi_i) tilde.op nu) EE_(s tilde.op mu)
+  [u_i (phi_i (s_i),s_(-i))-u_i (s)].
+$
 Use $f(nu,mu)=-G(mu,nu)$ in our minimax construction, with $v=0$. A uniform guarantee $f(nu,mu)>=-epsilon.alt$ is exactly the equilibrium condition, since the opponent can concentrate on any one deviation. The mediator's strategy space can be enormous. We will only construct responses to particular $nu$.
 
 == A defense oracle from fixed points
@@ -130,8 +134,10 @@ It maps $S_i$ into itself by convexity. Choose $s_i$ satisfying $macron(phi)_i (
 ]
 #proof[
   By affinity in player $i$'s own strategy, each term with $w_i>0$ satisfies
-  $ EE_(phi_i tilde.op nu_i)[u_i (phi_i (s_i),s_(-i))]
-    =u_i (macron(phi)_i (s_i),s_(-i))=u_i (s). $
+  $
+    EE_(phi_i tilde.op nu_i)[u_i (phi_i (s_i),s_(-i))]
+    =u_i (macron(phi)_i (s_i),s_(-i))=u_i (s).
+  $
   Sum with weights $w_i$; zero-weight terms contribute nothing.
 ]
 
@@ -146,7 +152,7 @@ Existence follows from #lecture-link("brouwer", <sec-brouwer-general>)[Brouwer's
 Take $Phi_i$ to be the constant maps $s_i mapsto a_i$ for $a_i in S_i$. The mean map is constant too, so its fixed point is simply
 $ s_i=EE_(a_i tilde.op nu_i)[a_i] quad "when" quad w_i>0. $
 For a finite normal-form game, write $nu_(i,a)$ for the mass of deviation to action $a$. The response is the product distribution with marginals
-$ p_i (a)=frac(nu_(i,a),w_i), quad w_i=sum_a nu_(i,a). $
+$ p_i (a)=frac(nu_(i,a), w_i), quad w_i=sum_a nu_(i,a). $
 Choose any marginal when $w_i=0$. This is the normalized Hart--Schmeidler construction from the #lecture-link("eah", <sec-cce-existence>)[minimax supplement]. It avoids allocating a variable to every joint action. A final mixture of these product distributions is generally correlated.
 
 == Correlated equilibria: stationary distributions
@@ -154,13 +160,17 @@ Choose any marginal when $w_i=0$. This is the normalized Hart--Schmeidler constr
 For normal-form player $i$ with $m_i$ actions, every deterministic deviation from a recommendation is a map on those actions. Its linear extension to $Delta(m_i)$ is a matrix with one unit-vector column per action. The convex hull of these maps is the set of column-stochastic matrices $Q_i$. For the conditional mean deviation, the fixed-point equation is
 $ Q_i p_i=p_i, quad p_i>=0, quad sum_a p_i (a)=1. $
 It is the stationary-distribution equation for a finite Markov chain. A solution exists even when the chain is reducible; uniqueness is unnecessary. Given opponents' marginals, set $v_i (a)=u_i (a,p_(-i))$. Then
-$ sum_(a,b) p_i (a) (Q_i)_(b a) [v_i (b)-v_i (a)]
-  =v_i^T (Q_i p_i-p_i)=0. $
+$
+  sum_(a,b) p_i (a) (Q_i)_(b a) [v_i (b)-v_i (a)]
+  =v_i^T (Q_i p_i-p_i)=0.
+$
 Thus, stationary distributions supply a defense response without solving for a Nash equilibrium.
 
 There are $m_i^(m_i)$ deterministic deviation maps, but the opponent does not need a coordinate for each one. Introduce $B_i=w_i Q_i$ and describe its domain by
-$ B_i>=0, quad sum_b (B_i)_(b a)=w_i quad forall a,
-  quad w_i>=0, quad sum_i w_i=1. $
+$
+  B_i>=0, quad sum_b (B_i)_(b a)=w_i quad forall a,
+  quad w_i>=0, quad sum_i w_i=1.
+$
 These are linear constraints in at most $n+sum_i m_i^2$ coordinates. If $w_i=0$, nonnegativity forces $B_i=0$. For a product response $p$, the cut coefficients are explicitly
 $ G(p,B)=sum_i sum_(a,b) (B_i)_(b a) p_i (a)[v_i (b)-v_i (a)]. $
 The final distribution can be sampled by choosing a saved response index $t$ with probability $lambda_t$, then sampling the actions independently from its marginals $p_(i,t)$.

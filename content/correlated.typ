@@ -1,6 +1,10 @@
 #import "meta/gabri_notes.typ": *
-#let lecture = (lec_num: 3, date: [Tue, Sep 22, 2026], title: "Properties of Nash equilibrium", instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)])
-#show: gabri_notes.with(..lecture)
+#show: gabri_notes.with(
+  lec_num: 3,
+  date: [Tue, Sep 22, 2026],
+  title: "Properties of Nash equilibrium",
+  instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)],
+)
 
 In this lecture, we will continue analyzing the properties of Nash equilibria in normal-form games. We will then introduce the concept of correlated equilibrium, a relaxation of Nash equilibrium with desirable properties.
 
@@ -13,60 +17,78 @@ We introduced the #lecture-link("nfgs_nash", <def-nash-equilibrium>)[definition 
 In two-player zero-sum games the Nash equilibria are exactly those strategy profiles for which both players are playing a maxmin strategy. We formalize this in the next theorem.  First, though, we introduce some notation which will make our life easier when dealing with two-player games.
 
 #definition[Matrices $U_1$ and $U_2$ for two-player games][
-Consider a generic two-player zero-sum game, as shown next. As usual, we denote the sets of actions for player by $A_1$ and $A_2$.
+  Consider a generic two-player zero-sum game, as shown next. As usual, we denote the sets of actions for player by $A_1$ and $A_2$.
 
-#align(center)[
+  #align(center)[
 
     #image("figures/correlated/game_table.svg")
   ]
 
   Let $x in Delta (A_1)$ denote a strategy of Player 1, and $y in Delta (A_2)$ a strategy of Player 2. We can express the expected utilities for the players according to the bilinear expressions
 
-$ u_1 (x \, y) = x^top U_1 y \, #h(2em) #h(2em) u_2 (x \, y) = x^top U_2 y \, $
+  $ u_1 (x \, y) = x^top U_1 y \, #h(2em) #h(2em) u_2 (x \, y) = x^top U_2 y \, $
 
   where
 
-$ U_1 colon.eq mat(delim: "(", a_11, a_12, dots.h.c, a_(1 m); a_21, a_22, dots.h.c, a_(2 m); dots.v, dots.v, dots.down, dots.v; a_(n 1), a_(n 2), dots.h.c, a_(n m)) \, quad U_2 colon.eq mat(delim: "(", b_11, b_12, dots.h.c, b_(1 m); b_21, b_22, dots.h.c, b_(2 m); dots.v, dots.v, dots.down, dots.v; b_(n 1), b_(n 2), dots.h.c, b_(n m)) . $
+  $
+    U_1 colon.eq mat(delim: "(", a_11, a_12, dots.h.c, a_(1 m); a_21, a_22, dots.h.c, a_(2 m); dots.v, dots.v, dots.down, dots.v; a_(n 1), a_(n 2), dots.h.c, a_(n m)) \, quad U_2 colon.eq mat(delim: "(", b_11, b_12, dots.h.c, b_(1 m); b_21, b_22, dots.h.c, b_(2 m); dots.v, dots.v, dots.down, dots.v; b_(n 1), b_(n 2), dots.h.c, b_(n m)) .
+  $
 ]
 
 From now on, we will assume that a two-player game has been defined, and we will use the notation with $U_1$ and $U_2$ defined above to refer to the utility matrices of the players.
 
 #theorem[
-Consider a two-player zero-sum game, that is, one for which $U_2 = - U_1$. Then, a strategy profile $(x^(*) \, y^(*)) in Delta (A_1) times Delta (A_2)$ is a Nash equilibrium if and only if it is a maxmin strategy, _i.e._, if and only if
+  Consider a two-player zero-sum game, that is, one for which $U_2 = - U_1$. Then, a strategy profile $(x^(*) \, y^(*)) in Delta (A_1) times Delta (A_2)$ is a Nash equilibrium if and only if it is a maxmin strategy, _i.e._, if and only if
 
-$ x^(*) in "arg max"_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y \, #h(2em) upright("and") #h(2em) y^(*) in "arg max"_(y in Delta (A_2)) min_(x in Delta (A_1)) x^top U_2 y . $
+  $
+    x^(*) in "arg max"_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y \, #h(2em) upright("and") #h(2em) y^(*) in "arg max"_(y in Delta (A_2)) min_(x in Delta (A_1)) x^top U_2 y .
+  $
 ]#label("thm:nash is mm")
 
 #proof[
-We prove the result assuming we trust von Neumann's minimax theorem, which states that
+  We prove the result assuming we trust von Neumann's minimax theorem, which states that
 
-$ max_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y = min_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y . $
+  $
+    max_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y = min_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y .
+  $
 
   $(arrow.r.double.long)$~~Suppose that $(x^(*) \, y^(*))$ is a Nash equilibrium. Then, by the definition of Nash equilibrium and using the fact that $U_2 = - U_1$, we have that
 
-$ (x^(*))^top U_1 y^(*) = max_(x in Delta (A_1)) x^top U_1 y^(*) \, #h(2em) upright("and") #h(2em) (x^(*))^top U_1 y^(*) = min_(y in Delta (A_2)) (x^(*))^top U_1 y . $
+  $
+    (x^(*))^top U_1 y^(*) = max_(x in Delta (A_1)) x^top U_1 y^(*) \, #h(2em) upright("and") #h(2em) (x^(*))^top U_1 y^(*) = min_(y in Delta (A_2)) (x^(*))^top U_1 y .
+  $
 
   Hence, we can write the chain of equalities and inequalities
 
-$ min_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y lt.eq max_(x in Delta (A_1)) x^top U_1 y^(*) = min_(y in Delta (A_2)) (x^(*))^top U_1 y lt.eq max_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y . $
+  $
+    min_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y lt.eq max_(x in Delta (A_1)) x^top U_1 y^(*) = min_(y in Delta (A_2)) (x^(*))^top U_1 y lt.eq max_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y .
+  $
 
   By the minimax theorem, all inequalities must be equalities; hence, $(x^(*) \, y^(*))$ satisfies
 
-$ min_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y & = max_(x in Delta (A_1)) x^top U_1 y^(*) &  & quad arrow.l.r.double quad y^(*) in "arg min"_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y\
-max_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y & = min_(y in Delta (A_2)) (x^(*))^top U_1 y &  & quad arrow.l.r.double quad x^(*) in "arg max"_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y . $
+  $
+    min_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y & = max_(x in Delta (A_1)) x^top U_1 y^(*) & & quad arrow.l.r.double quad y^(*) in "arg min"_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y\
+    max_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y & = min_(y in Delta (A_2)) (x^(*))^top U_1 y & & quad arrow.l.r.double quad x^(*) in "arg max"_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y .
+  $
 
   $(arrow.l.double.long)$~~Conversely, suppose that $x^(*)$ and $y^(*)$ are maxmin strategies. Let $v^(*)$ be the common value of both sides of the minimax theorem, that is,
 
-$ v^(*) colon.eq max_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y = min_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y . $
+  $
+    v^(*) colon.eq max_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y = min_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y .
+  $
 
   We now show that $(x^(*) \, y^(*))$ is a Nash equilibrium. By definition, this means we need to show that
 
-$ (x^(*))^top U_1 y^(*) = max_(x in Delta (A_1)) x^top U_1 y^(*) & #h(2em) upright("and") #h(2em) (x^(*))^top U_1 y^(*) = min_(y in Delta (A_2)) (x^(*))^top U_1 y . $
+  $
+    (x^(*))^top U_1 y^(*) = max_(x in Delta (A_1)) x^top U_1 y^(*) & #h(2em) upright("and") #h(2em) (x^(*))^top U_1 y^(*) = min_(y in Delta (A_2)) (x^(*))^top U_1 y .
+  $
 
   Using the hypothesis,
 
-$ x^(*) & in "arg max"_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y \, quad &  & arrow.r.double.long quad v^(*) = min_(y in Delta (A_2)) (x^(*))^top U_1 y \,\
-y^(*) & in "arg min"_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y \, quad &  & arrow.r.double.long quad v^(*) = max_(x in Delta (A_1)) x^top U_1 y^(*) . $
+  $
+    x^(*) & in "arg max"_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y \, quad & & arrow.r.double.long quad v^(*) = min_(y in Delta (A_2)) (x^(*))^top U_1 y \,\
+    y^(*) & in "arg min"_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y \, quad & & arrow.r.double.long quad v^(*) = max_(x in Delta (A_1)) x^top U_1 y^(*) .
+  $
 
   These equalities imply that $v^(*) lt.eq (x^(*))^top U_1 y^(*)$ and $v^(*) gt.eq (x^(*))^top U_1 y^(*)$, and thus $v^(*) = (x^(*))^top U_1 y^(*)$. This shows that the players are best responding to the strategy of the opponent, completing the proof that $(x^(*) \, y^(*))$ is a Nash equilibrium.
 ]
@@ -87,39 +109,42 @@ which is a linear program with a linear number of constraints in the number of a
 
   #align(center)[
 
-  #table(stroke: none, columns: 3, align: center+horizon, inset: .7em,
-  [$max_(x in Delta \( A_1 \)) min_(y in Delta \( A_2 \)) x^top U_1 y$],
-  [],
-  [$min_(y in Delta \( A_2 \)) max_(x in Delta \( A_1 \)) x^top U_1 y$],
-  [$arrow.t.b$],
-  [],
-  [$arrow.t.b$],
-  [$ cases(max v, v lt.eq x^top U_1 a_2 quad forall a_2, 1^top x = 1, x gt.eq 0 .) $],
-  [$limits(arrow.l.r.long)^(upright("  linear programming  "))_(upright("duality"))$],
-  [$ cases(min w, w gt.eq a_1^top U_1 y quad forall a_1, 1^top y = 1, y gt.eq 0 .) $]
-  )
+    #table(
+      stroke: none,
+      columns: 3,
+      align: center + horizon,
+      inset: .7em,
+      [$max_(x in Delta \( A_1 \)) min_(y in Delta \( A_2 \)) x^top U_1 y$],
+      [],
+      [$min_(y in Delta \( A_2 \)) max_(x in Delta \( A_1 \)) x^top U_1 y$],
 
-          ]
+      [$arrow.t.b$], [], [$arrow.t.b$],
+      [$ cases(max v, v lt.eq x^top U_1 a_2 quad forall a_2, 1^top x = 1, x gt.eq 0 .) $],
+      [$limits(arrow.l.r.long)^(upright("  linear programming  "))_(upright("duality"))$],
+      [$ cases(min w, w gt.eq a_1^top U_1 y quad forall a_1, 1^top y = 1, y gt.eq 0 .) $],
+    )
+
+  ]
 - The connection between linear programming and two-player zero-sum games is bidirectional: as it turns out, _solving linear programming_ and _finding a Nash equilibrium in a two-player zero-sum game_ are _computationally equivalent_. This means that _any_ linear programming problem (with arbitrary constraints, variables, etc.) can be efficiently converted into a two-player zero-sum game. This is less obvious than it may seem. For one, the strategy sets in games are probability simplexes, while linear programs might have arbitrary linear equality and inequality constraints. Furthermore, linear programs might be unbounded or unfeasible; yet, a Nash equilibrium of a game always exists. It would have been perfectly reasonably to believe that linear programming was a significantly more general tool than equilibrium solvers for two-player zero-sum games, and we know today that that belief would have been wrong. For more on this, see #citep(<Brooks2023Oct>, <vonStengel2023Jul>, <adler2013equivalence>).
 - All of this seems simple with the luxury of hindsight. But the two fields were not as closely connected as we might think. We know this from a transcript of the first encounter between Dantzig, one of the fathers of linear programming, and von Neumann, one of the fathers of game theory. And, perhaps in what is a plot twist, it was von Neumann to teach Dantzig about duality!
 
   #quote(block: true)[
-            « On October 3, 1947, I visited him (von Neumann) for the first time at the Institute for Advanced Study at Princeton. I remember trying to describe to von Neumann, as I would to an ordinary mortal, the Air Force problem. I began with the formulation of the linear programming model in terms of activities and items, etc. Von Neumann did something which I believe was uncharacteristic of him. “Get to the point,” he said impatiently. Having at times a somewhat low kindlingpoint, I said to myself “O.K., if he wants a quicky, then that's what he will get.” In under one minute I slapped the geometric and algebraic version of the problem on the blackboard. Von Neumann stood up and said “Oh that!” Then for the next hour and a half, he proceeded to give me a lecture on the mathematical theory of linear programs. At one point seeing me sitting there with my eyes popping and my mouth open (after I had searched the literature and found nothing), von Neumann said: “I don't want you to think I am pulling all this out of my sleeve at the spur of the moment like a magician. I have just recently completed a book with Oskar Morgenstern on the theory of games. What I am doing is conjecturing that the two problems are equivalent. The theory that I am outlining for your problem is an analogue to the one we have developed for games.” Thus I learned about Farkas' Lemma, and about duality for the first time.»
+    « On October 3, 1947, I visited him (von Neumann) for the first time at the Institute for Advanced Study at Princeton. I remember trying to describe to von Neumann, as I would to an ordinary mortal, the Air Force problem. I began with the formulation of the linear programming model in terms of activities and items, etc. Von Neumann did something which I believe was uncharacteristic of him. “Get to the point,” he said impatiently. Having at times a somewhat low kindlingpoint, I said to myself “O.K., if he wants a quicky, then that's what he will get.” In under one minute I slapped the geometric and algebraic version of the problem on the blackboard. Von Neumann stood up and said “Oh that!” Then for the next hour and a half, he proceeded to give me a lecture on the mathematical theory of linear programs. At one point seeing me sitting there with my eyes popping and my mouth open (after I had searched the literature and found nothing), von Neumann said: “I don't want you to think I am pulling all this out of my sleeve at the spur of the moment like a magician. I have just recently completed a book with Oskar Morgenstern on the theory of games. What I am doing is conjecturing that the two problems are equivalent. The theory that I am outlining for your problem is an analogue to the one we have developed for games.” Thus I learned about Farkas' Lemma, and about duality for the first time.»
 
-              (from #citet(<Dantzig1982Apr>))
-          ]
+    (from #citet(<Dantzig1982Apr>))
+  ]
 - In light of the above you might be wondering how easy it would be to prove the minimax theorem without relying on linear programming duality. The #lecture-link("learning_intro", <sec-learning-minimax>)[proof using regret minimization] only requires the existence of suitable learning dynamics. The supplementary reading on #lecture-link("eah", <sec-minimax-algorithm>)[constructive minimax] develops a different computational approach.
 
 *Topological properties*  It is important to realize that what #ref(label("thm:nash is mm")) is saying is that in two-player zero-sum games, each player can plan their own strategy _independently_. _Any_ combination of maxmin strategies for the players forms an equilibrium. This is in contrast with the general case: there, in order to specify a Nash equilibrium we need to provide a tuple of strategies for all players. In two-player zero-sum games, instead, _any product of maxmin strategies is an equilibrium_. We have just arrived at the following corollary.
 
 #corollary[
-In a two-player zero-sum game, the set of Nash equilibria is a Cartesian product of nonempty, convex, compact sets.
+  In a two-player zero-sum game, the set of Nash equilibria is a Cartesian product of nonempty, convex, compact sets.
 ]#label("cor:nash product")
 
 Since Cartesian products of nonempty, convex, and compact sets are themselves nonempty, convex, and compact, #ref(label("cor:nash product")) immediately implies the following as well.
 
 #corollary[
-The set of Nash equilibria in a two-player zero-sum game is nonempty, convex, and compact.
+  The set of Nash equilibria in a two-player zero-sum game is nonempty, convex, and compact.
 ]
 
 It is worth remarking again that what does the heavy lifting here is really #ref(label("thm:nash is mm")); the rest follows as a direct corollary.
@@ -131,29 +156,31 @@ In the general two-player case, often referred to as _two-player general-sum gam
 *Topological properties*  Perhaps the most striking is that not only the set of Nash equilibria is no longer guaranteed to be convex, but it is not even guaranteed to be contractible. We show this phenomenon with the next example.
 
 #remark[Complex topology of Nash equilibria; Kohlberg-Mertens game #citep(<kohlberg1986strategic>)][
-Beyond two-player zero-sum games, the set of Nash equilibria in a game can be quite complex.
+  Beyond two-player zero-sum games, the set of Nash equilibria in a game can be quite complex.
 
-#wrapped-figure(side: right, text-width: 55%)[
-For one, _it is not at all guaranteed that the set is convex_. Even more, the set might be _topologically complex_, _e.g._, exhibiting holes.  This phenomenon was already observed by #citet(<kohlberg1986strategic>), who considered the two-player three-action game
+  #wrapped-figure(side: right, text-width: 55%)[
+    For one, _it is not at all guaranteed that the set is convex_. Even more, the set might be _topologically complex_, _e.g._, exhibiting holes.  This phenomenon was already observed by #citet(<kohlberg1986strategic>), who considered the two-player three-action game
 
-#align(center)[
+    #align(center)[
       #image("figures/correlated/km_game.svg", width: 118.75pt)
     ]
 
-The figure on the right, similar to the one in #citep(<Milionis2023Oct>), shows the projection of the set of all $0.27$-approximate Nash equilibria of this game, _i.e._, all strategy profiles such that no player has a unilateral deviation that increases their utility by more than $0.27$.
-][
-#image("figures/correlated/kohlberg_mertens.svg", width: 175.392pt)
-]
+    The figure on the right, similar to the one in #citep(<Milionis2023Oct>), shows the projection of the set of all $0.27$-approximate Nash equilibria of this game, _i.e._, all strategy profiles such that no player has a unilateral deviation that increases their utility by more than $0.27$.
+  ][
+    #image("figures/correlated/kohlberg_mertens.svg", width: 175.392pt)
+  ]
 ]
 
 *Computation*  In two-player general-sum games, computation of Nash equilibria is not a linear program. However, it is a _linear complementarity problem_ (LCP), a more general class of problems than linear feasibility programs, and which are written in the form
 
-$ upright(f i n d) quad x \, w in bb(R)^d #h(2em) upright("s.t.") #h(2em) w = M x + q \, #h(2em) x \, w gt.eq 0 \, #h(2em) x^top w = 0 . $
+$
+  upright(f i n d) quad x \, w in bb(R)^d #h(2em) upright("s.t.") #h(2em) w = M x + q \, #h(2em) x \, w gt.eq 0 \, #h(2em) x^top w = 0 .
+$
 
 The Lemke-Howson algorithm is a well-known algorithm to solve LCPs, and it can be used to find Nash equilibria in two-player general-sum games. However, the algorithm is not polynomial-time in the worst case, and it can be hard to find Nash equilibria in practice. An important corollary of the connection between two-player general-sum games and LCPs is the following:
 
 #corollary[
-Any two-player general-sum games with rational payoffs admits a Nash equilibrium with rational coordinates.
+  Any two-player general-sum games with rational payoffs admits a Nash equilibrium with rational coordinates.
 ]
 
 This follows directly from the way Lemke-Howson works, which is similar to the simplex algorithm. The algorithm moves along edges of a rational polytope until it finds a Nash equilibrium. Since the algorithm only moves along the edges of the polytope, it will only generate rational solutions.
@@ -167,25 +194,27 @@ In games with more than two players, the behavior of Nash equilibria can be even
 *Analytic properties*  As a start, _rational numbers might not be enough anymore_ to store the probabilities of each player's actions at equilibrium.
 
 #example[
-In his original paper, Nash showed a three-player game with rational payoffs and with the property that _all_ Nash equilibria prescribe probabilities that are irrational numbers #citep(<Nash51:NonCooperative>). Another simple example is also reported by #citet(<nau2004geometry>), as follows:
+  In his original paper, Nash showed a three-player game with rational payoffs and with the property that _all_ Nash equilibria prescribe probabilities that are irrational numbers #citep(<Nash51:NonCooperative>). Another simple example is also reported by #citet(<nau2004geometry>), as follows:
 
-#align(center)[
+  #align(center)[
     #image("figures/correlated/nash_irrational.svg")
   ]
 
   A simple calculation shows that the only Nash equilibrium $(x^(*) \, y^(*) \, z^(*))$ of this game satisfies
 
-$ (x_1^(*) \, y_1^(*) \, z_1^(*)) = (53 / 46 - sqrt(601) / 46 \, - 13 / 24 + sqrt(601) / 24 \, - 23 / 4 + sqrt(601) / 4) approx (0.619 \, 0.480 \, 0.379) . $
+  $
+    (x_1^(*) \, y_1^(*) \, z_1^(*)) = (53 / 46 - sqrt(601) / 46 \, - 13 / 24 + sqrt(601) / 24 \, - 23 / 4 + sqrt(601) / 4) approx (0.619 \, 0.480 \, 0.379) .
+  $
 
   From a computational point of view, this property raises the question of how a Nash equilibrium solver could even _represent_ such an output.
 ]
 
 #proof[
-Homework.
+  Homework.
 ]
 
 #remark[
-The issues with irrational numbers do not stop at square roots. In fact, _any polynomial root_ might be required to represent a Nash equilibrium. This was shown by #citet(<bubelis1979equilibria>), who showed how to construct games with arbitrary polynomial roots.
+  The issues with irrational numbers do not stop at square roots. In fact, _any polynomial root_ might be required to represent a Nash equilibrium. This was shown by #citet(<bubelis1979equilibria>), who showed how to construct games with arbitrary polynomial roots.
 
   Beyond the representation, the topology of Nash equilibria is also in general arbitrarily complex in three-player games. In particular, #citet(<datta2003universality>) showed that for any real algebraic variety, one can come up with some three-player game whose set of Nash equilibria is isomorphic to that variety.
 ]
@@ -209,13 +238,17 @@ Here, $u_i$ was defined as the expected payoff when all the players randomize _i
 The concept of _coarse correlated equilibrium_ is a relaxation of this definition. In a coarse correlated equilibrium, instead of asking for the players to pick _independent_ strategies, we allow coordination. In particular, we define the following.
 
 #definition[Coarse correlated equilibrium #citep(<moulin1978strategically>)][
-A _coarse correlated equilibrium (CCE)_ is a correlated strategy $mu in Delta (A_1 times dots.h times A_n)$ such that
+  A _coarse correlated equilibrium (CCE)_ is a correlated strategy $mu in Delta (A_1 times dots.h times A_n)$ such that
 
-#math.equation(block: true, numbering: "(1)", $bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (a'_1 \, dots.h \, a_n)] lt.eq bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (a_1 \, dots.h \, a_n)] #h(2em) forall i in \[ n \] \, a'_i in A_i .$.body) <eq:cce>
+  #math.equation(
+    block: true,
+    numbering: "(1)",
+    $bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (a'_1 \, dots.h \, a_n)] lt.eq bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (a_1 \, dots.h \, a_n)] #h(2em) forall i in \[ n \] \, a'_i in A_i .$.body,
+  ) <eq:cce>
 ] <def-cce>
 
 #remark[
-The definition of a CCE is a relaxation of the definition of a Nash equilibrium. In a Nash equilibrium, the players randomize independently; in a CCE, they can randomize in a correlated way. _A Nash equilibrium is a CCE $mu$ that happens to be a product distribution_, that is, $mu = x_1 ⊗ dots.h.c ⊗ x_n .$
+  The definition of a CCE is a relaxation of the definition of a Nash equilibrium. In a Nash equilibrium, the players randomize independently; in a CCE, they can randomize in a correlated way. _A Nash equilibrium is a CCE $mu$ that happens to be a product distribution_, that is, $mu = x_1 ⊗ dots.h.c ⊗ x_n .$
 
   This shows that the set of CCEs is a superset of the set of Nash equilibria. Thus, a coarse correlated equilibria always exists in every game.
 ]
@@ -226,13 +259,15 @@ $ sum_(a_1 in A_1) dots.h.c sum_(a_n in A_n) mu_(a_1 \, dots.h \, a_n) = 1 . $
 
 Furthermore, expanding the expectation in inequality #ref(<eq:cce>, supplement: none) defines a set of linear constraints
 
-$ sum_(a_1 in A_1) dots.h.c sum_(a_n in A_n) mu_(a_1 \, dots.h \, a_n) u_i (a'_i \, a_(- i)) lt.eq sum_(a_1 in A_1) dots.h.c sum_(a_n in A_n) mu_(a_1 \, dots.h \, a_n) u_i (a_i \, a_(- i)) $
+$
+  sum_(a_1 in A_1) dots.h.c sum_(a_n in A_n) mu_(a_1 \, dots.h \, a_n) u_i (a'_i \, a_(- i)) lt.eq sum_(a_1 in A_1) dots.h.c sum_(a_n in A_n) mu_(a_1 \, dots.h \, a_n) u_i (a_i \, a_(- i))
+$
 
 for all $i in \[ n \]$ and $a'_i in A_i$.
 Hence, the set of CCEs is the intersection of a finite set of linear constraints, and so it is a convex polytope. Note that the number of constraints is polynomial in the game (_i.e._, in the size of the payoff table), and so we can use linear programming to compute and even optimize over the set of CCEs in time polynomial in $\| A_1 \| times dots.h times \| A_n \|$.
 
 #corollary[
-Since the coefficients of the linear constraints are the payoffs of the game, the set of CCEs is always a rational polytope.
+  Since the coefficients of the linear constraints are the payoffs of the game, the set of CCEs is always a rational polytope.
 ]
 
 It is worth knowing that a CCE can also be computed in polynomial time in imperfect-information sequential games, despite the number of "actions" there, which is the number of strategies in the tree, is exponential in the input. Unfortunately, we lose the ability to optimize over the set.
@@ -242,15 +277,17 @@ It is worth knowing that a CCE can also be computed in polynomial time in imperf
 The concept of _correlated equilibrium_ is an intermediate relaxation between Nash equilibrium and coarse correlated equilibrium.
 
 #definition[Correlated equilibrium #citep(<Aumann1974Mar>)][
-A _correlated equilibrium (CE)_ is a correlated strategy $mu in Delta (A_1 times dots.h times A_n)$ such that
+  A _correlated equilibrium (CE)_ is a correlated strategy $mu in Delta (A_1 times dots.h times A_n)$ such that
 
-$ bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (phi.alt_i (a_i) \, a_(- i))] lt.eq bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (a_i \, a_(- i))] #h(2em) forall i in \[ n \] \, phi.alt_i : A_i arrow.r A_i \, $
+  $
+    bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (phi.alt_i (a_i) \, a_(- i))] lt.eq bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (a_i \, a_(- i))] #h(2em) forall i in \[ n \] \, phi.alt_i : A_i arrow.r A_i \,
+  $
 
   where the function $phi.alt_i : A_i arrow.r A_i$ is arbitrary.
 ] <def-ce>
 
 #remark[
-A CCE is a special case of a CE, where the functions $phi.alt_i$ considered are only _constant_ functions. Furthermore, it is not hard to show from expanding the definition that any Nash equilibrium is a CE. Thus, the set of CEs is a superset of the set of Nash equilibria and a subset of the set of CCEs.
+  A CCE is a special case of a CE, where the functions $phi.alt_i$ considered are only _constant_ functions. Furthermore, it is not hard to show from expanding the definition that any Nash equilibrium is a CE. Thus, the set of CEs is a superset of the set of Nash equilibria and a subset of the set of CCEs.
 ]
 
 All remarks made about the computation of CCEs in normal-form games apply to CEs as well. In particular, the set of CEs is a convex polytope, and a CE can be computed in polynomial time using linear programming.

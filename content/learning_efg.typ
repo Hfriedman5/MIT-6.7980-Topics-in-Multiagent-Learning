@@ -1,11 +1,10 @@
 #import "meta/gabri_notes.typ": *
-#let lecture = (
+#show: gabri_notes.with(
   lec_num: 8,
   date: [Thu, Oct 8, 2026],
   title: "Learning in extensive-form games",
   instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)],
 )
-#show: gabri_notes.with(..lecture)
 
 Several approaches for constructing no-regret algorithms for extensive-form games have been proposed. For one, extensive-form games are a particular instance of combinatorial games for which the multiplicative weights update algorithm can be implemented efficiently in the reduced normal form of the game, despite the exponential size. #lecture-link("kernelized", none)[] develops this construction.
 

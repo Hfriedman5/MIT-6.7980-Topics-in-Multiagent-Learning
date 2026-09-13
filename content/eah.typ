@@ -1,6 +1,10 @@
 #import "meta/gabri_notes.typ": *
-#let lecture = (lec_num: "S1", date: [Fall 2026], title: "A second look at the minimax theorem", instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)])
-#show: gabri_notes.with(..lecture)
+#show: gabri_notes.with(
+  lec_num: "S1",
+  date: [Fall 2026],
+  title: "A second look at the minimax theorem",
+  instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)],
+)
 
 #lecture-link("correlated", <def-cce>)[] introduced the notion of coarse correlated equilibria. As we discussed, coarse correlated equilibria sidestep various difficulties (including topological and related to use of irrational numbers) that come with Nash equilibria. In this lecture, we show a powerful centralized algorithm for computing coarse correlated equilibria. (Soon in this course, we will also see that coarse correlated equilibria can also be #lecture-link("learning_intro", <sec-learning-correlated>)[_learned_ efficiently in a distributed multi-agent setting].)
 
@@ -20,39 +24,51 @@ While the original proof of #citet(<Hart89>) is for CE, I will present here a ve
 
 As a reminder, by definition a coarse correlated equilibrium is a distribution $mu in Delta (A_1 times dots.h times A_n)$ such that
 
-$ bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i))] lt.eq bb(E)_(a tilde.op mu) [u_i (a_i \, a_(- i))] #h(2em) forall i in \[ n \] \, a'_i in A_i \, $
+$
+  bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i))] lt.eq bb(E)_(a tilde.op mu) [u_i (a_i \, a_(- i))] #h(2em) forall i in \[ n \] \, a'_i in A_i \,
+$
 
 or equivalently,
 
-$ max_(i in \[ n \]\
-a'_i in A_i) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 . $
+$
+  max_(i in \[ n \]\
+  a'_i in A_i) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 .
+$
 
 A CCE then exists if and only if
 
-$ min_mu max_(i in \[ n \]\
-a'_i in A_i) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 . $
+$
+  min_mu max_(i in \[ n \]\
+  a'_i in A_i) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 .
+$
 
 How can we prove the above inequality without resorting to the existence of Nash equilibria? _The rescue comes from the minimax theorem._
 
 Before we can use the minimax theorem, we have to “convexify” the inner problem however, since the maximum is currently on a discrete set. To convexity the problem, we will simply allow the possibility for the internal maximumization problem to propose a _distribution_ $nu$ over deviations $(i \, a_i)$, and we will rewrite the problem as
 
-$ min_mu max_nu bb(E)_(a tilde.op mu) bb(E)_(\( i \, a'_i \) tilde.op nu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 . $
+$
+  min_mu max_nu bb(E)_(a tilde.op mu) bb(E)_(\( i \, a'_i \) tilde.op nu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 .
+$
 
 By the minimax theorem and swapping the order of the expectations, the above min-max value is equal to
 
-$ max_nu min_mu bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] . $
+$
+  max_nu min_mu bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] .
+$
 
 Can we show that this value is $lt.eq 0$? The answer is yes, and constructive: given any $nu$, we can find a $mu$ in closed form---in fact, a _product_ distribution---such that the value is $lt.eq 0$.
 
 #theorem[#citet(<Hart89>)][
-Given any distribution $nu$ over pairs $(i \, a'_i) : i in \[ n \] \, a'_i in A_i$, we can explicitly and efficiently construct a product distribution $mu in Delta \( A_1 \) ⊗ dots.h ⊗ Delta \( A_n \)$ such that
+  Given any distribution $nu$ over pairs $(i \, a'_i) : i in \[ n \] \, a'_i in A_i$, we can explicitly and efficiently construct a product distribution $mu in Delta \( A_1 \) ⊗ dots.h ⊗ Delta \( A_n \)$ such that
 
-$ bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 . $
+  $ bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 . $
 ]#label("thm:hart schmeidler")
 
 The above theorem immediately implies that
 
-$ max_nu min_mu bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 \, $
+$
+  max_nu min_mu bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 \,
+$
 
 and using the minimax theorem, we conclude the existence of coarse correlated equilibria.
 
@@ -74,37 +90,47 @@ The Ellipsoid-Against-Hope algorithm can then be seen as a way to convert the mi
 Combining the two steps above, we will have constructed a $mu^(*)$ that is an $epsilon.alt$-coarse correlated equilibrium, and that can be represented as a convex combination of product distributions. In other words, we have shown the following corollary.
 
 #corollary[
-Assume rational, bounded payoffs and an oracle that evaluates expected payoffs under product distributions in polynomial time. Then an $epsilon.alt$-coarse correlated equilibrium can be computed in time polynomial in the representation size, payoff encoding length, the sum of the numbers of actions, and $log \( 1 \/ epsilon.alt \)$. Such a coarse correlated equilibrium is represented as a convex combination of product distributions.
+  Assume rational, bounded payoffs and an oracle that evaluates expected payoffs under product distributions in polynomial time. Then an $epsilon.alt$-coarse correlated equilibrium can be computed in time polynomial in the representation size, payoff encoding length, the sum of the numbers of actions, and $log \( 1 \/ epsilon.alt \)$. Such a coarse correlated equilibrium is represented as a convex combination of product distributions.
 ]
 
 == Sketch of the Ellipsoid-Against-Hope algorithm
 
 In more detail, what #ref(label("thm:hart schmeidler")) implies is that the following open polytope must be empty:
 
-$ {nu in Delta {(i \, a'_i) : i in \[ n \] \, a_i in A_i} : bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] > 0\
-forall mu in Delta (A_1 times dots.h times A_n)} . $
+$
+  {nu in Delta {(i \, a'_i) : i in \[ n \] \, a_i in A_i} : bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] > 0\
+    forall mu in Delta (A_1 times dots.h times A_n)} .
+$
 
 Furthermore, for any $nu$, we know how to prove that at least one of the constraints is violated. The key idea is then to use the ellipsoid method to _certify_ the emptiness of the polytope. Normally, the ellipsoid method is used to find a point in a set, but in our case, the point does not exist and we want to use the ellipsoid method to isolate constraints that prove the emptiness of the set. For this reason, the algorithm was called Ellipsoid-Against-Hope by #citet(<papadimitriou2008computing>).
 
 The ellipsoid will maintain a search space which can be thought of as a suitable subset of the deviator's set. At every iteration $t$, the algorithm will compute the center point $nu_t$ of the set. Then, it will find a violated constraint using the distribution $mu_t colon.eq mu \( nu_t \)$ in the proof of #ref(label("thm:hart schmeidler")). The violated constraint implies that the deviator set must be curtailed, and the ellipsoid will be updated accordingly reducing the size of the search space by a constant. The algorithm will continue until the search space is small enough to guarantee that the set is empty. The iteration count also depends polynomially on the dimension and encoding/conditioning bounds. For an approximate guarantee, use constraints with a positive $epsilon.alt$ margin and the corresponding separation and volume bounds; shrinking an arbitrary open set does not by itself certify exact emptiness. The following algebra describes the exact finite certificate when one has been obtained. By the last iteration $T$, the algorithm will have produced several violated constraints, each of which is associated with a mediator strategy $mu_t$. The set
 
-$ {nu in Delta {(i \, a_i) : i in \[ n \] \, a_i in A_i} : bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu_1) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] > 0\
-dots.v\
-bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu_T) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] > 0} . $
+$
+  {nu in Delta {(i \, a_i) : i in \[ n \] \, a_i in A_i} : bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu_1) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] > 0\
+    dots.v\
+    bb(E)_(\( i \, a'_i \) tilde.op nu) bb(E)_(a tilde.op mu_T) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] > 0} .
+$
 
 The constraints of the set are all linear in $nu$, and the set is empty. By Farkas' lemma, there must exist a convex combination of the constraints the makes all the coefficients on the left-hand size non-positive. In other words, there must exist $alpha_1 \, dots.h \, alpha_T gt.eq 0$ with $sum_t alpha_t=1$ such that
 
-$ sum_(t = 1)^T alpha_t bb(E)_(a tilde.op mu_t) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 \, #h(2em) forall i in \[ n \] \, a'_i in A_i . $
+$
+  sum_(t = 1)^T alpha_t bb(E)_(a tilde.op mu_t) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 \, #h(2em) forall i in \[ n \] \, a'_i in A_i .
+$
 
 Letting $macron(mu) := sum_(t = 1)^T alpha_t mu_t$, we can then write
 
-$ bb(E)_(a tilde.op macron(mu)) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 \, #h(2em) forall i in \[ n \] \, a'_i in A_i \, $
+$
+  bb(E)_(a tilde.op macron(mu)) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 \, #h(2em) forall i in \[ n \] \, a'_i in A_i \,
+$
 
 and hence $macron(mu)$ is a coarse correlated equilibrium. The only question is whether this combination ${ alpha_t }$ can computed efficiently. This is indeed the case, as we can use linear programming directly to find such a combination, by solving the feasibility program
 
-$ upright("find") & alpha_1 \, dots.h \, alpha_T gt.eq 0\
-upright("s.t.") & sum_(t = 1)^T alpha_t bb(E)_(a tilde.op mu_t) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 #h(2em) forall i in \[ n \] \, a'_i in A_i\
- & alpha_1 + dots.h + alpha_T = 1 . $
+$
+  upright("find") & alpha_1 \, dots.h \, alpha_T gt.eq 0\
+  upright("s.t.") & sum_(t = 1)^T alpha_t bb(E)_(a tilde.op mu_t) [u_i (a'_i \, a_(- i)) - u_i (a_i \, a_(- i))] lt.eq 0 #h(2em) forall i in \[ n \] \, a'_i in A_i\
+  & alpha_1 + dots.h + alpha_T = 1 .
+$
 
 This completes the sketch of the proof of the correctness of the Ellipsoid-Against-Hope algorithm.
 
@@ -125,11 +151,13 @@ If you are curious to read more, the following papers contains extensions and re
 #lec_bibliography("meta/refs.bib", title: none)
 
 #appendix[
-= Appendix: Proof of Theorem~#ref(label("thm:hart schmeidler"), supplement: none)
+  = Appendix: Proof of Theorem~#ref(label("thm:hart schmeidler"), supplement: none)
 
-Let $s_i=sum_(a_i in A_i) nu_(i,a_i)$ be the total mass assigned to player $i$'s deviations. If $s_i>0$, set $mu_(i)(a_i)=nu_(i,a_i)/s_i$; if $s_i=0$, choose any distribution $mu_i$ on $A_i$. Let $mu=mu_1 times dots.h times mu_n$ be their product distribution.
+  Let $s_i=sum_(a_i in A_i) nu_(i,a_i)$ be the total mass assigned to player $i$'s deviations. If $s_i>0$, set $mu_(i)(a_i)=nu_(i,a_i)/s_i$; if $s_i=0$, choose any distribution $mu_i$ on $A_i$. Let $mu=mu_1 times dots.h times mu_n$ be their product distribution.
 
-For $s_i>0$, averaging the deviating action according to $nu_(i,dot)/s_i$ is exactly the same as drawing it from $mu_i$, independently of the opponents. Therefore
-$ sum_(a'_i) nu_(i,a'_i) EE_(a tilde.op mu)[u_(i)(a'_i,a_(-i))-u_(i)(a_i,a_(-i))] = s_(i)(EE_(a tilde.op mu)[u_(i)(a)]-EE_(a tilde.op mu)[u_(i)(a)])=0. $
-If $s_i=0$, the same expression is zero because all its coefficients vanish. Sum over players to obtain the theorem, with equality. This normalization also handles zero-mass players, for whom an unnormalized product of the $nu$ entries would not define a probability distribution.
+  For $s_i>0$, averaging the deviating action according to $nu_(i,dot)/s_i$ is exactly the same as drawing it from $mu_i$, independently of the opponents. Therefore
+  $
+    sum_(a'_i) nu_(i,a'_i) EE_(a tilde.op mu)[u_(i)(a'_i,a_(-i))-u_(i)(a_i,a_(-i))] = s_(i)(EE_(a tilde.op mu)[u_(i)(a)]-EE_(a tilde.op mu)[u_(i)(a)])=0.
+  $
+  If $s_i=0$, the same expression is zero because all its coefficients vanish. Sum over players to obtain the theorem, with equality. This normalization also handles zero-mass players, for whom an unnormalized product of the $nu$ entries would not define a probability distribution.
 ]
