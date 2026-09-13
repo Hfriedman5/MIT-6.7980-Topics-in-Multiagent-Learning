@@ -228,9 +228,11 @@ impl ChapterNav {
             return self.number.clone();
         }
         match self.syllabus_numbers.as_slice() {
-            [] => self.number.to_string(),
-            [number] => number.to_string(),
-            numbers => numbers.iter().map(u8::to_string).collect::<Vec<_>>().join("–"),
+            [] => self.number.parse::<u8>().map_or_else(
+                |_| self.number.clone(),
+                |number| format!("{number:02}"),
+            ),
+            numbers => numbers.iter().map(|number| format!("{number:02}")).collect::<Vec<_>>().join("–"),
         }
     }
 

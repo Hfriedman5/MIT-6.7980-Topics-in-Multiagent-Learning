@@ -1449,7 +1449,69 @@ fn equation_width_script() -> &'static str {
     var eqno = maxWidth(Array.from(eq.querySelectorAll(".eqno")));
     return Math.max(rowWidth, math + (eqno ? eqno + gap : 0), eq.scrollWidth || 0);
   }
+  function sizeTableColumns(){
+    // Browsers ignore mixed length/percentage calc() widths on native columns.
+    // Resolve Typst tracks against their container, retaining semantic tables.
+    // Reset to the authored CSS first so auto columns can shrink after a resize.
+    document.querySelectorAll("table[data-table-columns]").forEach(function(table){
+      var group = table.querySelector(":scope > colgroup");
+      var wrapper = table.closest(".lecture-table");
+      if (!group || !wrapper) return;
+      var cols = Array.from(group.children);
+      var available = wrapper.clientWidth;
+      var explicitWidth = function(col){
+        return Math.max(0, available * Number(col.dataset.tableRatio) + Number(col.dataset.tablePt) * 96 / 72);
+      };
+      table.style.minWidth = "";
+      var totalFraction = cols.reduce(function(sum, col){ return sum + Number(col.dataset.tableFraction || 0); }, 0);
+      if (table.style.tableLayout === "fixed" && totalFraction > 0) {
+        // Keep fractional columns readable on narrow screens. Measure their
+        // intrinsic minimums using native layout, then retain their proportions
+        // in the fixed layout and let the surrounding wrapper scroll.
+        var authoredWidth = table.style.width;
+        table.style.tableLayout = "auto";
+        table.style.width = "min-content";
+        var explicitTotal = 0;
+        cols.forEach(function(col){
+          if (col.dataset.tableTrack === "fraction") col.style.width = "auto";
+          else { var width = explicitWidth(col); explicitTotal += width; col.style.width = width + "px"; }
+        });
+        var minimumFractionSpace = 0;
+        cols.forEach(function(col){
+          var fraction = Number(col.dataset.tableFraction || 0);
+          if (fraction > 0) minimumFractionSpace = Math.max(minimumFractionSpace, col.getBoundingClientRect().width * totalFraction / fraction);
+        });
+        var borderWidth = table.getBoundingClientRect().width - group.getBoundingClientRect().width;
+        table.style.tableLayout = "fixed";
+        table.style.width = authoredWidth;
+        table.style.minWidth = Math.ceil(explicitTotal + minimumFractionSpace + borderWidth) + "px";
+      }
+      cols.forEach(function(col){ col.style.width = col.dataset.tableWidth; });
+      var gridWidth = group.getBoundingClientRect().width;
+      var fractions = 0;
+      var used = 0;
+      var widths = cols.map(function(col){
+        if (col.dataset.tableTrack === "fraction") {
+          fractions += Number(col.dataset.tableFraction);
+          return null;
+        }
+        var width = col.dataset.tableTrack === "auto"
+          ? col.getBoundingClientRect().width
+          : explicitWidth(col);
+        used += width;
+        return width;
+      });
+      var remaining = Math.max(0, gridWidth - used);
+      cols.forEach(function(col, index){
+        if (col.dataset.tableTrack === "auto") return;
+        var width = widths[index];
+        if (width === null) width = fractions > 0 ? remaining * Number(col.dataset.tableFraction) / fractions : 0;
+        col.style.width = width + "px";
+      });
+    });
+  }
   function markOverwideEquations(){
+    sizeTableColumns();
     document.querySelectorAll(".equation").forEach(function(eq){
       eq.classList.remove("is-overwide");
       var available = eq.clientWidth;
@@ -1470,7 +1532,7 @@ fn equation_width_script() -> &'static str {
     });
     document.querySelectorAll(".lecture-table").forEach(function(wrapper){
       var table = wrapper.querySelector("table");
-      wrapper.classList.toggle("has-overflow", !!table && table.scrollWidth > table.clientWidth + 2);
+      wrapper.classList.toggle("has-overflow", !!table && Math.max(table.scrollWidth, table.getBoundingClientRect().width) > wrapper.clientWidth + 2);
     });
   }
   window.markOverwideEquations = markOverwideEquations;

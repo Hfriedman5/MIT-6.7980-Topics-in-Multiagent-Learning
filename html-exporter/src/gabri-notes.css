@@ -522,7 +522,7 @@ figure[id],
 }
 
 .lecture-rail-link span {
-    flex: 0 0 2.1rem;
+    flex: 0 0 1.5rem;
     font-variant-numeric: tabular-nums
 }
 
@@ -979,9 +979,7 @@ code {
 
 /* Preserve large mathematical tables without widening the whole page. */
 .lecture-content table:not(.bibliography-table) {
-    display: block;
-    max-width: 100%;
-    overflow-x: auto;
+    display: table;
     border-collapse: collapse;
     text-align: left
 }
@@ -990,20 +988,6 @@ code {
     padding: .45rem .6rem;
     text-align: left;
     vertical-align: top
-}
-
-.lecture-content table:not(.bibliography-table) th {
-    border-bottom: 1px solid var(--rule)
-}
-
-.lecture-content .table-centered table :is(th, td) {
-    text-align: center;
-    vertical-align: middle
-}
-
-.lecture-content .table-centered table {
-    width: max-content;
-    margin-inline: auto
 }
 
 .lecture-table {

@@ -43,6 +43,24 @@ including after reloading or reopening the browser.
 Previous/next links follow the available notes in course order;
 supplementary readings have their own sequence.
 
+Tables retain Typst's resolved cell borders, horizontal and vertical alignment,
+solid fills (including transparency), and linear-gradient fills. Borders support
+thickness, solid colors, borderless cells, per-side overrides, and standard
+solid/dashed/dotted styles. Table defaults, column arrays, position-dependent
+functions, and cell overrides are resolved by Typst before conversion; native
+headers and merged cells are kept. The outer alignment positions the table
+independently of its cells.
+
+Column definitions become native HTML `colgroup` tracks: lengths and percentages
+retain their requested widths, `fr` tracks divide the space left by explicit and
+`auto` tracks, and `auto` tracks use browser content sizing. Fully specified
+tables use fixed layout. A browser sizing pass resolves mixed units (unsupported
+in native column CSS) after font loading and on resize; without JavaScript these
+mixed widths are approximate. The browser may adjust fractional proportions
+alongside content-sized `auto` columns. Wide tables scroll within the lecture
+column. Nonlinear gradients, tiled fills, and exact custom dash patterns are not
+currently reproduced.
+
 Useful options:
 
 - `--root <dir>`: set the Typst project root.

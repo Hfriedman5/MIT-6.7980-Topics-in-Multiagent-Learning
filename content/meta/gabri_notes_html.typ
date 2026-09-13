@@ -4,6 +4,7 @@
 #import "linalg.typ": *
 #import "lovelace_html.typ": *
 #import "equate_html.typ": equate, share-align
+#import "tables_html.typ": style-table-cell, render-html-table
 
 #import "citations.typ": *
 #import "notation.typ": *
@@ -305,7 +306,10 @@
   show align: it => html.elem("div", attrs: (
     class: "media-alignment",
     style: "text-align: " + if repr(it.alignment).contains("right") { "right" } else if repr(it.alignment).contains("center") { "center" } else { "left" } + ";",
-  ))[#it.body]
+  ))[#{
+    set align(it.alignment)
+    it.body
+  }]
   show image: it => context if target() == "paged" {
     it
   } else {
@@ -341,9 +345,9 @@
   let render-caption(caption) = if caption != none {
     html.elem("figcaption")[#caption]
   }
-  show table: it => html.elem("div", attrs: (
-    class: "lecture-table" + if repr(it.align).contains("center") { " table-centered" } else { "" },
-  ))[#it]
+  show table: render-html-table
+  show html.elem.where(tag: "td"): style-table-cell
+  show html.elem.where(tag: "th"): style-table-cell
   // Images and equations have their own SVG renderers. Keep their containing
   // figure in the DOM, including tables, captions, and algorithm links.
   let render-figure-body(body, kind: none) = body

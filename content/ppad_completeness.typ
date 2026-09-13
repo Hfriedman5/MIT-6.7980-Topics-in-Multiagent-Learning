@@ -2,6 +2,12 @@
 
 #let eps = math.epsilon.alt
 
+// HTML cell padding and math fonts need more room for labels such as x = 0.
+#let payoff-table-columns() = {
+  let width = if target() == "html" { 2cm } else { 1.3cm }
+  (width, width, width)
+}
+
 #let lecture = (
   lec_num: 20,
   date: [Tue, Nov 24, 2026],
@@ -97,8 +103,8 @@ Consider any game that contains the following interaction between four players $
     #block(width: 100%, breakable: false)[
     #paragraph-marker(shape: "triangle-right") _Payoffs of player $w$._~ The payoff of player $w$ is defined as follows.
     If $w$ plays $0$, her payoff does not depend on $z$'s strategy, but only on $x$ and $y$, according to the payoff table
-    #align(center)[#table(
-        columns: (1.3cm, 1.3cm, 1.3cm),
+    #align(center)[#context table(
+        columns: payoff-table-columns(),
         align: center,
         fill: none,
         stroke: .2mm,
@@ -110,8 +116,8 @@ Consider any game that contains the following interaction between four players $
 
     #block(width: 100%, breakable: false)[
     If $w$ plays $1$, her payoff does not depend on $x$ and $y$'s strategy and depends on $z$'s according to the table
-    #align(center)[#table(
-        columns: (1.3cm, 1.3cm, 1.3cm),
+    #align(center)[#context table(
+        columns: payoff-table-columns(),
         align: center,
         fill: none,
         stroke: .2mm,
@@ -122,8 +128,8 @@ Consider any game that contains the following interaction between four players $
 
     #block(width: 100%, breakable: false)[
     #paragraph-marker(shape: "triangle-right") _Payoffs of player $z$._~ The payoff of player $z$ is defined according to the table
-    #align(center)[#table(
-        columns: (1.3cm, 1.3cm, 1.3cm),
+    #align(center)[#context table(
+        columns: payoff-table-columns(),
         align: center,
         fill: none,
         stroke: .2mm,
