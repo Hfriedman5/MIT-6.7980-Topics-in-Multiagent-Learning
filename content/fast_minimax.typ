@@ -44,7 +44,6 @@ $ P_T={x in X : f(x,y_t)<=v-eta/2 quad forall t=1,...,T}. $
 Initially there are no response constraints, so $P_0=X$. Every point of $X$ fails at least one of the infinitely many possible constraints: its own defense response has payoff at least $v$. The ellipsoid method finds a small collection of constraints that is sufficient for our accuracy target.
 
 #pseudocode-list(
-  booktabs: true,
   max-width: true,
   numbered-title: [Fast minimax construction],
   caption: [Collecting defense responses. All separating cuts are represented in the affine hull of X.],

@@ -113,10 +113,10 @@
   line-number-supplement: "Line",
   stroke: 1pt + gray,
   indentation: 1em,
-  hooks: 0pt,
+  hooks: true,
   line-gap: .8em,
   booktabs-stroke: black + 1.2pt,
-  booktabs: false,
+  booktabs: true,
   title: none,
   numbered-title: none,
   max-width: false,
@@ -124,6 +124,9 @@
   ..children,
 ) = {
   children = children.pos().map(normalize-line)
+  let hook-length = if type(hooks) == bool {
+    if hooks { indentation / 2 } else { 0pt }
+  } else { hooks }
 
   let collect-precursors(level, line-number, y, children) = {
     let precursors = ()
@@ -245,7 +248,7 @@
             colspan: 1,
             rowspan: prec.rowspan,
             stroke: (left: stroke, bottom: stroke, rest: none),
-            h(hooks),
+            h(hook-length),
           )
         } else {
           ()

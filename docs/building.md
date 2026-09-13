@@ -332,12 +332,14 @@ their aspect ratio. Smaller images remain centered in the figure column.
 ## Algorithms
 
 The vendored Lovelace renderers create the numbered algorithm figure inside
-`pseudocode` and `pseudocode-list`. Attach a label to the call and pass an optional
-`caption` directly:
+`pseudocode` and `pseudocode-list`. Ruled headers, bottom rules, and hooked scope
+lines are enabled by default (`booktabs: true`, `hooks: true`), matching the HTML
+style. In the PDF renderer, `hooks: false` removes the horizontal ends; a length
+such as `hooks: .5em` sets their width explicitly. Attach a label to the call and
+pass an optional `caption` directly:
 
 ```typst
 #pseudocode-list(
-  booktabs: true,
   numbered-title: [Example algorithm],
   caption: [An optional explanation of the algorithm.],
 )[

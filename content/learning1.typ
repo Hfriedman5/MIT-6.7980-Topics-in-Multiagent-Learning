@@ -100,7 +100,7 @@ The algorithm is presented in pseudocode in @algo-rm.
 
 #wrapped-figure(
 [
-#pseudocode-list(booktabs: true, numbered-title: [Regret Matching])[
+#pseudocode-list(numbered-title: [Regret Matching])[
   + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
   + *function* `NextStrategy()`
     + *if* $[r^((t-1))]^+ != 0$
@@ -112,7 +112,7 @@ The algorithm is presented in pseudocode in @algo-rm.
 ] <algo-rm>
 ],
 [
-#pseudocode-list(booktabs: true, numbered-title: [Regret Matching#super[+]])[
+#pseudocode-list(numbered-title: [Regret Matching#super[+]])[
   + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
   + *function* `NextStrategy()`
     + *if* $[r^((t-1))]^+ != 0$
@@ -207,7 +207,7 @@ where $eta > 0$ is an inverse temperature parameter, then we obtain the _multipl
 This algorithm is presented in @algo-mwu.
 ],
 [
-#pseudocode-list(booktabs: true, numbered-title: [Multiplicative Weights Update])[
+#pseudocode-list(numbered-title: [Multiplicative Weights Update])[
   + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
   + *function* `NextStrategy()`
     + *return* $x^((t)) <-$ `softmax`$(eta r^((t-1)))$

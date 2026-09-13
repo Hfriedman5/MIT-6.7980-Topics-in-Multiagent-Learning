@@ -94,7 +94,6 @@ Fix one player and drop the player index. Against fixed opponents, write the uti
 We can run MWU on the simplex $Delta(V)$ by maintaining a weight for each deterministic strategy. The vector we play is the expectation of that distribution. We call this algorithm _vertex MWU_; replacing the observed gradient by an optimistic correction gives vertex OMWU.
 
 #pseudocode-list(
-  booktabs: true,
   max-width: true,
   numbered-title: [Vertex MWU/OMWU],
   caption: [Vertex MWU/OMWU. Both the expectation and the weight update appear to require enumerating all vertices.],
