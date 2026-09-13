@@ -13,8 +13,7 @@ import subprocess
 import sys
 import zipfile
 
-from build_dynamics import build_dynamics
-from build_diagrams import build_diagrams
+from build_figures import build_figures
 from course_index import load_course, render_index
 from lecture_links import validate_lecture_links
 from public_files import copy_public_files, note_outputs, required_files, validate_public_path
@@ -169,8 +168,7 @@ def main() -> None:
     (ROOT / '.build' / 'logs').mkdir(exist_ok=True)
     shutil.copy2(ROOT / 'html-exporter/src/gabri-notes.css', STAGE / 'assets/notes.css')
     shutil.copy2(ROOT / 'html-exporter/src/course.css', STAGE / 'assets/course.css')
-    build_dynamics(ROOT)
-    build_diagrams(ROOT)
+    build_figures(ROOT)
     for chapter in config['notes']:
         prepare_pdf_source(ROOT / chapter['source'], chapter)
         prepare_html_source(ROOT / chapter['source'], chapter)

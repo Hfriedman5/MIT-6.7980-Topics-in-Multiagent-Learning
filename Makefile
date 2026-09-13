@@ -1,6 +1,6 @@
 PYTHON ?= python3
 
-.PHONY: all html bundle syllabus check check-pdf serve
+.PHONY: all html bundle figures syllabus check check-pdf serve
 
 all: bundle
 
@@ -9,6 +9,9 @@ html:
 
 bundle:
 	$(PYTHON) scripts/build_site.py --zip
+
+figures:
+	$(PYTHON) scripts/build_figures.py
 
 syllabus:
 	typst compile --root . --font-path html-exporter/assets/fonts 'syllabus/6.7980 F26 Syllabus.typ' 'syllabus/6.7980 Fall 2026 Syllabus.pdf'

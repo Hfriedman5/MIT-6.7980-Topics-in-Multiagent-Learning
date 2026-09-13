@@ -105,11 +105,17 @@ IDs and supplies the old numbered statement IDs as aliases.
 
 ## Build pipeline
 
-`make html` builds the Rust converter, regenerates the editable dynamics and
-diagram figures, compiles native HTML and PDF bundles, postprocesses the HTML,
+`make html` builds the Rust converter, regenerates every standalone Typst figure,
+compiles native HTML and PDF bundles, postprocesses the HTML,
 generates the course index and syllabus PDF, and assembles `html/`. The bundle
 target requires Typst 0.15.1 and currently uses its experimental feature flag.
 `make bundle` also produces `dist/6.7980-notes.zip`.
+
+`make figures` rebuilds just the SVGs beside their sources. The figure builder
+discovers new standalone sources automatically, skips shared libraries and
+include-only component plots, and expands `gate.typ` into all six gate SVGs.
+It recompiles every figure to pick up changes in imported dependencies. See
+`content/figures/README.md` for source locations and individual rebuild commands.
 
 The generated website has a schedule, 18 lecture and supplementary pages,
 PDF downloads, links to chapter sources on GitHub, a syllabus, and local browser
@@ -297,17 +303,16 @@ outline uses the same section anchors as the permalink icons.
 All active figure dependencies live in `content/figures/<topic>/`, normally
 matching the lecture's Typst filename. Shared figures retain their owning topic:
 for example, `kernelized.typ` reuses `figures/efg_intro/nf_strategies.svg`.
-Folder names never depend on lecture numbers. There is one rendered asset per
-figure, next to its editable source when available; no separate assets copy is
-needed.
+Folder names never depend on lecture numbers. Each SVG has an editable Typst
+source beside it, with the six gate variants sharing `gate.typ`; no separate
+assets copy is needed.
 
 ```sh
-python3 scripts/build_dynamics.py       # OGD/MWU and optimism figures
-python3 scripts/build_diagrams.py       # self-play, bandits, and PPAD diagrams
+make figures                           # rebuild every figure SVG
 ```
 
-These commands run during the full site build. Editable dynamics and diagram
-sources live under `content/figures/`; the dynamics helpers are in
+The same figure builder runs during the full site build. Editable sources
+live under `content/figures/`; the dynamics helpers are in
 `content/meta/dyns.typ`. Generated SVGs are used by both HTML and lecture PDF
 rendering; standalone figure PDFs are neither needed nor generated.
 
