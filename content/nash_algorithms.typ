@@ -1,5 +1,5 @@
 #import "meta/gabri_notes.typ": *
-#let lecture = (lec_num: "S2", date: [Fall 2026], title: "Centralized algorithms for Nash equilibrium computation", instructor: [Prof. Constantinos Daskalakis])
+#let lecture = (lec_num: "S2", date: [Fall 2026], title: "Centralized algorithms for Nash equilibrium computation", instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)])
 #show: gabri_notes.with(..lecture)
 
 In previous lectures, we saw the basic game theory formalism, and some of the most fundamental equilibrium concepts, and their existence proofs. The #lecture-link("nfgs_nash", <sec-nash-existence>)[proof of Nash equilibrium existence] makes use of Brouwer's fixed point theorem, which does not immediately suggest an algorithm for computing Nash equilibria. On the other hand, we saw that the existence of Nash equilibrium in two-player zero-sum games can also be established using #lecture-link("correlated", <sec-zero-sum>)[strong linear programming duality], which suggests a polynomial-time algorithm for computing Nash equilibria in these games.

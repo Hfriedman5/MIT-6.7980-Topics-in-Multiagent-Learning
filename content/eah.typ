@@ -1,5 +1,5 @@
 #import "meta/gabri_notes.typ": *
-#let lecture = (lec_num: "S1", date: [Fall 2026], title: "A second look at the minimax theorem", instructor: [Prof. Gabriele Farina])
+#let lecture = (lec_num: "S1", date: [Fall 2026], title: "A second look at the minimax theorem", instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)])
 #show: gabri_notes.with(..lecture)
 
 #lecture-link("correlated", <def-cce>)[] introduced the notion of coarse correlated equilibria. As we discussed, coarse correlated equilibria sidestep various difficulties (including topological and related to use of irrational numbers) that come with Nash equilibria. In this lecture, we show a powerful centralized algorithm for computing coarse correlated equilibria. (Soon in this course, we will also see that coarse correlated equilibria can also be #lecture-link("learning_intro", <sec-learning-correlated>)[_learned_ efficiently in a distributed multi-agent setting].)

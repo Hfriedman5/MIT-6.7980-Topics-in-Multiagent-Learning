@@ -1,5 +1,5 @@
 #import "meta/gabri_notes.typ": *
-#let lecture = (lec_num: 3, date: [Tue, Sep 22, 2026], title: "Properties of Nash equilibrium", instructor: [Prof. Gabriele Farina])
+#let lecture = (lec_num: 3, date: [Tue, Sep 22, 2026], title: "Properties of Nash equilibrium", instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)])
 #show: gabri_notes.with(..lecture)
 
 In this lecture, we will continue analyzing the properties of Nash equilibria in normal-form games. We will then introduce the concept of correlated equilibrium, a relaxation of Nash equilibrium with desirable properties.

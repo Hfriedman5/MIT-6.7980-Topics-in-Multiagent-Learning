@@ -4,7 +4,7 @@
   lec_num: 16,
   date: [Tue, Nov 10, 2026],
   title: "High-dimensional games",
-  instructor: [Prof. Constantinos Daskalakis],
+  instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)],
 )
 #show: gabri_notes.with(..lecture)
 

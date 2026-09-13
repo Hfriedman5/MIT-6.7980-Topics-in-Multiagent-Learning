@@ -3,7 +3,7 @@
   lec_num: 2,
   date: [Thu, Sep 17, 2026],
   title: "Brouwer and Sperner",
-  instructor: [Prof. Constantinos Daskalakis],
+  instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)],
 )
 #show: gabri_notes.with(..lecture)
 

@@ -1,7 +1,7 @@
 #import "meta/gabri_notes.typ": *
 
 #let lecture = (
-  instructor: [Prof. Gabriele Farina (gfarina\@mit.edu)],
+  instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)],
   lec_num: "S3",
   date: [Fall 2026],
   title: "Learning algorithms (II)",

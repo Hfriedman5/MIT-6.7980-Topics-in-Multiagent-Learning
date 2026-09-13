@@ -1,7 +1,7 @@
 #import "meta/gabri_notes.typ": *
 
 #let lecture = (
-  instructor: [Prof. Constantinos Daskalakis (costis\@mit.edu)],
+  instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)],
   lec_num: 6,
   date: [Thu, Oct 1, 2026],
   title: "Learning with bandit feedback",

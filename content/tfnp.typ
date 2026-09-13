@@ -5,7 +5,7 @@
   lec_num: 18,
   date: [Tue, Nov 17, 2026],
   title: "Total search and TFNP",
-  instructor: [Prof. Constantinos Daskalakis],
+  instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)],
 )
 #show: gabri_notes.with(..lecture)
 

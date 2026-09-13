@@ -4,7 +4,7 @@
   lec_num: "S7",
   date: [Fall 2026],
   title: "Fast computation via the minimax theorem",
-  instructor: [Prof. Gabriele Farina],
+  instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)],
 )
 #show: gabri_notes.with(..lecture)
 

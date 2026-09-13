@@ -6,7 +6,7 @@
   lec_num: 20,
   date: [Tue, Nov 24, 2026],
   title: "PPAD-hardness of Nash equilibrium",
-  instructor: [Prof. Constantinos Daskalakis],
+  instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)],
   extrathanks: [Some of the content of the lecture was adapted from material from Costis Daskalakis.],
 )
 #show: gabri_notes.with(..lecture)
