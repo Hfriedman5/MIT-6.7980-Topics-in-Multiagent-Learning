@@ -1421,6 +1421,7 @@ figcaption .figcaption-label {
 .changelog-title,
 .notes-heading,
 .env.statement,
+.env.proof,
 .env.algorithm .env-title,
 .eqno,
 .equation-block,
@@ -1491,6 +1492,10 @@ figcaption .figcaption-label {
 
 .lecture-content .env.statement > a.permalink-gutter {
     top: .42rem
+}
+
+.lecture-content .env.proof > a.permalink-gutter {
+    top: .16rem
 }
 
 .lecture-content .env.algorithm .env-title > a.permalink-gutter {

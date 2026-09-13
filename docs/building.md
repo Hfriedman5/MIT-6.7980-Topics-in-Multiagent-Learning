@@ -260,7 +260,8 @@ refreshes the generated configuration without rewriting the website or PDFs.
 ## Permalinks
 
 Lecture HTML exposes anchor icons on sections (including unnumbered
-headings), figures, tables, algorithms, theorem-style statements, footnotes, and
+headings), figures, tables, algorithms, theorem-style statements, proofs, proof
+sketches, solutions, footnotes, and
 numbered equations. Icons appear on hover or keyboard focus. Section and environment
 icons sit in the left margin. Figures, tables, and algorithms with captions place
 their icons immediately to the left of the caption label. Captionless algorithms
@@ -280,7 +281,10 @@ label becomes a hyphen to keep the HTML ID valid. Labels are
 exported even when nothing references them. Keep a label unchanged when moving
 or renumbering an item to keep its permalink stable. Without a label, the
 exporter uses the heading title or the item's kind and number, adding a suffix
-for duplicates. Native Typst targets and existing numbered statement anchors
+for duplicates. Unlabeled proofs use `proof-1`, `proof-2`, and so on; proof
+sketches and solutions have their own sequences. Label a proof explicitly, for
+example `#proof[... ] <proof:main-result>`, to keep its URL stable when reordering
+proofs. Native Typst targets and existing numbered statement anchors
 remain available, so existing references continue to resolve. The lecture
 outline uses the same section anchors as the permalink icons.
 

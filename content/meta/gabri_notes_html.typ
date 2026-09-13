@@ -348,6 +348,14 @@
   // figure in the DOM, including tables, captions, and algorithm links.
   let render-figure-body(body, kind: none) = body
 
+  // Proofs are native HTML sections rather than numbered figures. Preserve
+  // their authored labels even when nothing references them in the document.
+  show html.elem.where(tag: "section"): it => {
+    if it.attrs.at("class", default: "").split().contains("proof") and it.has("label") and not "data-label" in it.attrs {
+      html.elem(it.tag, attrs: (..it.attrs, "data-label": str(it.label)), it.body)
+    } else { it }
+  }
+
   // for styling, use `where` to assign classes for different types of figure
   show figure: it => {
     // Preserve authored labels even when Typst has no reference that would
@@ -710,7 +718,7 @@
   )
 
   (..args, body) => {
-    html.elem("section", attrs: (class: "env proof"))[
+    html.elem("section", attrs: (class: "env proof", "data-proof-kind": Name))[
       #html.elem("p", attrs: (class: "env-heading"))[
         #html.elem("span", attrs: (class: "env-title"))[
           #if args.pos().len() > 0 [

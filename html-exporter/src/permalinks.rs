@@ -8,7 +8,7 @@ use crate::{element_text, escape_attr, heading_text_from_html, heading_title_htm
 pub fn add_permalinks(body: &str) -> (String, HashMap<String, String>) {
     let mut dom = Html::parse_fragment(body);
     let targets = Selector::parse(
-        ".notes-heading, section.env.statement, section.changelog, figure.rendered-figure, .equation-line:has(> .eqno)",
+        ".notes-heading, section.env.statement, section.env.proof, section.changelog, figure.rendered-figure, .equation-line:has(> .eqno)",
     )
     .unwrap();
     let all_ids = Selector::parse("[id]").unwrap();
@@ -29,9 +29,17 @@ pub fn add_permalinks(body: &str) -> (String, HashMap<String, String>) {
     let mut heading_ids = HashMap::new();
     let mut changes = Vec::new();
     let mut counts: HashMap<String, usize> = HashMap::new();
+    let permalink_selector = Selector::parse(".permalink").unwrap();
 
     for target in dom.select(&targets) {
-        if child(&target, ".permalink").is_some() {
+        // A link owned by a nested statement or proof does not decorate its
+        // enclosing proof. Only skip targets that already have their own link.
+        if target.select(&permalink_selector).any(|link| {
+            link.ancestors()
+                .filter_map(ElementRef::wrap)
+                .find(|ancestor| targets.matches(ancestor))
+                .is_some_and(|owner| owner.id() == target.id())
+        }) {
             continue;
         }
         if target
@@ -65,6 +73,16 @@ pub fn add_permalinks(body: &str) -> (String, HashMap<String, String>) {
                 "changelog".to_owned(),
                 child(&target, ".changelog-title").unwrap_or(target),
             )
+        } else if target
+            .value()
+            .has_class("proof", scraper::CaseSensitivity::CaseSensitive)
+        {
+            let name = target.value().attr("data-proof-kind").unwrap_or("Proof");
+            let kind = slugify(name);
+            let count = counts.entry(kind.clone()).or_default();
+            *count += 1;
+            let description = format!("{name} {count}");
+            (kind, description.clone(), slugify(&description), target)
         } else if target.value().name() == "section" {
             let kind = child(&target, ".env-kind")
                 .map(|el| element_text(&el))
@@ -425,6 +443,80 @@ mod tests {
             dom.select(&Selector::parse("a.permalink").unwrap()).count(),
             1
         );
+    }
+
+    #[test]
+    fn proofs_sketches_and_solutions_have_unique_labeled_or_numbered_links() {
+        let body = r##"<section class="env proof" id="loc-proof" data-proof-kind="Proof" data-label="proof:α"><p class="env-heading">Proof.</p><p>First proof.</p></section>
+<section class="env proof" data-proof-kind="Proof"><p>Second proof.</p></section>
+<section class="env proof" data-proof-kind="Proof Sketch"><p>A sketch.</p></section>
+<section class="env proof" data-proof-kind="Solution" data-label="proof-2"><p>A solution.</p></section>
+<section class="env proof" data-proof-kind="Solution"><p>Another solution.</p></section>
+<a href="#loc-proof">Original reference</a>"##;
+        let (html, headings) = add_permalinks(body);
+        let dom = Html::parse_fragment(&html);
+        let links: Vec<_> = dom
+            .select(&Selector::parse(".proof > .permalink-gutter").unwrap())
+            .collect();
+        assert_eq!(
+            links
+                .iter()
+                .map(|link| link.value().attr("href").unwrap())
+                .collect::<Vec<_>>(),
+            [
+                "#proof:%CE%B1",
+                "#proof-2-2",
+                "#proof-sketch-1",
+                "#proof-2",
+                "#solution-2"
+            ]
+        );
+        assert_eq!(
+            links[2].value().attr("aria-label"),
+            Some("Permalink to Proof Sketch 1")
+        );
+        assert!(html.contains(r##"href="#loc-proof">Original reference</a>"##));
+        assert!(html.contains("First proof."));
+        assert!(headings.is_empty());
+        for id in [
+            "loc-proof",
+            "proof:α",
+            "proof-2-2",
+            "proof-sketch-1",
+            "proof-2",
+            "solution-2",
+        ] {
+            assert_eq!(
+                dom.select(&Selector::parse("[id]").unwrap())
+                    .filter(|element| element.value().id() == Some(id))
+                    .count(),
+                1
+            );
+        }
+        assert_eq!(add_permalinks(&html).0, html);
+    }
+
+    #[test]
+    fn nested_proofs_get_their_own_links_even_with_decorated_statements() {
+        let (statement, _) = add_permalinks(
+            r#"<section class="env statement"><p class="env-heading"><span class="env-kind">Claim</span><span class="env-number">L5.1</span></p><p>A claim.</p></section>"#,
+        );
+        let body = format!(
+            r#"<section class="env proof" data-proof-kind="Proof"><p class="env-heading">Proof.</p>{statement}<section class="env proof" data-proof-kind="Proof"><p class="env-heading">Proof of the claim.</p><p>Nested argument.</p></section></section>"#
+        );
+        let (html, _) = add_permalinks(&body);
+        let dom = Html::parse_fragment(&html);
+        let links: Vec<_> = dom
+            .select(&Selector::parse(".proof > .permalink-gutter").unwrap())
+            .map(|link| link.value().attr("href").unwrap())
+            .collect();
+        assert_eq!(links, ["#proof-2", "#proof-1"]);
+        assert_eq!(
+            dom.select(&Selector::parse(".statement > .permalink-gutter").unwrap())
+                .count(),
+            1
+        );
+        assert_eq!(add_permalinks(&html).0, html);
     }
 
     #[test]

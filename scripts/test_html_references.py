@@ -150,6 +150,9 @@ The proof.
 = Section <sec:overview>
 #heading(numbering: none)[Further reading] <sec:reading>
 #theorem[A statement.] <thm:result>
+#proof[A proof.] <proof:result>
+#proofsketch[A sketch.] <proof:sketch>
+#solution[A solution.] <solution:exercise>
 #figure(table(columns: 2, [A], [B]), caption: [Notation.]) <tab:notation>
 #pseudocode(numbered-title: [CFR], [Continue.]) <algo:cfr>
 $ a &= b #label("eq:first") \\
@@ -157,6 +160,7 @@ $ a &= b #label("eq:first") \\
 $ x = y $ <eq:whole>
 ''')
         for label in ('sec:overview', 'sec:reading', 'thm:result',
+                      'proof:result', 'proof:sketch', 'solution:exercise',
                       'tab:notation', 'algo:cfr', 'eq:first', 'eq:second', 'eq:whole'):
             self.assertIn(label, page.labeled_elements)
         for label, kind in (('tab:notation', 'table'), ('algo:cfr', 'algorithm')):
@@ -164,6 +168,23 @@ $ x = y $ <eq:whole>
             self.assertEqual(tag, 'figure')
             self.assertEqual(attrs['data-figure-kind'], kind)
             self.assertEqual(attrs['data-figure-number'], '1')
+
+    def test_labeled_proofs_keep_native_links_and_nested_targets(self):
+        page = self.compile('''
+#show: gabri_notes.with(lec_num: 5, title: [Proof links])
+#proof[
+  An outer proof.
+  #claim[A claim.] <claim:inner>
+  #proof[A nested proof.] <proof:inner>
+] <proof:outer>
+#link(<proof:outer>)[Outer proof]
+#link(<proof:inner>)[Inner proof]
+''')
+        self.assert_local_targets_exist(page)
+        for label in ('proof:outer', 'proof:inner'):
+            tag, attrs = page.labeled_elements[label]
+            self.assertEqual(tag, 'section')
+            self.assertEqual(attrs['data-proof-kind'], 'Proof')
 
 
 if __name__ == '__main__':
