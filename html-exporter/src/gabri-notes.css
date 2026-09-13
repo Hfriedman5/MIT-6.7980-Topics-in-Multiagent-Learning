@@ -806,6 +806,26 @@ code {
     padding: .16rem 0 .16rem .85rem
 }
 
+.proof-qed {
+    float: right;
+    margin-left: 1em;
+    font-style: normal
+}
+
+/* Keep the float's line metrics identical to the surrounding text while
+   enlarging the glyph on their shared baseline. */
+.proof-qed-symbol {
+    font-size: 1.4em;
+    line-height: 0
+}
+
+/* Keep the final square inside the proof when it wraps onto its own line. */
+.env.proof::after {
+    content: "";
+    display: block;
+    clear: both
+}
+
 .env-heading {
     margin: .15rem 0 .35rem
 }

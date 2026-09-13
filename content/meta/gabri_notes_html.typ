@@ -729,7 +729,9 @@
         ]
       ]
       #html.elem("div", attrs: (class: "env-body"))[
-        #body
+        #body #html.elem("span", attrs: (
+          class: "proof-qed", role: "img", "aria-label": "End of " + lower(Name),
+        ))[#html.elem("span", attrs: (class: "proof-qed-symbol"))[□]]
       ]
     ]
   }
