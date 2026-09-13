@@ -279,7 +279,7 @@ The project is the central component of the course and accounts for #course.grad
   lecture(
     "kernelized",
     [High-dimensional games],
-    description: [Combinatorial games, vertex MWU, and the 0/1-polyhedral kernel. Efficient kernels and sequence-form learning.],
+    description: [Learning with large strategy spaces. Kernelized methods and multiplicative weights.],
     instructor: [Constantinos Daskalakis],
   ),
   lecture(
