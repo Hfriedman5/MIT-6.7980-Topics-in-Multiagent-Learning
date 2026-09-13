@@ -11,14 +11,9 @@ Several approaches for constructing no-regret algorithms for extensive-form game
 
 The #lecture-link("efg_intro", <sec-sequence-form>)[_sequence-form representation_] is the natural representation of strategies for learning in extensive-form games. Indeed, in that representation utility functions are linear and the strategy set of each player a convex polytope, aligning with the requirements of the regret minimization framework.
 
-#wrapped-figure(
-  [
-    Thanks to the sequence form representation of strategies, all the results about external regret minimization we have seen so far apply to extensive-form games as well, including for example the fact that a Nash equilibrium in a two-player zero-sum game can be found by letting two regret minimizers play against each other by exchanging sequence-form strategies at every iteration according to the #lecture-link("learning_intro", <sec-learning-zero-sum>)[canonical self-play setup].
-  ],
-  [#image("figures/learning_intro/self_play.svg", width: 330pt)],
-  side: right,
-  text-width: 45%,
-)
+Thanks to the sequence form representation of strategies, all the results about external regret minimization we have seen so far apply to extensive-form games as well, including for example the fact that a Nash equilibrium in a two-player zero-sum game can be found by letting two regret minimizers play against each other by exchanging sequence-form strategies at every iteration according to the #lecture-link("learning_intro", <sec-learning-zero-sum>)[canonical self-play setup].
+
+#align(center, image("figures/learning_intro/self_play.svg", width: 9cm))
 
 Another example is the computation of coarse correlated equilibria in any multiplayer extensive-form game via external regret minimization, or computation of best responses against static opponents.
 
@@ -29,16 +24,12 @@ To construct an external regret minimizer that outputs sequence-form strategies,
 The idea of the CFR algorithm is simple: construct a regret minimizer for the whole tree-form problem starting from _local_ regret minimizers at each decision point, each learning what actions to play at that decision point.
 
 #example[
-  #wrapped-figure(
-    [
-      As an example, consider the TFDP faced by Player~1 in the game of Kuhn poker~#citep(<Kuhn50:Simplified>), introduced in the #lecture-link("efg_intro", <sec-tfdp>)[tree-form decision process example]. The black nodes are the _decision points_ of the player, and the white nodes are the _observation points_.
+  As an example, consider the TFDP faced by Player~1 in the game of Kuhn poker~#citep(<Kuhn50:Simplified>), introduced in the #lecture-link("efg_intro", <sec-tfdp>)[tree-form decision process example]. The black nodes are the _decision points_ of the player, and the white nodes are the _observation points_.
 
-      Since the player has six decision points---denoted $j_1 \, dots.h \, j_6$ in the figure---the CFR algorithm will use six local regret minimizers, which we denote $R_1 \, dots.h \, R_6$. Each regret minimizer $R_j$ will be responsible for outputting a local strategy $b_j in Delta (A_j)$ for the decision point $j$.
-    ],
-    [#image("figures/learning_efg/kuhn_tfdp-transparent.png", width: 340pt)],
-    side: right,
-    text-width: 50%,
-  )
+  #align(center, image("figures/learning_efg/kuhn_tfdp-transparent.png", width: 9cm))
+
+  Since the player has six decision points---denoted $j_1 \, dots.h \, j_6$ in the figure---the CFR algorithm will use six local regret minimizers, which we denote $R_1 \, dots.h \, R_6$. Each regret minimizer $R_j$ will be responsible for outputting a local strategy $b_j in Delta (A_j)$ for the decision point $j$.
+
 ] <ex:cfr-kuhn>
 
 The local distributions output by the different local regret minimizers is then combined to form a _sequence-form strategy_ that plays according to the local distributions at each decision point.
@@ -105,7 +96,8 @@ In order to formally introduce counterfactual utility, we recall a bit of notati
     [Transition function:
 
       - given $j in cal(J)$ and $a in A_j$, $rho \( j \, a \)$ returns the next decision or observation point $v$ in $cal(J) union cal(K)$ in the decision tree that is reached after selecting legal action $a in j$, or $tack.t$ if the decision process ends;
-      - given $k in cal(K)$ and $s in S_k$ , $rho \( k \, s \)$ returns the next decision or observation point $v in cal(J) union K$ in the decision tree that is reached after observing signal $s$ at $k$, or $tack.t$ if the decision process ends],
+      - given $k in cal(K)$ and $s in S_k$ , $rho \( k \, s \)$ returns the next decision or observation point $v in cal(J) union K$ in the decision tree that is reached after observing signal $s$ at $k$, or $tack.t$ if the decision process ends
+    ],
 
     [$Sigma$], [Set of sequences, defined as $Sigma := { \( j \, a \) : j in cal(J) \, a in A_j }$],
     [$p_j$],
