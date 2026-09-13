@@ -91,8 +91,14 @@ End-of-Line is complete by definition and transitivity of reductions. PPAD is a 
 
 Other classes organize total search by different existence principles. PPA uses parity of odd-degree vertices in undirected graphs; PPP uses a pigeonhole principle; PLS uses the existence of a local optimum in a finite search space with efficiently computable improving moves. These names identify formal reduction classes. A proof that merely mentions parity or a potential function still needs an efficient encoding and a reduction before it establishes membership.
 
-#figure(caption: [Schematic complexity-class inclusions, with the total-search region labeled explicitly. Nesting denotes inclusions; the displayed strict separations and placement of FNP-complete problems outside TFNP are conjectural, not proved by this diagram. FP here denotes polynomial-time solvable total search problems.])[
-  #image("figures/tfnp/complexity_classes.svg", width: 58%, alt: "A schematic with polynomial-time total search inside PPAD, inside TFNP, inside FNP; FNP-complete problems are shown separately as a conjectural placement.")
+#figure(
+  caption: [Schematic complexity-class inclusions, with the total-search region labeled explicitly. Nesting denotes inclusions; the displayed strict separations and placement of FNP-complete problems outside TFNP are conjectural, not proved by this diagram. FP here denotes polynomial-time solvable total search problems.],
+)[
+  #image(
+    "figures/tfnp/complexity_classes.svg",
+    width: 5cm,
+    alt: "A schematic with polynomial-time total search inside PPAD, inside TFNP, inside FNP; FNP-complete problems are shown separately as a conjectural placement.",
+  )
 ]
 
 = Encoding a PPAD reduction <sec-ppad-encoding>
