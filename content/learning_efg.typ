@@ -121,10 +121,10 @@ Pseudocode for CFR is given in @algo:cfr. Note that the implementation is parame
 
 #pseudocode-list(numbered-title: [CFR regret minimizer])[
   - *Data:* $R_j$, regret minimizer for $Delta(A_j)$; one for each decision point $j in cal(J)$ of the TFDP.
-  + *function NextStrategy()*
+  + *function* `NextStrategy()`
     - _Step 1: ask each of the $R_j$ for their next strategy local at each decision point._
     + *for each* decision point $j in cal(J)$:
-      + $b_j^((t)) in Delta(A_j) arrow.l R_j."NextStrategy"()$
+      + $b_j^((t)) in Delta(A_j) arrow.l R_j$.`NextStrategy()`
     - _Step 2: we construct the sequence-form representation of the strategy that plays according to the distribution $b_j^((t))$ at each decision point $j in cal(J)$._
     + $x^((t)) = 0 in RR^Sigma$
     + *for each* decision point $j in cal(J)$ in _top-down traversal_ order in the TFDP:
@@ -135,7 +135,7 @@ Pseudocode for CFR is given in @algo:cfr. Note that the implementation is parame
           + $x^((t))[j a] arrow.l x^((t))[p_j] dot b_j^((t))[a]$
     - _You should convince yourself that the vector $x^((t))$ we just filled in above is a valid sequence-form strategy, that is, it satisfies the #lecture-link("efg_intro", <sec-sequence-form>)[sequence-form consistency constraints]. In symbols, $x^((t)) in cal(Q)$._
     + *return* $x^((t))$
-  + *function ObserveUtility($g^((t)) in RR^(abs(Sigma))$)*
+  + *function* `ObserveUtility`($g^((t)) in RR^(abs(Sigma))$)
     - _Step 1: we compute the expected utility for each subtree rooted at each node $v in cal(J) union cal(K)$._
     + $V^((t)) arrow.l$ empty dictionary. _Eventually, it will map keys $cal(J) union cal(K) union {bot}$ to real numbers._
     + $V^((t))[bot] arrow.l 0$
@@ -151,7 +151,7 @@ Pseudocode for CFR is given in @algo:cfr. Note that the implementation is parame
       + $g_j^((t)) arrow.l 0 in RR^(A_j)$
       + *for each* action $a in A_j$:
         + $g_j^((t))[a] arrow.l g^((t))[j a] + V^((t))[rho(j, a)]$
-      + $R_j."ObserveUtility"(g_j^((t)))$
+      + $R_j$.`ObserveUtility`$(g_j^((t)))$
 ] <algo:cfr>
 
 == Learning using self-play

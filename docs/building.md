@@ -342,7 +342,8 @@ The vendored Lovelace renderers create the numbered algorithm figure inside
   caption: [An optional explanation of the algorithm.],
 )[
   + Initialize the state.
-  + Update the state.
+  + *function* `NextStrategy()`
+    + *return* $x$
 ] <algo-example>
 
 See @algo-example.
@@ -352,6 +353,10 @@ Both entry points create exactly one `figure(kind: "algorithm")`, including when
 the caption is omitted. Do not add an outer figure. `numbered-title` supplies the
 title within the algorithm; `caption` supplies its figure caption. Numbering,
 references, and the existing HTML figure and side-caption layout are preserved.
+
+Write function names in backticks in both declarations and calls, as in the
+example above. Keep mathematical arguments in math, for example
+`` `ObserveUtility`($g^((t))$) ``.
 
 ## Typography and verification
 

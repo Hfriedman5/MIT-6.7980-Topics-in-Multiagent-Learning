@@ -210,7 +210,7 @@ This algorithm is presented in @algo-mwu.
 #pseudocode-list(booktabs: true, numbered-title: [Multiplicative Weights Update])[
   + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
   + *function* `NextStrategy()`
-    + *return* $x^((t)) <- "softmax"(eta r^((t-1)))$
+    + *return* $x^((t)) <-$ `softmax`$(eta r^((t-1)))$
   + *function* `ObserveUtility`($g^((t))$)
     + $r^((t)) <- r^((t-1)) + g^((t)) - ip(g^((t)), x^((t))) bold(1)$
 ] <algo-mwu>
