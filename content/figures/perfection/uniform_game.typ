@@ -25,10 +25,10 @@
   }
   for (pos, label, fill) in ((A, [A], black), (B, [B], white), (C, [C], black), (D, [D], black)) {
     circle(pos, radius: .085, fill: fill)
-    content((pos.at(0), pos.at(1)+.3), text(fill: blue, label))
+    content((pos.at(0), pos.at(1) + .3), text(fill: blue, label))
   }
   for (i, pos) in leaves.enumerate() {
-    rect((pos.at(0)-.05, pos.at(1)-.05), (pos.at(0)+.05, pos.at(1)+.05), fill: white)
-    content((pos.at(0), pos.at(1)-.35), ($(2,-2)$, $(1,-1)$, $(-2,2)$, $(0,0)$, $(0,0)$).at(i))
+    rect((pos.at(0) - .05, pos.at(1) - .05), (pos.at(0) + .05, pos.at(1) + .05), fill: white)
+    content((pos.at(0), pos.at(1) - .35), ($(2,-2)$, $(1,-1)$, $(-2,2)$, $(0,0)$, $(0,0)$).at(i))
   }
 })

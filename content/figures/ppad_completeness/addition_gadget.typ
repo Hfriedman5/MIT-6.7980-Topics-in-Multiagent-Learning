@@ -17,5 +17,12 @@
   edge("d", "stealth-stealth"),
   node((0, 2))[$z$],
   edge("d", "--stealth", stroke: blue),
-  node(enclose: ((-1, 0), (1, 0), (0, 2)), snap: false, stroke: blue, corner-radius: 2mm, inset: 5mm, fill: blue.transparentize(90%)),
+  node(
+    enclose: ((-1, 0), (1, 0), (0, 2)),
+    snap: false,
+    stroke: blue,
+    corner-radius: 2mm,
+    inset: 5mm,
+    fill: blue.transparentize(90%),
+  ),
 )

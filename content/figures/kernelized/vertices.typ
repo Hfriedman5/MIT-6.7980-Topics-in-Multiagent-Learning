@@ -138,15 +138,15 @@
 
       if lbl != none {
         content(mp)[#text(
-            if not hl {
-              luma(20%)
-            } else {
-              blue.darken(30%)
-            },
-            font: "New Computer Modern",
-            size: 9pt,
-            box(fill: bg, inset: (y: .3mm, x: .15mm))[#lbl],
-          )]
+          if not hl {
+            luma(20%)
+          } else {
+            blue.darken(30%)
+          },
+          font: "New Computer Modern",
+          size: 9pt,
+          box(fill: bg, inset: (y: .3mm, x: .15mm))[#lbl],
+        )]
       }
     }
     arr((0, 0), (-1.44, -.96), lbl: 1, hl: s.at(0) == "1")
