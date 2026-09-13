@@ -157,6 +157,39 @@ See #lecture-link("learning_intro", <sec-learning-zero-sum>)[the _self-play_ pro
                          'the self-play proof (Lecture\u00a04, “Learning in games: Foundations”)')
         self.assertIn('em', page.references[0]['tags'])
 
+    def test_direct_headers_support_reordered_arguments_and_literal_title_forms(self):
+        helper = ROOT / 'content/meta/lecture-links.typ'
+        cases = (
+            ('#show: gabri_notes.with(lec_num: 6, title: "Bandits")', 6, '"Bandits"'),
+            ('#show: gabri_notes.with(\n  title: [Supplement (part 2)],\n'
+             '  instructor: [An instructor],\n  lec_num: "S8",\n)',
+             'S8', '[Supplement (part 2)]'),
+            ('#show: gabri_notes.with(\n  lec_num: 19,\n'
+             '  title: "Games (and \\"learning\\")",\n)',
+             19, '"Games (and \\"learning\\")"'),
+        )
+        for source, number, title in cases:
+            with self.subTest(source=source):
+                self.compile(f'''
+#import {json.dumps(str(helper))}: lecture-header
+#let header = lecture-header({json.dumps(source)})
+#assert.eq(header.lec_num, {json.dumps(number)})
+#assert.eq(header.title, {title})
+''')
+
+    def test_standalone_header_reader_reports_missing_or_dynamic_metadata(self):
+        helper = ROOT / 'content/meta/lecture-links.typ'
+        for source, error in (
+            ('#let lecture = (lec_num: 6, title: "Bandits")', 'Expected a direct'),
+            ('#show: gabri_notes.with(title: "Bandits")', 'Expected literal lec_num and title'),
+            ('#show: gabri_notes.with(lec_num: 6, title: topic)', 'Expected literal lec_num and title'),
+        ):
+            with self.subTest(source=source):
+                self.compile(f'''
+#import {json.dumps(str(helper))}: lecture-header
+#let header = lecture-header({json.dumps(source)})
+''', expect_error=error)
+
     @unittest.skipUnless(shutil.which('pdfinfo'), 'Poppler is required for PDF links')
     def test_native_pdf_links_have_relative_urls_and_matching_named_destinations(self):
         output = self.compile(self.fixture('S8', html=False, inserted=True), html=False, bundle=True)

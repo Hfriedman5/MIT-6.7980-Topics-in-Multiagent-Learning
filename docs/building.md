@@ -76,13 +76,17 @@ in the compilation. HTML links point to the other HTML files; PDF links point
 to the other PDFs with named destinations. Keep the PDF directory together to
 follow these links offline. Each format is compiled in its own bundle.
 
-Each note exports its existing header as a `lecture` dictionary and applies it
-with `#show: gabri_notes.with(..lecture)`. In a standalone preview, the helper
-imports the destination's header and displays its lecture number and title,
+Each note passes its header arguments directly to `#show: gabri_notes.with(...)`.
+Keep `lec_num` literal and `title` a quoted string or plain bracketed content.
+In a standalone preview, the helper reads those arguments from the destination's
+source and displays its lecture number and title,
 linking to the corresponding public HTML section. Exact environment and section
 numbers require the bundle, where Typst can introspect every destination. This
 fallback needs no generated files. A standalone PDF's website base can be
 overridden with `--input course-url=https://example.org/course/`.
+
+The bundle takes document titles from the resolved course configuration, whose
+titles are validated against the authored headers before compilation.
 
 `scripts/lecture_links.py` checks literal link calls against published sources
 and unique labels before the build. Typst validates the actual reference targets
