@@ -5,7 +5,13 @@ same basename beside the SVG. The six `ppad_completeness/gate_*.svg` files share
 `ppad_completeness/gate.typ` and select their gate with a compiler input.
 
 `make`, `make html`, and `make bundle` regenerate all figure SVGs before
-compiling the notes. Run `make figures` to rebuild just the figures.
+compiling the notes. Run `make figures` to rebuild just the figures. The builder
+also writes HTML variants under `.build/html-figures/`, using Georgia for body
+labels and Frutiger for bold labels, matching the HTML pages. Georgia must be
+installed or available through `TYPST_FONT_PATHS`. Mathematical notation keeps
+its math font. HTML variants also contain a selectable text layer taken directly
+from Typst's layout; the visible glyph outlines retain the exact typography.
+The SVGs beside the sources retain the PDF typography.
 
 From the repository root, regenerate an individual figure with Typst 0.15.1:
 
@@ -18,6 +24,19 @@ typst compile --root . --font-path html-exporter/assets/fonts \
 For a gate, add `--input gate=assignment` (or `constant`, `addition`,
 `subtraction`, `multiplication`, `comparison`) and compile `gate.typ` to the
 corresponding `gate_<name>.svg`.
+
+For a selectable HTML variant, use the exporter after `make figures` builds it:
+
+```sh
+html-exporter/target/release/notes-html-exporter --figure-svg --root . \
+  content/figures/nfgs_nash/nash_plots.typ \
+  .build/html-figures/nfgs_nash/nash_plots.svg
+```
+
+For gate variants, add `--figure-input gate=assignment` (or another gate name).
+Shared typography is defined in
+`libs/typography.typ`; new figures should import `figure-font` and `figure-style`,
+use `#set text(font: figure-font, ...)`, and apply `#show: figure-style`.
 
 The root flag lets figures import shared libraries and component plots.
 `learning2/plots.typ` includes the four `ftr_*.typ` / `omd_euc.typ` files beside

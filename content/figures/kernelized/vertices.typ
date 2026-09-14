@@ -1,4 +1,5 @@
 // Extensive-form tree with nine sequence coordinates for Player 1.
+#import "../libs/typography.typ": figure-font
 #import "@preview/cetz:0.4.1"
 
 #let draw-tree(s) = {
@@ -70,17 +71,17 @@
     }
 
     info1((0, 0))
-    content((.4, 0))[#text(blue, font: "New Computer Modern")[A]]
+    content((.4, 0))[#text(blue, font: figure-font)[A]]
     info1((-1.44, -.96))
-    content((-1.44 - .4, -.96))[#text(blue, font: "New Computer Modern")[P]]
+    content((-1.44 - .4, -.96))[#text(blue, font: figure-font)[P]]
     info1((1.44, -.96))
-    content((1.44 + .4, -.96))[#text(blue, font: "New Computer Modern")[Q]]
+    content((1.44 + .4, -.96))[#text(blue, font: figure-font)[Q]]
     info1((-1.44 - .72, -1.92))
-    content((-1.44 - .72 - .4, -1.92))[#text(blue, font: "New Computer Modern")[B]]
+    content((-1.44 - .72 - .4, -1.92))[#text(blue, font: figure-font)[B]]
     info1((-1.44 + .72, -1.92))
-    content((-1.44 + .72 - .4, -1.92))[#text(blue, font: "New Computer Modern")[C]]
+    content((-1.44 + .72 - .4, -1.92))[#text(blue, font: figure-font)[C]]
     info2((1.44 - .72, -1.92), (1.44 + .72, -1.92))
-    content((1.44 + .72 + .4, -1.92))[#text(blue, font: "New Computer Modern")[D]]
+    content((1.44 + .72 + .4, -1.92))[#text(blue, font: figure-font)[D]]
 
     node((0, 0), 1)
     node((-1.44, -.96), 2)
@@ -143,7 +144,7 @@
           } else {
             blue.darken(30%)
           },
-          font: "New Computer Modern",
+          font: figure-font,
           size: 9pt,
           box(fill: bg, inset: (y: .3mm, x: .15mm))[#lbl],
         )]

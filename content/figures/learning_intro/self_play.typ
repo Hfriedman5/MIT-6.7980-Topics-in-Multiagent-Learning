@@ -1,12 +1,10 @@
+#import "../../meta/notation.typ": vx, vy, cX, cY
+#import "../../meta/notation.typ": cR
 #set page(width: auto, height: auto, margin: 1mm, fill: none)
-#set text(font: "New Computer Modern", size: 9pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 9pt)
+#show: figure-style
 #import "@preview/cetz:0.4.1"
-
-#let vx = $x$
-#let vy = $y$
-#let cX = math.cal("X")
-#let cY = math.cal("Y")
-#let cR = math.cal("R")
 
 #align(center, cetz.canvas({
   import cetz.draw: *

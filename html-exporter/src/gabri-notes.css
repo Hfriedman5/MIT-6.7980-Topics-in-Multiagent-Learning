@@ -760,10 +760,6 @@ figure[id],
     font-weight: 400
 }
 
-.lecture-content .secno::after {
-    content: " "
-}
-
 .lecture-content p {
     margin: .72rem 0
 }
@@ -1156,7 +1152,7 @@ code {
 .equation-aligned {
     display: grid;
     --equation-align-gutter: .28rem;
-    grid-template-columns: minmax(0, 1fr) max-content max-content minmax(0, 1fr) minmax(0, max-content);
+    grid-template-columns: minmax(0, 1fr) repeat(var(--equation-alignment-columns, 2), max-content) minmax(0, 1fr) minmax(0, max-content);
     align-items: center;
     column-gap: var(--equation-align-gutter);
     row-gap: .35rem
@@ -1191,8 +1187,13 @@ code {
     line-height: 0
 }
 
+.equation-align-cell {
+    min-width: max-content;
+    line-height: 0
+}
+
 .equation-align-full {
-    grid-column: 1 / 5;
+    grid-column: 1 / var(--equation-number-column, 5);
     justify-self: center;
     min-width: max-content;
     line-height: 0
@@ -1208,7 +1209,7 @@ code {
 }
 
 .equation-aligned .eqno {
-    grid-column: 5;
+    grid-column: var(--equation-number-column, 5);
     align-self: center
 }
 
@@ -1265,9 +1266,9 @@ span[role="math"].math-katex-source {
     text-align: center
 }
 
-.rendered-figure svg:not(.katex svg),
+.rendered-figure svg:not(.katex svg, svg svg),
 .rendered-figure img,
-.lecture-content figure.typst svg:not(.katex svg),
+.lecture-content figure.typst svg:not(.katex svg, svg svg),
 .lecture-content figure.typst img {
     display: block;
     max-width: 100%;
@@ -1289,7 +1290,7 @@ span[role="math"].math-katex-source {
     margin: var(--place-dy, .15rem) 1.1rem .9rem 0
 }
 
-.placed-figure svg:not(.katex svg),
+.placed-figure svg:not(.katex svg, svg svg),
 .placed-figure img,
 .placed-figure .typst-frame {
     display: block;
@@ -1371,7 +1372,7 @@ span[role="math"].math-katex-source {
     margin-bottom: 0
 }
 
-.wrapped-figure-media svg:not(.katex svg),
+.wrapped-figure-media svg:not(.katex svg, svg svg),
 .wrapped-figure-media img,
 .wrapped-figure-media .typst-frame {
     display: block;
@@ -1387,7 +1388,7 @@ span[role="math"].math-katex-source {
     line-height: 0
 }
 
-.lecture-image svg {
+.lecture-image > svg {
     display: block;
     max-width: 100%;
     height: auto !important

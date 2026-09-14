@@ -1,6 +1,8 @@
 // Recovered from Costis Gabri monograph/texcontent/figures/L03/nash_irrational.typ
 #set page(width: auto, height: auto, fill: none, margin: .6mm)
-#set text(font: "New Computer Modern", size: 9pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 9pt)
+#show: figure-style
 #import "../libs/nash.typ": brown, payoff_table
 #import "@preview/cetz:0.4.1"
 

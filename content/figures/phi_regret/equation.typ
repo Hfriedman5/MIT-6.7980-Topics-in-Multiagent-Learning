@@ -1,6 +1,9 @@
+#import "../../meta/notation.typ": vp
 // Extracted from Costis Gabri monograph/typst_content/L08.typ
 #set page(width: auto, height: auto, margin: 0mm, fill: none)
-#set text(font: "New Computer Modern", size: 10pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 10pt)
+#show: figure-style
 
 #let boxd(i) = box(
   baseline: 6mm,
@@ -9,8 +12,8 @@
   radius: 0.3mm,
   stroke: .3pt + black,
   // fill: luma(90%), //.2mm + black,
-  text(9pt, align(center + horizon, stack(dir: ttb, spacing: 2mm)[|][#v(-.5mm)$p_#i$][#sym.arrow.b])),
+  text(9pt, align(center + horizon, stack(dir: ttb, spacing: 2mm)[|][#v(-.5mm)$vp_#i$][#sym.arrow.b])),
 )
 $
-  Phi := {P = mat(boxd(1), boxd(2), dots.c, boxd(n)): p_1, ..., p_n in Delta^n}.
+  Phi := {P = mat(boxd(1), boxd(2), dots.c, boxd(n)): vp_1, ..., vp_n in Delta^n}.
 $

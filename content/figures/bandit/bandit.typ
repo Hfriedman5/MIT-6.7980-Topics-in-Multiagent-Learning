@@ -1,8 +1,9 @@
+#import "../../meta/notation.typ": cX, vx, vy, vp, vg, vxi
 #set page(width: auto, height: auto, margin: 1mm, fill: none)
-#set text(font: "New Computer Modern", size: 9pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 9pt)
+#show: figure-style
 #import "@preview/cetz:0.4.1"
-
-#let cX = $X$
 
 #cetz.canvas(
   length: 1cm,
@@ -50,13 +51,13 @@
 
     content((0.7, 1.95))[#set text(blue); _Bandit_ regret \ minimizer]
     content((-1.1, .25))[$w^((t))$]
-    content((2.8, .25))[$tilde(g)^((t))$]
-    content((6.2, .25))[$y^((t))$]
+    content((2.8, .25))[$tilde(vg)^((t))$]
+    content((6.2, .25))[$vy^((t))$]
     content((6.1, -.21))[$in cX$]
-    content((7.8, .25))[$p^((t))$]
+    content((7.8, .25))[$vp^((t))$]
     content((7.7, -.21))[$in cX$]
-    content((7.7, .95))[#set text(luma(30%));$xi^((t)) in cX$]
-    content((11.8, .25))[$x^((t)) in cX$]
+    content((7.7, .95))[#set text(luma(30%));$vxi^((t)) in cX$]
+    content((11.8, .25))[$vx^((t)) in cX$]
 
     content((9.5, 1.9))[#set text(9pt);($<-$ for high-prob. \ regret bounds only)]
   },

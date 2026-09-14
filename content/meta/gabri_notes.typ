@@ -15,33 +15,10 @@
 #let lecture-label(value) = if str(value).starts-with("S") { "Supplementary reading " + str(value) } else {
   "Lecture " + str(value)
 }
-#let sf = text.with(font: "Frutiger")
-#let eps = math.epsilon.alt
-#let BB = $𝔹$
-#let CC = $ℂ$
-#let NN = $ℕ$
-#let QQ = $ℚ$
-#let RR = $ℝ$
-#let EE = math.op($𝔼$, limits: true)
-#let cK = $cal(K)$
-#let cS = $cal(S)$
-#let PPAD = text(font: "New Computer Modern", "PPAD")
-#let NP = text(font: "New Computer Modern", "NP")
-#let coNP = text(font: "New Computer Modern", "co-NP")
-#let P = text(font: "New Computer Modern", "P")
-#let argmin = math.op("arg min", limits: true)
-#let argmax = math.op("arg max", limits: true)
 #let html-math-color(fill, body) = text(fill: fill, body)
-#let ip(a, b) = $lr(chevron.l #a, #b chevron.r)$
-#let div(a, b, dgf: $phi$) = $op("D")_#dgf (#a mid(||) #b)$
-#let divt(a, b) = $op("D")_(phi_t) (#a mid(||) #b)$
-#let dom = math.op("dom")
-#let diag = math.op("diag")
-#let cone = math.op("cone")
-#let span = math.op("span")
-#let colspan = math.op("colspan")
-#let qquad = $quad quad$
 #let proofdir(marker, body) = [#marker~~#body]
+#let comment = body => text(luma(128))[~~~~ $triangle.stroked.small.r$ _ #body _]
+
 #let bpar(body) = [#strong(body) #h(0.5em)]
 #let changelog(body) = block(above: 3em, stroke: (top: 0.15mm + luma(80%)), inset: (top: 8pt))[
   #text(size: 9pt, fill: luma(40%))[*Changelog*]
@@ -106,6 +83,7 @@
   set list(indent: 4.05mm)
   set enum(indent: 4.05mm)
   set heading(numbering: (..nums) => lecture-number-label(lec_num) + "." + nums.pos().map(str).join("."))
+  set figure(numbering: n => lecture-number-label(lec_num) + "." + str(n))
   set math.equation(supplement: none)
   set cite(style: "alphanum.csl")
   show cite: set text(fill: blue.darken(40%))

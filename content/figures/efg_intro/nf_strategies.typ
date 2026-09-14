@@ -1,6 +1,8 @@
 // Extracted from Costis Gabri monograph/typst_content/L09.typ
 #set page(width: auto, height: auto, margin: 0mm, fill: none)
-#set text(font: "New Computer Modern", size: 10pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 10pt)
+#show: figure-style
 #import "../kernelized/vertices.typ": draw-tree
 
 #let makevec(s, num) = {
@@ -14,7 +16,7 @@
       columns: (3.3mm,) * 9,
       row-gutter: 0mm,
       align: center,
-      ..range(9).map(i => text(gray, size: 7pt, font: "New Computer Modern Sans 08")[#{ i + 1 }]),
+      ..range(9).map(i => text(gray, size: 7pt, font: "Frutiger")[#{ i + 1 }]),
       ..range(9).map(i => s.at(i)),
     )) #h(-1.5mm) )]
 }

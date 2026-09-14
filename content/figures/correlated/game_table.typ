@@ -1,6 +1,8 @@
 // Recovered from Costis Gabri monograph/texcontent/figures/L04/game_table.typ
 #set page(width: auto, height: auto, fill: none, margin: 0mm)
-#set text(font: "New Computer Modern", size: 9pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 9pt)
+#show: figure-style
 #import "@preview/cetz:0.4.1"
 #import "../libs/nash.typ": game_table
 

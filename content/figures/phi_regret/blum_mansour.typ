@@ -1,6 +1,9 @@
+#import "../../meta/notation.typ": vx, vp
 // Extracted from Costis Gabri monograph/typst_content/L08.typ
 #set page(width: auto, height: auto, margin: 1mm, fill: none)
-#set text(font: "New Computer Modern", size: 9pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 9pt)
+#show: figure-style
 #import "@preview/cetz:0.4.1"
 
 #cetz.canvas(length: 1cm, {
@@ -25,10 +28,10 @@
     set-style(stroke: .3mm)
     rect((-.3, -2.8), (11.0, 2.3), stroke: (dash: "dashed", paint: blue), radius: 3mm, fill: blue.transparentize(95%))
     blk((3, 0))[_External_ regret \ minim. for $Delta^n$ ]
-    blk((6.4, 0), w: 2.2)[Assemble $P^((t))$ \ $\(p_1^((t))#h(.5mm)|#h(.7mm)dots.c#h(.7mm)|#h(.7mm)p_n^((t))\)$ ]
+    blk((6.4, 0), w: 2.2)[Assemble $P^((t))$ \ $\(vp_1^((t))#h(.5mm)|#h(.7mm)dots.c#h(.7mm)|#h(.7mm)vp_n^((t))\)$ ]
     blk((3, 1.4))[_External_ regret \ minim. for $Delta^n$ ]
     blk((3, -1.9))[_External_ regret \ minim. for $Delta^n$ ]
-    blk((9.5, 0))[Fixed point #v(0mm) $x^((t)) = P^((t)) x^((t))$]
+    blk((9.5, 0))[Fixed point #v(0mm) $vx^((t)) = P^((t)) vx^((t))$]
     circle((0.06, 0), radius: .6mm, fill: black)
 
     set-style(mark: (end: "stealth", fill: black, scale: .6), stroke: .35mm)
@@ -57,12 +60,12 @@
     content((-1.0, -.25))[$Delta^n -> RR$]
     content((3, -.9))[$dots.v$]
     content((1.1, 1.7))[$x_1^((t)) u^((t))$]
-    content((4.75, 1.7))[$p_1^((t))$]
+    content((4.75, 1.7))[$vp_1^((t))$]
     content((1.1, .3))[$x_2^((t)) u^((t))$]
-    content((4.75, .3))[$p_2^((t))$]
+    content((4.75, .3))[$vp_2^((t))$]
     // content((7.9, .25))[$P^((t))$]
     content((1.1, -2.2))[$x_n^((t)) u^((t))$]
-    content((4.75, -1.6))[$p_n^((t))$]
+    content((4.75, -1.6))[$vp_n^((t))$]
 
-    content((11.9, .3))[$x^((t)) in Delta^n$]
+    content((11.9, .3))[$vx^((t)) in Delta^n$]
   })

@@ -14,6 +14,35 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @unittest.skipUnless(shutil.which('typst'), 'Typst CLI is required')
 class NoteStyleTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('pdftotext'), 'Poppler is required for citation text')
+    def test_pdf_citations_preserve_explicit_supplements(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            (folder / 'references.bib').write_text(
+                '@book{probe, author={Example, Alice}, title={Citation probe}, year={2024}}\n')
+            source = folder / 'probe.typ'
+            source.write_text(
+                f'#import {json.dumps(str(ROOT / "content/meta/gabri_notes.typ"))}: *\n'
+                '#show: gabri_notes.with(lec_num: 15, title: [Citation probe])\n'
+                'Plain #citep(<probe>).\n\n'
+                'Definition #citep(<probe>, [Definition 1]).\n\n'
+                'Section #citep(<probe>, [Section 2.1]).\n\n'
+                '#lec_bibliography("references.bib")\n')
+            output = source.with_suffix('.pdf')
+            result = subprocess.run(
+                ['typst', 'compile', '--root', ROOT.anchor, str(source), str(output)],
+                capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            text = subprocess.check_output(['pdftotext', str(output), '-'], text=True)
+            text = ' '.join(text.split())
+            plain = re.search(r'Plain \[([^\]]+)\]\.', text)
+            self.assertIsNotNone(plain, text)
+            label = plain[1]
+            # Exact matching catches dropped locators and unwanted `p.` prefixes
+            # on supplements that already name their own section/definition.
+            self.assertIn(f'Definition [{label}, Definition 1].', text)
+            self.assertIn(f'Section [{label}, Section 2.1].', text)
+
     @unittest.skipUnless(shutil.which('pdftoppm'), 'Poppler is required for image bounds')
     def test_pdf_figures_honor_requested_widths_and_fit_their_column(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -8,6 +8,7 @@ import tempfile
 import unittest
 
 from lecture_links import validate_lecture_links
+from test_html_pseudocode import PseudocodePage
 from test_html_references import ReferencePage
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -145,6 +146,62 @@ class LectureLinkRenderingTests(unittest.TestCase):
     def test_native_typst_rejects_an_invalid_reference_target(self):
         body = self.fixture(19).replace('#theorem[The target result.]', '#text[Unnumbered text.]')
         self.compile(body, bundle=True, expect_error='cannot reference text')
+
+    @unittest.skipUnless(shutil.which('pdftotext'), 'Poppler is required for PDF figure references')
+    def test_figure_numbers_reset_per_kind_and_note_and_references_use_destination_prefix(self):
+        for html in (True, False):
+            for number, prefix in ((15, 'L15'), ('S8', 'S8')):
+                with self.subTest(html=html, number=number):
+                    source = 'source.html' if html else 'pdf/source.pdf'
+                    destination = 'destination.html' if html else 'pdf/destination.pdf'
+                    output = self.compile(f'''
+#document("{source}")[
+  #show: gabri_notes.with(lec_num: 5, title: [Source])
+  #theorem[An unrelated statement.]
+  #figure(rect(width: 10pt, height: 10pt), caption: [First figure.]) <first-figure>
+  #pseudocode(numbered-title: [First], [Start.]) <first-algorithm>
+  #figure(table([A]), caption: [First table.]) <first-table>
+  #figure(rect(width: 10pt, height: 10pt), caption: [Second figure.]) <second-figure>
+  #pseudocode-list(numbered-title: [Second], caption: [Source caption.])[
+    + Continue.
+  ] <second-algorithm>
+  #figure(table([B]), caption: [Second table.]) <second-table>
+  See #lecture-link("destination", <target-algorithm>)[] and @second-algorithm.
+  See #lecture-link("destination", <target-figure>)[] and @second-figure.
+  See #lecture-link("destination", <target-table>)[] and @second-table.
+]
+#document("{destination}")[
+  #show: gabri_notes.with(lec_num: {json.dumps(number)}, title: [Destination])
+  #figure(rect(width: 10pt, height: 10pt), caption: [Target figure.]) <target-figure>
+  #pseudocode-list(numbered-title: [Target], caption: [Target caption.])[
+    + Finish.
+  ] <target-algorithm>
+  #figure(table([C]), caption: [Target table.]) <target-table>
+  See #lecture-link("source", <second-algorithm>)[] and @target-algorithm.
+  See #lecture-link("source", <second-figure>)[] and @target-figure.
+  See #lecture-link("source", <second-table>)[] and @target-table.
+]
+''', html=html, bundle=True)
+                    if html:
+                        texts = [PseudocodePage((output / name).read_text()).root.text()
+                                 for name in (source, destination)]
+                    else:
+                        texts = [subprocess.check_output(
+                            ['pdftotext', str(output / name), '-'], text=True)
+                            for name in (source, destination)]
+                    first, second = [' '.join(text.split()) for text in texts]
+                    self.assertIn('Algorithm L5.1: First', first)
+                    self.assertIn('Algorithm L5.2: Second', first)
+                    self.assertIn(f'Algorithm {prefix}.1: Target', second)
+                    self.assertIn(f'See Algorithm {prefix}.1 and Algorithm L5.2.', first)
+                    self.assertIn(f'See Algorithm L5.2 and Algorithm {prefix}.1.', second)
+                    separator = '.' if html else ':'
+                    for kind in ('Figure', 'Table'):
+                        self.assertIn(f'{kind} L5.1{separator} First {kind.lower()}.', first)
+                        self.assertIn(f'{kind} L5.2{separator} Second {kind.lower()}.', first)
+                        self.assertIn(f'{kind} {prefix}.1{separator} Target {kind.lower()}.', second)
+                        self.assertIn(f'See {kind} {prefix}.1 and {kind} L5.2.', first)
+                        self.assertIn(f'See {kind} L5.2 and {kind} {prefix}.1.', second)
 
     def test_standalone_preview_uses_the_destination_notes_own_header(self):
         output = self.compile('''

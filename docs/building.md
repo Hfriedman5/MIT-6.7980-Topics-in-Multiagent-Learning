@@ -170,7 +170,24 @@ working PDF style.
 - Edit `html-exporter/src/gabri-notes.css` for the lecture layout.
 - Edit `content/meta/gabri_notes_html.typ` for semantic HTML components.
 - Edit `content/meta/gabri_notes.typ` for the native PDF layout.
+- Edit `content/meta/notation.typ` for mathematical symbols, operators, and notation helpers shared by the notes and figures.
 - Edit `content/meta/lovelace_html.typ` for HTML pseudocode.
+
+Both note styles re-export `notation.typ`. Keep notation definitions in that
+file and use the same convention throughout the course: `v*` for bold vectors
+(such as `vx`), `c*` for calligraphic sets (such as `cX`), and `mat*` for upright
+bold matrices (such as `matA`). `xhat` and `yhat` put hats on the corresponding
+vectors; `mU` denotes the bold utility matrix with player subscript 1.
+Use bold notation for whole vectors and vector blocks, including player strategies
+(`vx_i`), iterates, gradients, finite probability vectors, and neural parameter
+vectors (`vtheta`). Keep scalar coordinates plain (`x_(i,a)`, `g_a`), or use
+explicit indexing of a bold vector (`vx[a]`). Hats, bars, and time indices
+preserve the underlying scalar/vector distinction. Scalar-valued functions,
+abstract policies and probability measures, discrete actions, and graph labels
+are not made bold merely because they appear next to vectors. Use `ve` for
+standard basis vectors and `vone` for the all-ones vector.
+The HTML style selects the `html-` encodings of these same conventions for
+KaTeX. Standalone figures import notation from `../../meta/notation.typ`.
 
 `how_to_cite.url_prefix` in `html-export.json` sets the published base URL for
 lecture citation links, currently `https://www.mit.edu/~6.7980/`. Keep the trailing
@@ -313,8 +330,18 @@ make figures                           # rebuild every figure SVG
 
 The same figure builder runs during the full site build. Editable sources
 live under `content/figures/`; the dynamics helpers are in
-`content/meta/dyns.typ`. Generated SVGs are used by both HTML and lecture PDF
-rendering; standalone figure PDFs are neither needed nor generated.
+`content/meta/dyns.typ`. SVGs beside the sources use the lecture PDF typography.
+The builder also generates `.build/html-figures/` variants with Georgia body
+labels and Frutiger bold labels to match the HTML pages, preserving mathematical
+fonts and explicit sans-serif labels. Georgia must be installed or supplied via
+`TYPST_FONT_PATHS`; the build checks availability. Generated HTML sources select
+these variants automatically; standalone figure PDFs are neither needed nor generated.
+
+HTML SVGs retain their visible glyph outlines and include a transparent,
+selectable text layer from Typst's original text runs. The HTML exporter embeds
+these SVGs directly into the page, so readers can select and copy labels rather
+than interact with an opaque image. Repeated figures receive separate SVG IDs.
+`make figures` builds the Rust exporter before regenerating these variants.
 
 The optional `prepare_kuhn_figure.py` and `prepare_kuhn_alternatives.py` scripts
 require Pillow. They preserve white node interiors and verify that compositing

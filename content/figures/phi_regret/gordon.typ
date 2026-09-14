@@ -1,8 +1,10 @@
+#import "../../meta/notation.typ": vx, cX
 // Extracted from Costis Gabri monograph/typst_content/L08.typ
 #set page(width: auto, height: auto, margin: 1mm, fill: none)
-#set text(font: "New Computer Modern", size: 9pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 9pt)
+#show: figure-style
 #import "@preview/cetz:0.4.1"
-#let cX = math.cal("X")
 
 #cetz.canvas(length: 1cm, {
     import cetz.draw: *
@@ -27,7 +29,7 @@
     rect((-.5, -1.2), (11.5, 1.4), stroke: (dash: "dashed", paint: blue), radius: 3mm, fill: blue.transparentize(95%))
     blk((1.3, 0))[Utility \ construction \ in $Phi$ space]
     blk((5.5, 0), hgt: 1.1)[_External_ regret \ minimizer for $Phi$ ]
-    blk((9.7, 0), hgt: 1.3)[Fixed point #v(-1.5mm) $x^((t)) = phi.alt^((t))(x^((t)))$]
+    blk((9.7, 0), hgt: 1.3)[Fixed point #v(-1.5mm) $vx^((t)) = phi.alt^((t))(vx^((t)))$]
 
     set-style(mark: (end: "stealth", fill: black, scale: .6), stroke: .35mm)
     line((-1.7, 0), (0., 0))
@@ -43,5 +45,5 @@
     content((3.5, .25))[$U^((t))$]
     content((3.4, -.25))[$Phi -> RR$]
     content((7.6, .25))[$phi.alt^((t)) in Phi$]
-    content((12.2, .25))[$x^((t)) in cX$]
+    content((12.2, .25))[$vx^((t)) in cX$]
   })

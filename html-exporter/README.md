@@ -19,6 +19,7 @@ See the [course README](../README.md) and [build guide](../docs/building.md).
 For a single lecture:
 
 ```sh
+make figures
 python3 scripts/course_index.py --resolve-only
 cargo run --manifest-path html-exporter/Cargo.toml -- \
   --root . \
@@ -68,6 +69,15 @@ Useful options:
 - `--site-title <title>`: change the header title.
 - `--authors <text>`: change the author line.
 - `--index <href>` and `--pdf <href>`: add header links.
+- `--figure-svg`: compile a single-page figure using the HTML fonts and add a
+  selectable text layer. Gate variants accept `--figure-input gate=addition`.
+
+The page exporter inlines these selectable SVGs so labels can be selected and
+copied in the browser. Their visible outlines preserve Typst's mathematical
+glyphs and exact spacing; the text layer supplies the original Unicode strings.
+URL links on those labels also work in the text layer, including within scaled
+or rotated drawings. Link regions use the same nested transforms as the artwork;
+unlinked labels remain selectable text.
 
 ## Checks
 

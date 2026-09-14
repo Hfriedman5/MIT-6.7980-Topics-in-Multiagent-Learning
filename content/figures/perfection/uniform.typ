@@ -1,9 +1,10 @@
+#import "../../meta/notation.typ": sf, eps
 // Extracted from Costis Gabri monograph/typst_content/L11.typ
 #set page(width: 372.3973pt, height: auto, margin: 0mm, fill: none)
-#set text(font: "New Computer Modern", size: 10pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 10pt)
+#show: figure-style
 #import "../libs/efgs.typ": efg-tree, kuhn-tree
-#let sf = text.with(font: "Frutiger")
-#let eps = math.epsilon.alt
 
 #align(center, stack(dir: ltr, spacing: 1fr)[
       #box(

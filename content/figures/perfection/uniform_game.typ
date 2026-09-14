@@ -1,5 +1,7 @@
 #set page(width: auto, height: auto, margin: 2mm, fill: none)
-#set text(font: "New Computer Modern", size: 10pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 10pt)
+#show: figure-style
 #import "@preview/cetz:0.4.1"
 
 #cetz.canvas({

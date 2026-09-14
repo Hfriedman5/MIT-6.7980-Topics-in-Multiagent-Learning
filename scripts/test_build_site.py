@@ -15,6 +15,8 @@ class LecturePdfBuildTests(unittest.TestCase):
         self.root = Path(self.temp.name).resolve()
         self.stage = self.root / '.build/site'
         (self.stage / 'pdf').mkdir(parents=True)
+        (self.stage / 'assets').mkdir()
+        (self.stage / 'assets/notes.css').write_text('body {}')
         (self.root / '.build/logs').mkdir()
         self.source = self.root / 'content/lecture.typ'
         self.source.parent.mkdir(parents=True)
@@ -44,6 +46,16 @@ Lecture prose.
                 with self.assertRaisesRegex(ValueError, 'obsolete source layout'):
                     build_site.chapter_source_text(self.source)
 
+    def test_html_uses_figure_variants_and_keeps_raster_images(self):
+        self.source.write_text('#image("figures/example/plot.svg")\n'
+                               '#image("figures/example/photo.png")')
+        html = build_site.prepare_html_source(self.source, self.chapter).read_text()
+        pdf = build_site.prepare_pdf_source(self.source).read_text()
+        self.assertIn('"/.build/html-figures/example/plot.svg"', html)
+        self.assertIn('"/content/figures/example/photo.png"', html)
+        self.assertIn('"/content/figures/example/plot.svg"', pdf)
+        self.assertNotIn('html-figures', pdf)
+
     def test_native_output_is_postprocessed_with_its_pdf_download(self):
         calls = []
         (self.stage / 'pdf/lecture.pdf').write_bytes(b'%PDF-1.7\n')
@@ -59,7 +71,14 @@ Lecture prose.
 
         with patch.object(build_site.subprocess, 'run', side_effect=export):
             build_site.build_chapter(self.chapter)
-        self.assertEqual(len(calls), 1)
+            first = (self.stage / 'lecture.html').read_text()
+            self.assertRegex(first, r'assets/notes\.css\?v=[0-9a-f]{12}')
+            build_site.build_chapter(self.chapter)
+            self.assertEqual((self.stage / 'lecture.html').read_text(), first)
+            (self.stage / 'assets/notes.css').write_text('body { color: black; }')
+            build_site.build_chapter(self.chapter)
+            self.assertNotEqual((self.stage / 'lecture.html').read_text(), first)
+        self.assertEqual(len(calls), 3)
         self.assertFalse((self.stage / 'source').exists())
 
     def test_missing_pdf_stops_before_exporting_a_dead_link(self):

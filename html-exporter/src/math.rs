@@ -372,11 +372,46 @@ fn is_linebreak(arg: &Arg) -> bool {
 }
 
 fn convert_sequence(args: &[Arg], context: ConvertContext) -> String {
-    let converted = args
+    let items = args
         .iter()
         .filter(|arg| arg.name.is_none())
+        .collect::<Vec<_>>();
+    let mut fragments = items
+        .iter()
         .map(|arg| convert_expr_with_context(&arg.value, context))
-        .collect::<String>();
+        .collect::<Vec<_>>();
+    // A source space beside prose is visible in Typst, but an ordinary TeX
+    // space outside \text is ignored. Move that authored space into the text
+    // fragment. Do not add spaces around operators or attached math labels.
+    for (index, item) in items.iter().enumerate() {
+        if index == 0
+            || index + 1 == items.len()
+            || !bracket_literal(&item.value)
+                .is_some_and(|value| !value.is_empty() && value.chars().all(char::is_whitespace))
+            || [items[index - 1], items[index + 1]].iter().any(|neighbor| {
+                call_parts(&neighbor.value)
+                    .is_some_and(|(name, _)| matches!(name, "align-point" | "linebreak"))
+            })
+        {
+            continue;
+        }
+        if is_plain_text_literal(&items[index - 1].value) {
+            let previous = &mut fragments[index - 1];
+            if !tex_text_wrapper_inner(previous)
+                .is_some_and(|value| value.ends_with(char::is_whitespace))
+            {
+                previous.insert(previous.len() - 1, ' ');
+            }
+        } else if is_plain_text_literal(&items[index + 1].value) {
+            let next = &mut fragments[index + 1];
+            if !tex_text_wrapper_inner(next)
+                .is_some_and(|value| value.starts_with(char::is_whitespace))
+            {
+                next.insert("\\text{".len(), ' ');
+            }
+        }
+    }
+    let converted = fragments.concat();
     let converted = scope_math_prefixes(&converted);
     // A bare TeX line break is ignored inside scripts and delimiter groups.
     // Only group breaks belonging to this sequence, not those in descendants.
@@ -393,6 +428,14 @@ fn convert_sequence(args: &[Arg], context: ConvertContext) -> String {
         };
         format!("\\begin{{{environment}}}{converted}\\end{{{environment}}}")
     }
+}
+
+fn is_plain_text_literal(input: &str) -> bool {
+    bracket_literal(input)
+        .or_else(|| quoted_literal(input))
+        .is_some_and(|value| {
+            value.chars().count() > 1 && value.chars().any(|ch| ch.is_ascii_alphabetic())
+        })
 }
 
 fn convert_delimited(input: &str, context: ConvertContext) -> String {
@@ -1385,6 +1428,7 @@ fn is_equation_math_attrs(attrs: &str) -> bool {
         matches!(
             class,
             "equation-math"
+                | "equation-align-cell"
                 | "equation-align-left"
                 | "equation-align-right"
                 | "equation-align-full"
@@ -1685,6 +1729,49 @@ mod tests {
     }
 
     #[test]
+    fn step_justifications_preserve_authored_spaces_beside_math() {
+        for (phrase, symbol) in [("linearity of", "u"), ("definition of", "v")] {
+            let input = format!(
+                "lr(body: sequence([(], [{phrase}], [ ], attach(base: [{symbol}], t: [t]), [)]))"
+            );
+            assert_eq!(
+                typst_repr_to_katex(&input),
+                format!("(\\text{{{phrase} }} {symbol}^{{t}})")
+            );
+        }
+        assert_eq!(
+            typst_repr_to_katex("sequence([x], [ ], [is linear])"),
+            r"x \text{ is linear}"
+        );
+        assert_eq!(
+            typst_repr_to_katex("sequence([by], [ ], [linearity])"),
+            r"\text{by } \text{linearity}"
+        );
+    }
+
+    #[test]
+    fn prose_spacing_keeps_math_labels_and_operators_tight() {
+        for (input, expected) in [
+            (
+                "sequence(attach(base: [Reg], t: [T]), [ ], [(], [x], [)])",
+                r"\text{Reg}^{T} (x)",
+            ),
+            (
+                "sequence(op(text: [max], limits: true), [ ], [x])",
+                r"\operatorname*{max} x",
+            ),
+            ("sequence([s.t.], [x])", r"\text{s.t.}x"),
+            (
+                "sequence([linearity of ], [ ], [u])",
+                r"\text{linearity of } u",
+            ),
+            ("sequence([from], [(], [2], [)])", r"\text{from}(2)"),
+        ] {
+            assert_eq!(typst_repr_to_katex(input), expected);
+        }
+    }
+
+    #[test]
     fn text_subscripts_drop_literal_group_braces() {
         let input = "attach(base: [Φ], b: lr(body: sequence([{], [const], [}])))";
         assert_eq!(typst_repr_to_katex(input), r"\Phi_{\text{const}}");
@@ -1935,6 +2022,17 @@ mod tests {
         let input = r#"<figure class="equation" id="eqx"><span class="eqno">(2)</span></figure><span role="math" data-typst-math="sequence([from], lr(body: sequence([(], ref(target: &lt;eqx&gt;), [)])))" data-math-display="inline"><svg></svg></span>"#;
         let out = postprocess_html_math(input.to_owned(), MathMode::Katex);
         assert!(out.contains(r"\(\text{from}(2)\)"), "{out}");
+        assert!(!out.contains("<svg>"));
+    }
+
+    #[test]
+    fn justification_columns_keep_reference_spacing_and_display_style() {
+        let input = r#"<figure class="equation" id="eqx"><span class="eqno">(2)</span></figure><span class="equation-align-cell" data-typst-math="lr(body: sequence([(], [from], [ ], lr(body: sequence([(], ref(target: &lt;eqx&gt;), [)])), [)]))" data-math-display="inline"><svg></svg></span>"#;
+        let out = postprocess_html_math(input.to_owned(), MathMode::Katex);
+        assert!(
+            out.contains(r"\(\displaystyle \left(\text{from } \left(2\right)\right)\)"),
+            "{out}"
+        );
         assert!(!out.contains("<svg>"));
     }
 

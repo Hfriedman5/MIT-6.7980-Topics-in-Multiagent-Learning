@@ -7,8 +7,6 @@
   extrathanks: [Some of the content of the lecture was adapted from material from Costis Daskalakis.],
 )
 
-#let eps = math.epsilon.alt
-
 // HTML cell padding and math fonts need more room for labels such as x = 0.
 #let payoff-table-columns() = {
   let width = if target() == "html" { 2cm } else { 1.3cm }

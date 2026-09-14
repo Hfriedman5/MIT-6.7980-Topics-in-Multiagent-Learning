@@ -205,7 +205,9 @@ See @algorithm-probe.
         links = [element for element in page.elements()
                  if element.tag == 'a' and 'Algorithm' in element.text()]
         self.assertEqual(len(links), 1)
-        self.assertIn('Algorithm', links[0].text())
+        self.assertEqual(links[0].text().replace('\u00a0', ' '), 'Algorithm L99.1')
+        self.assertEqual(page.find('algorithm')[0].find('env-title')[0].text().strip(),
+                         'Algorithm L99.1: Regret matching')
         target = links[0].attrs.get('href', '').removeprefix('#')
         self.assertTrue(target)
         self.assertTrue(any(element.attrs.get('id') == target
@@ -221,13 +223,18 @@ See @algorithm-probe.
         for figure in figures:
             self.assertEqual(len(figure.find('algorithm')), 1)
             self.assertFalse(any(element.tag == 'figure' for element in figure.elements()))
+        self.assertEqual([figure.find('env-title')[0].text().strip() for figure in figures],
+                         [f'Algorithm L99.{number}: {title}' for number, title in
+                          enumerate(('First', 'Second', 'Third', 'Fourth'), 1)])
+        self.assertEqual([figure.attrs['data-figure-number'] for figure in figures],
+                         ['L99.1', 'L99.2', 'L99.3', 'L99.4'])
         captions = [element.text().strip() for figure in figures
                     for element in figure.elements() if element.tag == 'figcaption']
-        self.assertEqual(captions, ['Algorithm 2. Second caption.', 'Algorithm 3. Third caption.'])
+        self.assertEqual(captions, ['Algorithm L99.2. Second caption.', 'Algorithm L99.3. Third caption.'])
         references = [element for element in page.elements()
                       if element.tag == 'a' and element.text().startswith('Algorithm')]
         self.assertEqual([element.text().replace('\u00a0', ' ') for element in references],
-                         ['Algorithm 1', 'Algorithm 2', 'Algorithm 3', 'Algorithm 4'])
+                         ['Algorithm L99.1', 'Algorithm L99.2', 'Algorithm L99.3', 'Algorithm L99.4'])
         self.assertEqual([element.attrs['href'] for element in references],
                          ['#' + figure.attrs['id'] for figure in figures])
 
@@ -236,11 +243,21 @@ See @algorithm-probe.
                      'Typst CLI and Poppler are required for PDF algorithm probes')
 class PagedPseudocodeTests(unittest.TestCase):
     def test_both_apis_preserve_numbered_titles_captions_and_references(self):
+        for lecture in (None, 15, 'S8'):
+            with self.subTest(lecture=lecture):
+                self.check_algorithm_figures(lecture)
+
+    def check_algorithm_figures(self, lecture):
         with tempfile.TemporaryDirectory(prefix='notes-algorithm-test-') as folder:
             source = Path(folder) / 'probe.typ'
             output = source.with_suffix('.pdf')
+            library = 'lovelace.typ' if lecture is None else 'gabri_notes.typ'
+            style = '' if lecture is None else (
+                f'#show: gabri_notes.with(lec_num: {json.dumps(lecture)}, title: [Algorithms])\n')
+            prefix = '' if lecture is None else ('L15.' if lecture == 15 else 'S8.')
             source.write_text(
-                f'#import {json.dumps(str(ROOT / "content/meta/lovelace.typ"))}: *\n'
+                f'#import {json.dumps(str(ROOT / "content/meta" / library))}: *\n'
+                + style +
                 '#set page(width: 450pt, height: auto, margin: 20pt)\n'
                 + ALGORITHM_FIGURES)
             result = subprocess.run(
@@ -251,10 +268,11 @@ class PagedPseudocodeTests(unittest.TestCase):
             text = ' '.join(subprocess.check_output(['pdftotext', str(output), '-'],
                                                    text=True).split())
             for number, title in enumerate(('First', 'Second', 'Third', 'Fourth'), 1):
-                self.assertIn(f'Algorithm {number}: {title}', text)
-            self.assertIn('Algorithm 2: Second caption.', text)
-            self.assertIn('Algorithm 3: Third caption.', text)
-            self.assertIn('See Algorithm 1, Algorithm 2, Algorithm 3, and Algorithm 4.', text)
+                self.assertIn(f'Algorithm {prefix}{number}: {title}', text)
+            self.assertIn(f'Algorithm {prefix}2: Second caption.', text)
+            self.assertIn(f'Algorithm {prefix}3: Third caption.', text)
+            self.assertIn(f'See Algorithm {prefix}1, Algorithm {prefix}2, '
+                          f'Algorithm {prefix}3, and Algorithm {prefix}4.', text)
 
 
 if __name__ == '__main__':

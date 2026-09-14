@@ -8,10 +8,27 @@
 
 #import "citations.typ": *
 #import "notation.typ": *
+#import "notation.typ": html-cal as cal, html-bb as bb, html-bold as bold, html-sans as sans
+#import "notation.typ": html-italic as italic, html-upright as upright, html-argmin as argmin, html-argmax as argmax
+#import "notation.typ": html-P as P, html-PPAD as PPAD, html-NP as NP, html-coNP as coNP
+#import "notation.typ": html-span as span, html-colspan as colspan, html-div as div, html-divt as divt
+#import "notation.typ": html-matA as matA, html-matI as matI, html-matK as matK, html-matM as matM
+#import "notation.typ": html-matU as matU, html-va as va, html-vb as vb, html-vc as vc
+#import "notation.typ": html-vp as vp, html-vq as vq, html-vs as vs, html-vu as vu
+#import "notation.typ": html-vx as vx, html-vy as vy, html-vz as vz, html-cA as cA
+#import "notation.typ": html-cC as cC, html-cH as cH, html-cK as cK, html-cS as cS
+#import "notation.typ": html-cU as cU, html-cX as cX, html-cY as cY, html-cG as cG
+#import "notation.typ": html-vg as vg, html-vm as vm, html-vr as vr, html-cR as cR
+#import "notation.typ": html-ve as ve, html-vf as vf, html-vh as vh, html-vv as vv, html-vw as vw
+#import "notation.typ": html-vell as vell, html-vxi as vxi, html-vtheta as vtheta, html-vphi as vphi
+#import "notation.typ": html-vmu as vmu, html-vnu as vnu, html-vlambda as vlambda, html-vrho as vrho
+#import "notation.typ": html-vpi as vpi
+#import "notation.typ": html-vU as vU, html-vV as vV, html-vW as vW, html-vone as vone
+#import "notation.typ": html-vA as vA, html-vR as vR
+#import "notation.typ": html-xhat as xhat, html-yhat as yhat, html-mU as mU, html-upsans as upsans
 #import "markers.typ": paragraph-marker
 #import "lecture-links.typ": lecture-link, lecture-title
 
-#let eps = math.epsilon.alt
 #let thmcounters = state("thmcounters", (:))
 
 // Render only graphical content to SVG. Disable HTML show rules while laying
@@ -148,6 +165,7 @@
   set par(justify: true)
   set list(indent: 4.05mm)
   set enum(indent: 4.05mm)
+  set figure(numbering: n => lecture-number-label(lec_num) + "." + str(n))
   set math.equation(numbering: "(1)")
   show: equate.with(breakable: true, sub-numbering: false, number-mode: "label")
   show figure.caption: body => context [
@@ -177,8 +195,7 @@
         ..anchor,
         ..permalink,
       ))[
-        #html.elem("span", attrs: (class: "secno"))[#counter(heading).display()]
-        #it.body
+        #html.elem("span", attrs: (class: "secno"))[#(number + " ")]#it.body
       ]
     } else {
       html.elem(tag, attrs: (
@@ -768,9 +785,6 @@
 #let proofsketch = proof-factory("Proof Sketch")
 #let solution = proof-factory("solution")
 
-#let argmin = math.op($arg#h(1mm)min$, limits: true)
-#let argmax = math.op($arg#h(1mm)max$, limits: true)
-
 #let dt(s) = {
   (
     [#s]
@@ -797,226 +811,9 @@
 
 #let proofdir(marker, body) = [#marker~~#body]
 
-// Math notation
-#let qquad = $quad quad$
-#let dif = $d$
-#let nor(pt, domain: $Omega$) = $𝓝_(domain)(pt)$
-#let span = $op("span")$
-#let colspan = $op("colspan")$
-#let ip(a, b) = $lr(chevron.l #a, #b chevron.r)$
-#let _html-math-undisplay(body) = {
-  if type(body) == content and body.func() == math.equation and body.has("body") {
-    body.body
-  } else {
-    body
-  }
-}
-
-#let opt(dir, var, obj, ..constraints) = {
-  let data = (($limits(dir)_(var)$, $&$ + _html-math-undisplay(obj)),)
-  for (i, cntnt) in constraints.pos().enumerate(start: 0) {
-    if i == 0 {
-      data.push(("s.t.", $&$ + _html-math-undisplay(cntnt)))
-    } else {
-      data.push(("", $&$ + _html-math-undisplay(cntnt)))
-    }
-  }
-  math.mat(delim: none, ..data)
-}
-#let P = [P]
-#let PPAD = text(font: "Georgia", "PPAD")
-#let NP = text(font: "Georgia", "NP")
-#let coNP = text(font: "Georgia", "co-NP")
-#let cone = math.op("cone")
-#let nablat = math.op($tilde(nabla)#h(-1mm)$)
-#let div(a, b, dgf: $phi$) = $op("D") _#dgf (#a mid(||) #b)$
-#let divt(a, b) = $op("D") _(phi_t) (#a mid(||) #b)$
-#let circled(body) = box(
-  baseline: .6mm,
-  circle(
-    radius: 1.6mm,
-    stroke: .15mm + luma(50%),
-    inset: .3mm,
-    body,
-  ),
-)
-#let dom = math.op("dom")
-#let diag = math.op("diag")
-
-// Explicit Unicode alphabets retain math styling in repr(), which otherwise
-// omits the style properties of Typst's styled(child: ..., ..) wrapper.
-#let _html-latin-base = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".clusters()
-#let _html-latin-alphabets = (
-  "cal": "𝒜ℬ𝒞𝒟ℰℱ𝒢ℋℐ𝒥𝒦ℒℳ𝒩𝒪𝒫𝒬ℛ𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵𝒶𝒷𝒸𝒹ℯ𝒻ℊ𝒽𝒾𝒿𝓀𝓁𝓂𝓃ℴ𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏0123456789".clusters(),
-  "cal-bold": "𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃0123456789".clusters(),
-  "bb": "𝔸𝔹ℂ𝔻𝔼𝔽𝔾ℍ𝕀𝕁𝕂𝕃𝕄ℕ𝕆ℙℚℝ𝕊𝕋𝕌𝕍𝕎𝕏𝕐ℤ𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡".clusters(),
-  "bold": "𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳𝟎𝟏𝟐𝟑𝟒𝟓𝟔𝟕𝟖𝟗".clusters(),
-  "bold-italic": "𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛0123456789".clusters(),
-  "italic": "𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍𝑎𝑏𝑐𝑑𝑒𝑓𝑔ℎ𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧0123456789".clusters(),
-  "sans": "𝖠𝖡𝖢𝖣𝖤𝖥𝖦𝖧𝖨𝖩𝖪𝖫𝖬𝖭𝖮𝖯𝖰𝖱𝖲𝖳𝖴𝖵𝖶𝖷𝖸𝖹𝖺𝖻𝖼𝖽𝖾𝖿𝗀𝗁𝗂𝗃𝗄𝗅𝗆𝗇𝗈𝗉𝗊𝗋𝗌𝗍𝗎𝗏𝗐𝗑𝗒𝗓𝟢𝟣𝟤𝟥𝟦𝟧𝟨𝟩𝟪𝟫".clusters(),
-  "sans-italic": "𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻0123456789".clusters(),
-  "sans-bold": "𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇𝟬𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵".clusters(),
-  "sans-bold-italic": "𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯0123456789".clusters(),
-)
-#let _html-symbol = $A$.body.func()
-#let _html-alphabet-char(char, requested, text-mode: false) = {
-  let index = _html-latin-base.position(c => c == char)
-  let previous = if text-mode { "normal" } else { "italic" }
-  if index == none {
-    for (kind, alphabet) in _html-latin-alphabets {
-      let found = alphabet.position(c => c == char)
-      if found != none and alphabet.at(found) != _html-latin-base.at(found) {
-        index = found
-        previous = kind
-        break
-      }
-    }
-  }
-  if index == none { return _html-symbol(char) }
-  let target = requested
-  if requested == "cal" and previous.contains("bold") { target = "cal-bold" }
-  if requested == "bold" {
-    target = if previous.contains("cal") { "cal-bold" }
-      else if previous == "bb" { "bb" }
-      else if previous.contains("sans") {
-        if previous.contains("italic") { "sans-bold-italic" } else { "sans-bold" }
-      } else if previous.contains("italic") { "bold-italic" } else { "bold" }
-  }
-  if requested == "sans" {
-    target = if previous.contains("bold") {
-      if previous.contains("italic") { "sans-bold-italic" } else { "sans-bold" }
-    } else if previous.contains("italic") { "sans-italic" } else { "sans" }
-  }
-  if requested == "upright" {
-    target = if previous.contains("cal") or previous == "bb" { previous }
-      else if previous.contains("sans") {
-        if previous.contains("bold") { "sans-bold" } else { "sans" }
-      } else if previous.contains("bold") { "bold" } else { "normal" }
-  }
-  if target == "normal" {
-    return math.class("normal", math.op(_html-latin-base.at(index), limits: false))
-  }
-  // Unicode has no italic digits; use the corresponding upright digits.
-  if index >= 52 {
-    target = if target == "bold-italic" { "bold" }
-      else if target == "sans-italic" { "sans" }
-      else if target == "sans-bold-italic" { "sans-bold" } else { target }
-  }
-  _html-symbol(_html-latin-alphabets.at(target).at(index))
-}
-#let _html-known-alphabet-char(char) = {
-  (char in _html-latin-base or _html-latin-alphabets.values().any(alphabet => char in alphabet)
-    or char.match(regex("^[ .,:;!?()\\[\\]{}+*/=\\-]$")) != none)
-}
-#let _html-simple-alphabet(body) = {
-  if type(body) == str { return body.clusters().all(_html-known-alphabet-char) }
-  if type(body) != content { return false }
-  if body.func() == math.equation { return _html-simple-alphabet(body.body) }
-  if body.has("children") { return body.children.all(_html-simple-alphabet) }
-  if body.has("text") { return type(body.text) == str and body.text.clusters().all(_html-known-alphabet-char) }
-  if body.func() == math.attach {
-    return body.fields().values().all(value => value == none or type(value) != content or _html-simple-alphabet(value))
-  }
-  body.func() in ([ ].func(), linebreak, h)
-}
-#let _html-font-style(style, native, body) = if html-math-mode == "katex" {
-  math.equation(metadata("katex-font:" + style) + _html-math-undisplay(body))
-} else {
-  native(body)
-}
-#let _html-alphabet(body, style, native) = {
-  if not _html-simple-alphabet(body) { return _html-font-style(style, native, body) }
-
-  if type(body) == str {
-    return body.clusters().map(c => _html-alphabet-char(c, style, text-mode: true)).join()
-  }
-  if type(body) != content { return native(body) }
-  if body.func() == math.equation { return _html-alphabet(body.body, style, native) }
-  if body.has("children") {
-    return body.children.map(c => _html-alphabet(c, style, native)).join()
-  }
-  if body.has("text") {
-    return body.text.clusters().map(c => _html-alphabet-char(c, style, text-mode: body.func() == text)).join()
-  }
-  if body.func() == math.attach {
-    let fields = body.fields()
-    let base = fields.remove("base")
-    for key in ("t", "b", "tl", "tr", "bl", "br") {
-      if fields.at(key, default: none) != none {
-        fields.insert(key, _html-alphabet(fields.at(key), style, native))
-      }
-    }
-    return math.attach(_html-alphabet(base, style, native), ..fields)
-  }
-  // Whitespace and punctuation do not carry an alphabet; preserve native
-  // styling for other compound expressions rather than dropping their content.
-  if body.func() in ([ ].func(), linebreak, h) { return body }
-  native(body)
-}
-#let _html-cal-symbol(body) = _html-alphabet(body, "cal", math.cal)
-#let cal = _html-cal-symbol
-#let bb(body) = _html-alphabet(body, "bb", math.bb)
-#let bold(body) = _html-alphabet(body, "bold", math.bold)
-#let sans(body) = _html-alphabet(body, "sans", math.sans)
-#let italic(body) = _html-alphabet(body, "italic", math.italic)
-#let _html-upright-word(body) = {
-  if type(body) == str { return body }
-  if type(body) != content { return none }
-  if body.func() == math.equation { return _html-upright-word(body.body) }
-  if body.func() == [ ].func() { return "" }
-  if body.has("text") {
-    if type(body.text) == str and body.text.match(regex("^[A-Za-z0-9 .,:;!?()\\-]*$")) != none { return body.text }
-    return none
-  }
-  if body.has("children") {
-    let parts = body.children.map(_html-upright-word)
-    if parts.any(p => p == none) { return none }
-    return parts.join()
-  }
-  none
-}
-#let upright(body) = {
-  let word = _html-upright-word(body)
-  if word != none { math.class("normal", math.op(word, limits: false)) }
-  else { _html-alphabet(body, "upright", math.upright) }
-}
-
 // A nested equation keeps the color marker scoped to the colored subexpression.
 #let html-math-color(fill, body) = if html-math-mode == "katex" {
   math.equation(metadata("katex-color:" + fill.to-hex()) + _html-math-undisplay(body))
 } else {
   text(fill, body)
 }
-
-#let BB = $𝔹$
-#let CC = $ℂ$
-#let NN = $ℕ$
-#let QQ = $ℚ$
-#let RR = $ℝ$
-#let EE = math.op($𝔼$, limits: true)
-
-#let matA = $𝐀$
-#let matI = $𝐈$
-#let matK = $𝐊$
-#let matM = $𝐌$
-#let matU = $𝐔$
-
-#let va = $𝐚$
-#let vb = $𝐛$
-#let vc = $𝐜$
-#let vp = $𝐩$
-#let vq = $𝐪$
-#let vs = $𝐬$
-#let vu = $𝐮$
-#let vx = $𝐱$
-#let vy = $𝐲$
-#let vz = $𝐳$
-
-#let cA = $𝓐$
-#let cC = $𝓒$
-#let cH = $𝓗$
-#let cK = $𝓚$
-#let cS = $𝓢$
-#let cU = $𝓤$
-#let cX = $𝓧$
-#let cY = $𝓨$

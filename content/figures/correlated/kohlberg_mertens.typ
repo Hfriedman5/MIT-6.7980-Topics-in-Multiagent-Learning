@@ -6,7 +6,9 @@
  * Timestamp: 2024-09-28T10:42:47.
  */
 
-#set text(font: "New Computer Modern")
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font)
+#show: figure-style
 #import "../libs/nash.typ": brown
 
 #set page(width: auto, height: auto, fill: none, margin: 0mm)

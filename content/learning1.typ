@@ -6,20 +6,6 @@
   title: "Learning in games: Algorithms",
 )
 
-#let va = $a$
-#let vb = $b$
-#let vx = $x$
-#let vy = $y$
-#let vg = $g$
-#let vr = $r$
-#let cX = $X$
-#let cY = $Y$
-#let cR = $R$
-#let xhat = $hat(vx)$
-#let yhat = $hat(vy)$
-
-#let mU = $upright(U)_1$
-
 The #lecture-link("learning_intro", <sec-learning-applications>)[applications of regret minimization] show how no-external-regret dynamics recover several solution concepts of interest, including Nash equilibria in two-player zero-sum games, normal-form coarse-correlated equilibria in multiplayer general-sum games, and more generally convex-concave saddle point problems.
 
 In this lecture, we begin exploring how no-external-regret dynamics can be constructed, starting from normal-form games.
@@ -47,9 +33,9 @@ Our goal is to make sure that the regret grows sublinearly in $T$ no matter the 
 )[
   *General principle*. Most algorithms known today for the task operate by _prioritizing actions based on how much regret they have incurred_. In particular, a key quantity to define modern algorithms is the vector of cumulated actions regrets
   $
-    vr^((t)) := sum_(tau=1)^t lr(size: #150%, (vg^((tau)) - ip(vg^((tau)), vx^((tau))) bold(1))).
+    vr^((t)) := sum_(tau=1)^t lr(size: #150%, (vg^((tau)) - ip(vg^((tau)), vx^((tau))) vone)).
   $
-  (Note that $"Reg"^((t)) = max_(a in A) vr^((t))_a$.)
+  (Note that $"Reg"^((t)) = max_(a in A) r^((t))_a$.)
   The natural question is: _how to prioritize?_
 ]
 
@@ -99,26 +85,26 @@ The algorithm is presented in pseudocode in @algo-rm.
 #wrapped-figure(
   [
     #pseudocode-list(numbered-title: [Regret Matching])[
-      + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
+      + $vr^((0)) <- 0 in RR^A, quad vx^((0)) <- vone\/|A| in Delta(A)$
       + *function* `NextStrategy()`
-        + *if* $[r^((t-1))]^+ != 0$
-          + *return* $x^((t)) <- display(([r^((t-1))]^+) / norm([r^((t-1))]^+)_1)$
+        + *if* $[vr^((t-1))]^+ != 0$
+          + *return* $vx^((t)) <- display(([vr^((t-1))]^+) / norm([vr^((t-1))]^+)_1)$
         + *else*
-          + *return* $x^((t)) <-$ any point in $Delta(A)$
-      + *function* `ObserveUtility`($g^((t))$)
-        + $r^((t)) <- r^((t-1)) + g^((t)) - ip(g^((t)), x^((t))) bold(1)$
+          + *return* $vx^((t)) <-$ any point in $Delta(A)$
+      + *function* `ObserveUtility`($vg^((t))$)
+        + $vr^((t)) <- vr^((t-1)) + vg^((t)) - ip(vg^((t)), vx^((t))) vone$
     ] <algo-rm>
   ],
   [
     #pseudocode-list(numbered-title: [Regret Matching#super[+]])[
-      + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
+      + $vr^((0)) <- 0 in RR^A, quad vx^((0)) <- vone\/|A| in Delta(A)$
       + *function* `NextStrategy()`
-        + *if* $[r^((t-1))]^+ != 0$
-          + *return* $x^((t)) <- display(([r^((t-1))]^+) / norm([r^((t-1))]^+)_1)$
+        + *if* $[vr^((t-1))]^+ != 0$
+          + *return* $vx^((t)) <- display(([vr^((t-1))]^+) / norm([vr^((t-1))]^+)_1)$
         + *else*
-          + *return* $x^((t)) <-$ any point in $Delta(A)$
-      + *function* `ObserveUtility`($g^((t))$)
-        + $r^((t)) <- [r^((t-1)) + g^((t)) - ip(g^((t)), x^((t))) bold(1)]^+$
+          + *return* $vx^((t)) <-$ any point in $Delta(A)$
+      + *function* `ObserveUtility`($vg^((t))$)
+        + $vr^((t)) <- [vr^((t-1)) + vg^((t)) - ip(vg^((t)), vx^((t))) vone]^+$
     ] <algo-rmp>
   ],
   side: right,
@@ -126,19 +112,19 @@ The algorithm is presented in pseudocode in @algo-rm.
 )
 
 #theorem[Regret bound for RM][
-  The Regret Matching algorithm (@algo-rm) is an external regret minimizer, and satisfies the regret bound $"Reg"^((T)) <= Omega sqrt(T)$, where $Omega$ is the maximum norm of $norm(vg^((t)) - ip(vg^((t)), vx^((t))) bold(1))_2$ up to time $T$.
+  The Regret Matching algorithm (@algo-rm) is an external regret minimizer, and satisfies the regret bound $"Reg"^((T)) <= Omega sqrt(T)$, where $Omega$ is the maximum norm of $norm(vg^((t)) - ip(vg^((t)), vx^((t))) vone)_2$ up to time $T$.
 
   In particular, if all the gradient vectors satisfy $norm(vg^((t)))_oo <= 1$ at all times $t$ then the regret satisfies $ "Reg"^((T)) <= 2 sqrt(T dot |A|). $
 ]
 #proof[
   We start by observing that, at all times $t$,
   $
-    (vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) bold(1))^top vx^((t+1)) = 0
+    (vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) vone)^top vx^((t+1)) = 0
   $
   (this is always true, not just for Regret Matching). Plugging in the definition (@eq-rm) of how $vx^((t+1))$ is constructed, we therefore conclude that
   #set math.equation(numbering: "(1)")
   $
-    (vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) bold(1))^top \[vr^((t))\]^+ = 0.
+    (vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) vone)^top \[vr^((t))\]^+ = 0.
   $ <eqx>
   #set math.equation(numbering: none)
   (Note that the above equation holds trivially when $\[vr^((t))\]^+=0$ and therefore $vx^((t+1))$ is picked arbitrarily.)
@@ -147,13 +133,13 @@ The algorithm is presented in pseudocode in @algo-rm.
   $
     norm([va + vb]^+)_2^2 <= norm([va]^+ + vb)_2^2,
   $
-  applied to $va = vr^((t))$ and $vb = vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) bold(1)$. In particular, since by definition $va + vb = vr^((t+1))$, we have
+  applied to $va = vr^((t))$ and $vb = vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) vone$. In particular, since by definition $va + vb = vr^((t+1))$, we have
   $
-    norm(\[vr^((t+1))\]^+)_2^2 &<= norm(\[vr^((t))\]^+ + (vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) bold(1)))_2^2 \
-    &= norm(\[vr^((t))\]^+)_2^2 + norm(vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) bold(1))_2^2 + 2 (
-      vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) bold(1)
+    norm(\[vr^((t+1))\]^+)_2^2 &<= norm(\[vr^((t))\]^+ + (vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) vone))_2^2 \
+    &= norm(\[vr^((t))\]^+)_2^2 + norm(vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) vone)_2^2 + 2 (
+      vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) vone
     )^top \[vr^((t))\]^+ \
-    &= norm(\[vr^((t))\]^+)_2^2 + norm(vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) bold(1))_2^2 #h(4.5cm) ("from" (#[@eqx]))\
+    &= norm(\[vr^((t))\]^+)_2^2 + norm(vg^((t+1)) - ip(vg^((t+1)), vx^((t+1))) vone)_2^2 #h(4.5cm) ("from" (#[@eqx]))\
     &<= norm(\[vr^((t))\]^+)_2^2 + Omega^2.
   $
   Hence, by induction we have
@@ -162,10 +148,10 @@ The algorithm is presented in pseudocode in @algo-rm.
   $
   which implies
   $
-    "Reg"^((T)) = max_(a in A) vr^((T))_a <= max_(a in A) #[~]\[ vr^((T))_a \]^+ <= norm(\[vr^((T))\]^+)_2 <= Omega sqrt(T).
+    "Reg"^((T)) = max_(a in A) r^((T))_a <= max_(a in A) #[~]\[ r^((T))_a \]^+ <= norm(\[vr^((T))\]^+)_2 <= Omega sqrt(T).
   $
   The proof of the first part is then complete. The second part then just follows from using the inequality
-  $ Omega = max_(t<=T) norm(g^((t)) - ip(g^((t)), x^((t)))bold(1))_2 <= 2 sqrt(|A|) max_(t<=T) norm(g^((t)))_oo. $
+  $ Omega = max_(t<=T) norm(vg^((t)) - ip(vg^((t)), vx^((t)))vone)_2 <= 2 sqrt(|A|) max_(t<=T) norm(vg^((t)))_oo. $
   #v(-6mm)
 ]
 
@@ -185,7 +171,7 @@ Because of that, Regret Matching#super[+] has stronger practical performance and
 
 With a simple modification to the analysis of RM, the same bound as RM can be proven.
 #theorem[Regret bound for RM#super[+]][
-  The RM#super[+] algorithm (@algo-rmp) is an external regret minimizer, and satisfies the regret bound $"Reg"^((T)) <= Omega sqrt(T)$, where $Omega$ is the maximum norm $norm(vg^((t)) - ip(vg^((t)), vx^((t))) bold(1))_2$ up to time $T$.
+  The RM#super[+] algorithm (@algo-rmp) is an external regret minimizer, and satisfies the regret bound $"Reg"^((T)) <= Omega sqrt(T)$, where $Omega$ is the maximum norm $norm(vg^((t)) - ip(vg^((t)), vx^((t))) vone)_2$ up to time $T$.
 
   So again, if all the gradient vectors satisfy $norm(vg^((t)))_oo <= 1$ at all times $t$ then the regret satisfies $ "Reg"^((T)) <= 2 sqrt(T dot |A|). $
 
@@ -198,8 +184,8 @@ With a simple modification to the analysis of RM, the same bound as RM can be pr
     If we replace the "hard" maximum of follow-the-leader with the "soft" maximum given by
 
     $
-      x_a^((t+1)) & = "softmax"_(a)(eta r^((t))) \
-                  & := exp(eta r_a^((t))) / (sum_(j=1)^m exp(eta r^((t))[j])),
+      x_a^((t+1)) & = "softmax"_(a)(eta vr^((t))) \
+                  & := exp(eta r_a^((t))) / (sum_(j=1)^m exp(eta vr^((t))[j])),
     $
     where $eta > 0$ is an inverse temperature parameter, then we obtain the _multiplicative weights update_ algorithm #citep(<freund1997decision>).
 
@@ -207,11 +193,11 @@ With a simple modification to the analysis of RM, the same bound as RM can be pr
   ],
   [
     #pseudocode-list(numbered-title: [Multiplicative Weights Update])[
-      + $r^((0)) <- 0 in RR^A, quad x^((0)) <- bold(1)\/|A| in Delta(A)$
+      + $vr^((0)) <- 0 in RR^A, quad vx^((0)) <- vone\/|A| in Delta(A)$
       + *function* `NextStrategy()`
-        + *return* $x^((t)) <-$ `softmax`$(eta r^((t-1)))$
-      + *function* `ObserveUtility`($g^((t))$)
-        + $r^((t)) <- r^((t-1)) + g^((t)) - ip(g^((t)), x^((t))) bold(1)$
+        + *return* $vx^((t)) <-$ `softmax`$(eta vr^((t-1)))$
+      + *function* `ObserveUtility`($vg^((t))$)
+        + $vr^((t)) <- vr^((t-1)) + vg^((t)) - ip(vg^((t)), vx^((t))) vone$
     ] <algo-mwu>
   ],
   side: right,
@@ -225,9 +211,9 @@ Compared to RM, MWU has a different flavor: it uses _softmax_ instead of ReLU. T
   $
     "Reg"^((
       T
-    )) <= (log |A|) / eta + eta sum_(t=1)^T norm(g^((t)))_oo^2 - 1 / (8 eta) sum_(t=2)^T norm(x^((t)) - x^((t-1)))_1^2,
+    )) <= (log |A|) / eta + eta sum_(t=1)^T norm(vg^((t)))_oo^2 - 1 / (8 eta) sum_(t=2)^T norm(vx^((t)) - vx^((t-1)))_1^2,
   $
-  no matter the sequence of gradient vectors $g^((t))$ chosen by the environment. In particular, if all the gradient vectors satisfy $norm(g^((t)))_oo <= 1$ at all times $t$ and $eta = sqrt(log |A|\/ T)$, the regret satisfies
+  no matter the sequence of gradient vectors $vg^((t))$ chosen by the environment. In particular, if all the gradient vectors satisfy $norm(vg^((t)))_oo <= 1$ at all times $t$ and $eta = sqrt(log |A|\/ T)$, the regret satisfies
 
   $ "Reg"^((T)) <= 2 sqrt(T log |A|). $
 ]<mwu-regret-bound>
@@ -268,19 +254,19 @@ The last general method that we mention today is the _online mirror descent (OMD
 #definition[OMD, simplex case][
   Let $psi : Delta(A) -> RR$ be a distance-generating function. The online mirror descent algorithm (OMD) defines the choice of strategy
   $
-    vx^((t)) & := argmax_(xhat in Delta(A)) {ip(vg^((t-1)), xhat) - 1 / eta div(xhat, x^((t-1)), dgf: psi)},
+    vx^((t)) & := argmax_(xhat in Delta(A)) {ip(vg^((t-1)), xhat) - 1 / eta div(xhat, vx^((t-1)), dgf: psi)},
   $
   where
   $
-    div(xhat, x, dgf: psi) := psi(xhat) - psi(x) - ip(nabla psi(x), xhat - x)
+    div(xhat, vx, dgf: psi) := psi(xhat) - psi(vx) - ip(nabla psi(vx), xhat - vx)
   $
   is called the _Bregman divergence_ associated with $psi$.
 ]
 
 Two choices of regularizer are standard for the probability simplex:
-- The _negative entropy_ function $H(vx) := sum_(a in A) vx_a log vx_a$. This is 1-strongly convex with respect to the $ell_1$ norm $norm(dot.c)_1$ (and therefore also with respect to $norm(dot.c)_2$). OMD instantiated with this regularizer leads to the multiplicative weights update algorithm seen in @sec-mwu; see also @sec-omd-mwu.
+- The _negative entropy_ function $H(vx) := sum_(a in A) x_a log x_a$. This is 1-strongly convex with respect to the $ell_1$ norm $norm(dot.c)_1$ (and therefore also with respect to $norm(dot.c)_2$). OMD instantiated with this regularizer leads to the multiplicative weights update algorithm seen in @sec-mwu; see also @sec-omd-mwu.
 
-- The _squared Euclidean norm_ $psi(x) := 1/2 norm(x)_2^2$, which is 1-strongly convex with respect to the $ell_2$ norm $norm(dot.c)_2$. OMD instantiated with this regularizer leads to the online projected gradient descent algorithm, which we will discuss in @sec-ogd.
+- The _squared Euclidean norm_ $psi(vx) := 1/2 norm(vx)_2^2$, which is 1-strongly convex with respect to the $ell_2$ norm $norm(dot.c)_2$. OMD instantiated with this regularizer leads to the online projected gradient descent algorithm, which we will discuss in @sec-ogd.
 
 == The general case <ftrl-omd-general-case>
 
@@ -291,7 +277,7 @@ FTRL and OMD apply well beyond the case of probability simplices. In fact, they 
 ]
 #definition[OMD, general version][
   For $t>=2$, after initializing $vx^((1))$ as above, the OMD algorithm produces strategies $vx^((t))$ by solving the optimization problem
-  $ vx^((t)) := argmax_(xhat in cX) {ip(vg^((t-1)), xhat) - 1 / eta div(xhat, x^((t-1)), dgf: psi)}. $
+  $ vx^((t)) := argmax_(xhat in cX) {ip(vg^((t-1)), xhat) - 1 / eta div(xhat, vx^((t-1)), dgf: psi)}. $
 ]
 
 We also remark the following connection between the two algorithms.
@@ -305,9 +291,9 @@ We mention the following regret bound for the general case. The supplementary re
   $
     "Reg"^((
       T
-    )) <= B / eta + eta sum_(t=1)^T norm(vg^((t)))_*^2 - 1 / (8 eta) sum_(t=2)^T norm(x^((t)) - x^((t-1)))^2,
+    )) <= B / eta + eta sum_(t=1)^T norm(vg^((t)))_*^2 - 1 / (8 eta) sum_(t=2)^T norm(vx^((t)) - vx^((t-1)))^2,
   $
-  where $B=max_(x in cX) psi(x)-min_(x in cX) psi(x)$ for FTRL, and $B=max_(x in cX) div(x, x^((1)), dgf: psi)$ for OMD. The latter reduces to the former when the initial minimizer lies in the relative interior. We assume these quantities are finite. As above, $norm(dot.c)_*$ is the dual norm.
+  where $B=max_(vx in cX) psi(vx)-min_(vx in cX) psi(vx)$ for FTRL, and $B=max_(vx in cX) div(vx, vx^((1)), dgf: psi)$ for OMD. The latter reduces to the former when the initial minimizer lies in the relative interior. We assume these quantities are finite. As above, $norm(dot.c)_*$ is the dual norm.
   In particular, if the norm of the gradient vectors is bounded, then by picking learning rate $eta = 1/sqrt(T)$, we obtain that $"Reg"^((T))$ is bounded as roughly $sqrt(T)$ (a sublinear function!) at all times $T$.
 ] <ftrl-omd-regret-bound>
 
@@ -316,7 +302,7 @@ We mention the following regret bound for the general case. The supplementary re
 #wrapped-figure(
   [
     Multiplicative weights update is the special case of _both FTRL and OMD_ in which the regularizer $psi$ is set to the _negative entropy_ function
-    $ H(vx) := sum_(a in A) vx_a log vx_a. $
+    $ H(vx) := sum_(a in A) x_a log x_a. $
 
     #example[
       The adjacent plot displays the negative entropy function in the case of $|A|=2$ actions.
@@ -343,10 +329,10 @@ Plugging the bound above into the general analysis of FTRL and OMD algorithms (@
 
 == Online Projected Gradient Ascent <sec-ogd>
 
-In the special case in which $psi(x) := 1/2 norm(x)_2^2$, then the OMD algorithm reduces to _online projected gradient ascent_.
+In the special case in which $psi(vx) := 1/2 norm(vx)_2^2$, then the OMD algorithm reduces to _online projected gradient ascent_.
 
 #definition[Online projected gradient ascent][
-  The online projected gradient ascent algorithm is the special case of OMD in which the regularizer is (half) the squared Euclidean norm, that is, $psi(x) = 1/2 norm(x)_2^2$. The choice of strategy is given by
+  The online projected gradient ascent algorithm is the special case of OMD in which the regularizer is (half) the squared Euclidean norm, that is, $psi(vx) = 1/2 norm(vx)_2^2$. The choice of strategy is given by
   $
     vx^((t)) = argmax_(xhat in cX) {
       ip(vg^((t-1)), xhat) - 1 / (2 eta) norm(xhat - vx^((t-1)))_2^2
@@ -358,8 +344,8 @@ Since the squared Euclidean norm is $1$-strongly convex with respect to the $ell
 
 #theorem[Regret bound for OGD][
   Let $D$ be the Euclidean diameter of $cX$. With any initial point in $cX$, projected gradient ascent satisfies
-  $ "Reg"^((T)) <= D^2/(2 eta) + eta/2 sum_(t=1)^T norm(g^((t)))_2^2. $
-  On the simplex, $D <= sqrt(2)$. If $norm(g^((t)))_oo <= 1$, then $norm(g^((t)))_2^2 <= |A|$. Choosing $eta=sqrt(2/(T|A|))$ therefore gives
+  $ "Reg"^((T)) <= D^2/(2 eta) + eta/2 sum_(t=1)^T norm(vg^((t)))_2^2. $
+  On the simplex, $D <= sqrt(2)$. If $norm(vg^((t)))_oo <= 1$, then $norm(vg^((t)))_2^2 <= |A|$. Choosing $eta=sqrt(2/(T|A|))$ therefore gives
   $ "Reg"^((T)) <= sqrt(2T|A|). $
 ]<ogd-regret-bound>
 
@@ -372,8 +358,8 @@ The next plots illustrate the behavior of OGD and MWU in a simple $2 times 2$ ga
       $ U_1 = mat(2, 1; 0, 2). $
       The unique Nash equilibrium of the game is in
       $
-        x^* & = (2/3, 1/3), \
-        y^* & = (1/3, 2/3).
+        vx^* & = (2/3, 1/3), \
+        vy^* & = (1/3, 2/3).
       $
       The purple dot indicates the starting strategy. The gray dotted line tracks the profile of _average_ strategies, which converges to an approximate Nash equilibrium as proved by the #lecture-link("learning_intro", <thm-regret-gap>)[regret-to-equilibrium argument].
     ],

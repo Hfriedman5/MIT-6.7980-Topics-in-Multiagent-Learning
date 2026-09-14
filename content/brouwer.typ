@@ -81,15 +81,15 @@ What does Sperner's lemma have to do with Brouwer's fixed point theorem? The con
 the boundary conditions are that the continuous function must map the compact set to itself, i.e.~the boundary points must be mapped to somewhere inside the set. In the case of Sperner's lemma, the boundary conditions are the coloring rules on the boundary.
 
 #wrapped-figure(side: left, text-width: 75%)[
-  As it turns out, Sperner's lemma can be viewed as a “discretized version” of Brouwer's fixed point theorem. To see the connection, consider a continuous function mapping $[0 \, 1]^2$ to itself and, depending on the direction of $f \( z \) - z$, assign red, yellow, or blue to the vertices of a fine, triangulated grid, whose boundary matches that of $[0 \, 1]^2$, according to the rules shown on the left.
+  As it turns out, Sperner's lemma can be viewed as a “discretized version” of Brouwer's fixed point theorem. To see the connection, consider a continuous function mapping $[0 \, 1]^2$ to itself and, depending on the direction of $f \( vz \) - vz$, assign red, yellow, or blue to the vertices of a fine, triangulated grid, whose boundary matches that of $[0 \, 1]^2$, according to the rules shown on the left.
 ][
   #image("figures/brouwer/color_wheel.svg", width: 92.774pt)
 ]
 (This coloring is a more boring version of the #lecture-link("nfgs_nash", <sec-nash-improvement>)[coloring of the Nash improvement function], but it will work for our purposes.)
 
-If the direction of $f \( z \) - z$ lies in the yellow-blue, blue-red, or yellow-red boundary, we can assign any one of the two compatible colors, but we will make sure that, for grid points lying on the boundary of $[0 \, 1]^2$, we will break ties in favor of the color that does not violate the Sperner coloring conditions. Because $f$ maps $[0 \, 1]^2$ to itself, there should always be at least one such option! Thus, the coloring we will obtain will be a valid Sperner coloring, and it will have at least one trichromatic~triangle.
+If the direction of $f \( vz \) - vz$ lies in the yellow-blue, blue-red, or yellow-red boundary, we can assign any one of the two compatible colors, but we will make sure that, for grid points lying on the boundary of $[0 \, 1]^2$, we will break ties in favor of the color that does not violate the Sperner coloring conditions. Because $f$ maps $[0 \, 1]^2$ to itself, there should always be at least one such option! Thus, the coloring we will obtain will be a valid Sperner coloring, and it will have at least one trichromatic~triangle.
 
-In turn, it should be intuitively clear why trichromatic triangles have value vis-à-vis the fixed point behavior of $f$: they are triangles where $f \( z \) - z$ changes direction within a small distance and, due to continuity, $f \( z \) - z$ can't be too large.
+In turn, it should be intuitively clear why trichromatic triangles have value vis-à-vis the fixed point behavior of $f$: they are triangles where $f \( vz \) - vz$ changes direction within a small distance and, due to continuity, $f \( vz \) - vz$ can't be too large.
 
 We formalize these ideas in the next sections, arriving at two results. First, we will show a complete proof of Brouwer's fixed point theorem, using Sperner's lemma and a compactness argument. Second, we will establish the following computational reduction. Suppose we are given access to an algorithm that takes as input a Sperner coloring of a triangulated grid and computes a trichromatic triangle guaranteed by Sperner's lemma. Then, we can use this algorithm to compute approximate Brouwer fixed points of a Lipschitz continuous function, $f$, from $[0 \, 1]^2$ to itself, by discretizing the domain into a grid whose cells have small enough diameter, as a function of the Lipschitz constant and the desired approximation, coloring the vertices of this grid according to the scheme presented above, and finding a trichromatic triangle. We illustrate how this reduction would work with an example.
 
@@ -113,48 +113,48 @@ By the Heine-Cantor theorem, any continuous function $f$ on a compact set is _un
   block: true,
   numbering: "(1)",
   $forall epsilon.alt > 0 \, exists delta (epsilon.alt) & > 0 :\
-  & ∥z - w∥_oo < delta (epsilon.alt) quad arrow.r.double.long quad ∥f \( z \) - f \( w \)∥_oo < epsilon.alt .$.body,
+  & ∥vz - vw∥_oo < delta (epsilon.alt) quad arrow.r.double.long quad ∥f \( vz \) - f \( vw \)∥_oo < epsilon.alt .$.body,
 )#label("eq: uniform continuity")
 
-Now, given $f$ and $epsilon.alt$, consider a triangulation of $\[ 0 \, 1 \]^2$ in which the diameter of every triangle is $delta$ in $ell_oo$. Assign colors to the vertices of the triangulation according to the direction of $f \( z \) - z$, using the coloring scheme discussed above, and breaking ties in an arbitrary way but respecting the Sperner coloring conditions. Let us call the resulting coloring a _Sperner discretization of $f$ of diameter $delta$_. Then, the following approximation bound can be established.
+Now, given $f$ and $epsilon.alt$, consider a triangulation of $\[ 0 \, 1 \]^2$ in which the diameter of every triangle is $delta$ in $ell_oo$. Assign colors to the vertices of the triangulation according to the direction of $f \( vz \) - vz$, using the coloring scheme discussed above, and breaking ties in an arbitrary way but respecting the Sperner coloring conditions. Let us call the resulting coloring a _Sperner discretization of $f$ of diameter $delta$_. Then, the following approximation bound can be established.
 
 #theorem[
-  Suppose that $z_Y$ is the yellow corner of a trichromatic triangle in a Sperner discretization of some continuous function $f : \[ 0 \, 1 \]^2 arrow.r \[ 0 \, 1 \]^2$ of diameter $delta lt.eq delta (epsilon.alt)$, where $delta \( epsilon.alt \)$ satisfies~#ref(label("eq: uniform continuity")) for some $epsilon.alt$. Then
+  Suppose that $vz_Y$ is the yellow corner of a trichromatic triangle in a Sperner discretization of some continuous function $f : \[ 0 \, 1 \]^2 arrow.r \[ 0 \, 1 \]^2$ of diameter $delta lt.eq delta (epsilon.alt)$, where $delta \( epsilon.alt \)$ satisfies~#ref(label("eq: uniform continuity")) for some $epsilon.alt$. Then
 
-  $ ∥f (z_Y) - z_Y∥_oo < epsilon.alt + delta . $
+  $ ∥f (vz_Y) - vz_Y∥_oo < epsilon.alt + delta . $
 ] <thm-sperner-approximation>
 
 #proof[
-  Let $z_R \, z_B \,$ and $z_Y$ be the red, blue, and yellow vertices of the trichromatic triangle. The key observation is that, by the coloring rule:
+  Let $vz_R \, vz_B \,$ and $vz_Y$ be the red, blue, and yellow vertices of the trichromatic triangle. The key observation is that, by the coloring rule:
 
-  - $(f (z_Y) - z_Y)_x$ and $(f (z_B) - z_B)_x$ have opposite signs if they are  nonzero
-  - $(f (z_Y) - z_Y)_y$ and $(f (z_R) - z_R)_y$ have opposite signs if they are  non-zero
+  - $(f (vz_Y) - vz_Y)_x$ and $(f (vz_B) - vz_B)_x$ have opposite signs if they are  nonzero
+  - $(f (vz_Y) - vz_Y)_y$ and $(f (vz_R) - vz_R)_y$ have opposite signs if they are  non-zero
 
   Thus, we can write
 
   $
-    \| (f (z_Y) - z_Y)_x \| & lt.eq \| (f (z_Y) - z_Y)_x - (f (z_B) - z_B)_x \| \
-                            & lt.eq \| (f (z_Y) - f (z_B))_x - (z_Y - z_B)_x \| \
-                            & lt.eq ∥f (z_Y) - f (z_B)∥_oo + ∥z_Y - z_B∥_oo < epsilon.alt + delta .
+    \| (f (vz_Y) - vz_Y)_x \| & lt.eq \| (f (vz_Y) - vz_Y)_x - (f (vz_B) - vz_B)_x \| \
+                            & lt.eq \| (f (vz_Y) - f (vz_B))_x - (vz_Y - vz_B)_x \| \
+                            & lt.eq ∥f (vz_Y) - f (vz_B)∥_oo + ∥vz_Y - vz_B∥_oo < epsilon.alt + delta .
   $
 
   and similarly
 
   $
-    \| (f (z_Y) - z_Y)_y \| & lt.eq \| (f (z_Y) - z_Y)_y - (f (z_R) - z_R)_y \| \
-                            & lt.eq \| (f (z_Y) - f (z_R))_y - (z_Y - z_R)_y \| \
-                            & lt.eq ∥f (z_Y) - f (z_R)∥_oo + ∥z_Y - z_R∥_oo < epsilon.alt + delta .
+    \| (f (vz_Y) - vz_Y)_y \| & lt.eq \| (f (vz_Y) - vz_Y)_y - (f (vz_R) - vz_R)_y \| \
+                            & lt.eq \| (f (vz_Y) - f (vz_R))_y - (vz_Y - vz_R)_y \| \
+                            & lt.eq ∥f (vz_Y) - f (vz_R)∥_oo + ∥vz_Y - vz_R∥_oo < epsilon.alt + delta .
   $
 
   From here, we can just use the definition of infinity norm:
 
-  $ ∥f (z_Y) - z_Y∥_oo = max {\| (f (z_Y) - z_Y)_x \| \, \| (f (z_Y) - z_Y)_y \|} < epsilon.alt + delta . med med med $
+  $ ∥f (vz_Y) - vz_Y∥_oo = max {\| (f (vz_Y) - vz_Y)_x \| \, \| (f (vz_Y) - vz_Y)_y \|} < epsilon.alt + delta . med med med $
 ]
 
 #corollary[
-  Consider the same setup as before, but now choose $delta colon.eq min {delta (epsilon.alt) \, epsilon.alt}$ for a given $epsilon.alt > 0$. Then $z_Y$ is a $2 epsilon.alt$-approximate fixed point of $f$, i.e.~
+  Consider the same setup as before, but now choose $delta colon.eq min {delta (epsilon.alt) \, epsilon.alt}$ for a given $epsilon.alt > 0$. Then $vz_Y$ is a $2 epsilon.alt$-approximate fixed point of $f$, i.e.~
 
-  $ ∥f (z_Y) - z_Y∥_oo < 2 epsilon.alt . $
+  $ ∥f (vz_Y) - vz_Y∥_oo < 2 epsilon.alt . $
 ] <cor:sperner>
 
 In turn, using a standard compactness argument, @cor:sperner implies Brouwer's fixed point theorem for continuous functions from $\[ 0 \, 1 \]^2$ to itself.
@@ -164,11 +164,11 @@ In turn, using a standard compactness argument, @cor:sperner implies Brouwer's f
 ]
 
 #proof[
-  Consider the sequence of approximation parameters $epsilon.alt_i colon.eq 2^(- i)$ for $i in bb(N)_(gt.eq 1)$, and the corresponding discretization parameters $delta_i colon.eq min {delta (epsilon.alt_i) \, epsilon.alt_i}$, as in @cor:sperner. For each $i$, we color the vertices of the resulting triangulation as above, so that they satisfy the conditions of Sperner's lemma, and identify a trichromatic triangle which is then guaranteed to exist. Let us denote by $z_(Y \, i)$ the yellow vertex of that triangle, which satisfies $∥f (z_(Y \, i)) - z_(Y \, i)∥_oo < 2 epsilon.alt_i$. Now consider the sequence of points $\( z_(Y \, i) \)_i$. Since $z_(Y \, i) in [0 \, 1]^2$ for all $i$, and $[0 \, 1]^2$ is a compact set, there exists a convergent subsequence $\( z_(Y \, n_j) \)_j$; let $z_Y^(*)$ denote the limit of this subsequence. By the continuity of $f$, the function $d \( z \) colon.eq ∥f \( z \) - z∥_oo$ is also continuous. Hence,
+  Consider the sequence of approximation parameters $epsilon.alt_i colon.eq 2^(- i)$ for $i in bb(N)_(gt.eq 1)$, and the corresponding discretization parameters $delta_i colon.eq min {delta (epsilon.alt_i) \, epsilon.alt_i}$, as in @cor:sperner. For each $i$, we color the vertices of the resulting triangulation as above, so that they satisfy the conditions of Sperner's lemma, and identify a trichromatic triangle which is then guaranteed to exist. Let us denote by $vz_(Y \, i)$ the yellow vertex of that triangle, which satisfies $∥f (vz_(Y \, i)) - vz_(Y \, i)∥_oo < 2 epsilon.alt_i$. Now consider the sequence of points $\( vz_(Y \, i) \)_i$. Since $vz_(Y \, i) in [0 \, 1]^2$ for all $i$, and $[0 \, 1]^2$ is a compact set, there exists a convergent subsequence $\( vz_(Y \, n_j) \)_j$; let $vz_Y^(*)$ denote the limit of this subsequence. By the continuity of $f$, the function $d \( vz \) colon.eq ∥f \( vz \) - vz∥_oo$ is also continuous. Hence,
 
-  $ d (z_Y^(*)) = lim_(j arrow.r oo) d (z_(Y \, n_j)) . $
+  $ d (vz_Y^(*)) = lim_(j arrow.r oo) d (vz_(Y \, n_j)) . $
 
-  Since $d (z_(Y \, n_j)) in [0 \, 2 dot.op 2^(- j)]$, we conclude $d (z_Y^(*)) = 0$, which is equivalent to $f (z_Y^(*)) = z_Y^(*)$. This proves that a fixed point exists.
+  Since $d (vz_(Y \, n_j)) in [0 \, 2 dot.op 2^(- j)]$, we conclude $d (vz_Y^(*)) = 0$, which is equivalent to $f (vz_Y^(*)) = vz_Y^(*)$. This proves that a fixed point exists.
 ]
 
 = Proof of Sperner's lemma <sec-sperner-proof>

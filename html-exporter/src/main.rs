@@ -2,6 +2,8 @@ mod chapters;
 mod math;
 mod options;
 mod permalinks;
+mod svg_images;
+mod svg_text;
 
 use chapters::{ChapterNav, ExportConfig};
 use math::MathMode;
@@ -39,6 +41,9 @@ fn main() {
 
 fn run() -> Result<(), String> {
     let config = options::parse()?;
+    if config.figure_svg {
+        return compile_figure_svg(&config);
+    }
     let export_config = load_export_config(&config)?;
     let raw_html = if let Some(path) = &config.from_html {
         fs::read_to_string(path)
@@ -46,6 +51,7 @@ fn run() -> Result<(), String> {
     } else {
         compile_typst_html(&config)?
     };
+    let raw_html = svg_images::inline_selectable_svgs(&raw_html)?;
     let mut document = HtmlParts::parse(&raw_html);
     let title = config
         .title
@@ -85,7 +91,7 @@ fn load_export_config(config: &Config) -> Result<Option<ExportConfig>, String> {
 }
 
 fn compile_typst_html(config: &Config) -> Result<String, String> {
-    let world = LocalWorld::new(&config.input, &config.root, config.math_mode)?;
+    let world = LocalWorld::new(&config.input, &config.root, config.math_mode, None)?;
     let warned = typst::compile::<HtmlDocument>(&world);
     for warning in &warned.warnings {
         eprintln!("typst warning: {}", format_diagnostic(warning));
@@ -97,16 +103,34 @@ fn compile_typst_html(config: &Config) -> Result<String, String> {
         .map_err(|errors| format_diagnostics("Typst HTML encoding failed", &errors))
 }
 
+fn compile_figure_svg(config: &Config) -> Result<(), String> {
+    let world = LocalWorld::new(
+        &config.input, &config.root, config.math_mode, Some(&config.figure_inputs),
+    )?;
+    let warned = typst::compile::<typst_layout::PagedDocument>(&world);
+    for warning in &warned.warnings {
+        eprintln!("typst warning: {}", format_diagnostic(warning));
+    }
+    let document = warned.output
+        .map_err(|errors| format_diagnostics("Figure compilation failed", &errors))?;
+    if document.pages().len() != 1 {
+        return Err("a standalone SVG figure must contain exactly one page".into());
+    }
+    write_output(config, svg_text::render(&document.pages()[0]))
+}
+
 struct LocalWorld {
     main: FileId,
+    root: PathBuf,
     library: LazyHash<Library>,
     fonts: FontStore,
     files: SystemFiles,
     time: Time,
+    html_notes: bool,
 }
 
 impl LocalWorld {
-    fn new(input: &Path, root: &Path, math_mode: MathMode) -> Result<Self, String> {
+    fn new(input: &Path, root: &Path, math_mode: MathMode, figure_inputs: Option<&[String]>) -> Result<Self, String> {
         let root = root
             .canonicalize()
             .map_err(|err| format!("could not canonicalize root {}: {err}", root.display()))?;
@@ -131,6 +155,14 @@ impl LocalWorld {
 
         let mut inputs = Dict::new();
         inputs.insert("html-math".into(), math_mode.as_typst_input().into_value());
+        if let Some(figure_inputs) = figure_inputs {
+            for input in figure_inputs {
+                let (key, value) = input.split_once('=')
+                    .ok_or_else(|| format!("expected figure input key=value, got {input:?}"))?;
+                inputs.insert(key.into(), value.into_value());
+            }
+            inputs.insert("figure-format".into(), "html".into_value());
+        }
         let features = [Feature::Html].into_iter().collect();
         let library = Library::builder()
             .with_inputs(inputs)
@@ -140,9 +172,14 @@ impl LocalWorld {
         let mut fonts = FontStore::new();
         fonts.extend(fonts::system());
         fonts.extend(fonts::scan(&root.join("html-exporter/assets/fonts")));
+        if let Some(paths) = env::var_os("TYPST_FONT_PATHS") {
+            for path in env::split_paths(&paths) {
+                fonts.extend(fonts::scan(&path));
+            }
+        }
         fonts.extend(fonts::embedded());
         let packages = SystemPackages::new(SystemDownloader::new("notes-html-exporter/0.1"));
-        let files = SystemFiles::new(FsRoot::new(root), packages);
+        let files = SystemFiles::new(FsRoot::new(root.clone()), packages);
         let time = match env::var("SOURCE_DATE_EPOCH") {
             Ok(value) => {
                 Time::fixed_timestamp(value.parse().map_err(|_| "invalid SOURCE_DATE_EPOCH")?)
@@ -153,10 +190,12 @@ impl LocalWorld {
 
         Ok(Self {
             main,
+            root,
             library: LazyHash::new(library),
             fonts,
             files,
             time,
+            html_notes: figure_inputs.is_none(),
         })
     }
 
@@ -166,6 +205,10 @@ impl LocalWorld {
 
     fn read_bytes(&self, id: FileId) -> FileResult<Vec<u8>> {
         let path = self.system_path(id)?;
+        Self::read_path_bytes(&path)
+    }
+
+    fn read_path_bytes(path: &Path) -> FileResult<Vec<u8>> {
         let file_error = |err| FileError::from_io(err, &path);
         if fs::metadata(&path).map_err(file_error)?.is_dir() {
             Err(FileError::IsDirectory)
@@ -192,7 +235,7 @@ impl World for LocalWorld {
         let bytes = self.read_bytes(id)?;
         let bytes = bytes.strip_prefix(b"\xef\xbb\xbf").unwrap_or(&bytes);
         let text = std::str::from_utf8(bytes)?;
-        let text = if matches!(id.root(), VirtualRoot::Project) {
+        let text = if self.html_notes && matches!(id.root(), VirtualRoot::Project) {
             use_html_notes_style(text)
         } else {
             text.to_owned()
@@ -201,6 +244,24 @@ impl World for LocalWorld {
     }
 
     fn file(&self, id: FileId) -> FileResult<Bytes> {
+        if self.html_notes && matches!(id.root(), VirtualRoot::Project) {
+            let source = self.system_path(id)?;
+            if let Some(variant) = html_figure_path(&self.root, &source) {
+                // Keep the authored FileId so image.source and figure markers
+                // retain their stable source paths while the glyphs match HTML.
+                let bytes = Self::read_path_bytes(&variant).map_err(|err| match err {
+                    FileError::NotFound(_) => FileError::Other(Some(
+                        format!(
+                            "missing HTML figure {}; run `make figures` before exporting HTML",
+                            variant.display()
+                        )
+                        .into(),
+                    )),
+                    err => err,
+                })?;
+                return Ok(Bytes::new(bytes));
+            }
+        }
         Ok(Bytes::new(self.read_bytes(id)?))
     }
 
@@ -211,6 +272,20 @@ impl World for LocalWorld {
     fn today(&self, offset: Option<Duration>) -> Option<Datetime> {
         self.time.today(offset)
     }
+}
+
+fn html_figure_path(root: &Path, source: &Path) -> Option<PathBuf> {
+    let relative = source.strip_prefix(root.join("content/figures")).ok()?;
+    if source.extension().and_then(|extension| extension.to_str()) != Some("svg") {
+        return None;
+    }
+    let has_source = source.with_extension("typ").is_file()
+        || (source
+            .file_stem()
+            .and_then(|stem| stem.to_str())
+            .is_some_and(|stem| stem.starts_with("gate_"))
+            && source.with_file_name("gate.typ").is_file());
+    has_source.then(|| root.join(".build/html-figures").join(relative))
 }
 
 fn format_diagnostics(prefix: &str, diagnostics: &[SourceDiagnostic]) -> String {
@@ -926,6 +1001,9 @@ fn render_document(
         html.push_str(chapter_citation_script());
     }
     html.push_str(equation_width_script());
+    html.push_str("<script>\n");
+    html.push_str(include_str!("sidenotes.js"));
+    html.push_str("</script>\n");
     html.push_str(settled_hash_scroll_script());
     html.push_str("</body>\n</html>\n");
     html
@@ -1435,11 +1513,15 @@ fn equation_width_script() -> &'static str {
     var columnGap = parseFloat(style.columnGap) || 0;
     var gap = 12;
     if (eq.classList.contains("equation-aligned")) {
-      var left = maxWidth(Array.from(eq.querySelectorAll(".equation-align-left")));
-      var right = maxWidth(Array.from(eq.querySelectorAll(".equation-align-right")));
+      var columns = [];
+      eq.querySelectorAll(".equation-align-cell").forEach(function(cell){
+        var column = Number(cell.dataset.alignColumn);
+        columns[column] = Math.max(columns[column] || 0, boxWidth(cell));
+      });
       var full = maxWidth(Array.from(eq.querySelectorAll(".equation-align-full")));
       var eqno = maxWidth(Array.from(eq.querySelectorAll(".eqno")));
-      var aligned = left + right + columnGap + (eqno ? eqno + columnGap : 0);
+      var aligned = columns.reduce(function(total, width){ return total + width; }, 0)
+        + Math.max(0, columns.length - 1) * columnGap + (eqno ? eqno + columnGap : 0);
       return Math.max(full, aligned, eq.scrollWidth || 0);
     }
     var rows = Array.from(eq.querySelectorAll(".equation-line"));
@@ -1974,6 +2056,8 @@ mod tests {
             export_config: None,
             from_html: None,
             math_mode: MathMode::Katex,
+            figure_svg: false,
+            figure_inputs: Vec::new(),
         };
         (book, config)
     }
@@ -2052,6 +2136,8 @@ mod tests {
             export_config: None,
             from_html: None,
             math_mode: MathMode::Katex,
+            figure_svg: false,
+            figure_inputs: Vec::new(),
         };
         let html = render_document(&config, "Existence proofs", &parts, None);
         assert_eq!(html.matches("Prof. Constantinos Daskalakis").count(), 1);

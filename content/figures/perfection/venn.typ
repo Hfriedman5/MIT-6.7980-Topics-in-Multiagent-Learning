@@ -1,6 +1,8 @@
 // Extracted from Costis Gabri monograph/typst_content/L11.typ
 #set page(width: auto, height: auto, margin: 0mm, fill: none)
-#set text(font: "New Computer Modern", size: 10pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 10pt)
+#show: figure-style
 #import "@preview/cetz:0.3.4"
 
 #cetz.canvas(length: 1.2cm, {

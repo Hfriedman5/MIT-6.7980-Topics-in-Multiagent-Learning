@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import sys
 from check_links import audit_site
+from build_figures import HTML_FIGURES
 
 
 class Page(HTMLParser):
@@ -31,15 +32,20 @@ class Page(HTMLParser):
             self.in_lecture_title = 'lecture-title' in attrs.get('class', '').split()
         marker = attrs.get('data-image-source',
                            self.open_elements[-1][1] if self.open_elements else None)
+        github_code_ref = ('github-code-ref' in attrs.get('class', '').split()
+                           or bool(self.open_elements and self.open_elements[-1][2]))
         if tag not in self.void_tags:
-            self.open_elements.append((tag, marker))
+            self.open_elements.append((tag, marker, github_code_ref))
         if 'id' in attrs:
             self.ids.add(attrs['id'])
         if attrs.get('role') == 'math':
             self.math += 1
         if 'data-image-source' in attrs:
             # The helper stores repr(image.source); HTMLParser unescapes entities.
-            self.image_sources.append(attrs['data-image-source'])
+            # Imported code-reference icons are not authored lecture diagrams.
+            # Keep their markers in the element stack for size validation below.
+            if not (github_code_ref and attrs.get('aria-label') == 'GitHub'):
+                self.image_sources.append(attrs['data-image-source'])
         if tag in ('a', 'link') and attrs.get('href'):
             self.links.append(attrs['href'])
         if tag in ('img', 'script') and attrs.get('src'):
@@ -126,7 +132,10 @@ def image_inventory_issues(source, source_text, page, page_name, *, root=None):
         if root is not None and candidate.is_absolute() and not candidate.is_relative_to(root):
             # Relocated build inputs use Typst's project-root absolute paths.
             candidate = root / path.lstrip('/')
-        return (source.parent / candidate).resolve()
+        candidate = (source.parent / candidate).resolve()
+        if root is not None and candidate.is_relative_to(root / HTML_FIGURES):
+            candidate = root / 'content/figures' / candidate.relative_to(root / HTML_FIGURES)
+        return candidate
 
     expected = Counter(resolve_image(path)
                        for path in source_image_paths(source_text))

@@ -6,20 +6,6 @@
   title: "Learning algorithms (II)",
 )
 
-#let va = $a$
-#let vb = $b$
-#let vx = $x$
-#let vy = $y$
-#let vg = $g$
-#let vm = $m$
-#let vr = $r$
-#let vz = $z$
-#let cX = $X$
-#let cY = $Y$
-#let cR = $R$
-#let xhat = $hat(vx)$
-#let yhat = $hat(vy)$
-#let mU = $upright(U)_1$
 #let darkblue = blue.darken(20%)
 
 #v(-4mm)
@@ -82,7 +68,6 @@ At least three variants can be defined.
   $,
 )
 
-
 While the three predictive algorithms are in general different, they coincide in the special case of _Legendre regularizers_ (see also the #lecture-link("learning1", <ftrl-omd-general-case>)[discussion of when FTRL and OMD agree]).
 
 #remark[
@@ -101,7 +86,7 @@ The idea of optimism is to use predictivity with the specific guess $vm^((t+1)) 
 all times $t$. This corresponds to predicting that the feedback is slow-changing.
 
 #example[Optimistic online gradient ascent][
-  The non-reflected OMD algorithm instantiated with squared Euclidean norm $psi(x) = 1/2 norm(x)_2^2$ gives rise to the (non-reflected) _optimistic online gradient ascent_ algorithm, whose update rule is
+  The non-reflected OMD algorithm instantiated with squared Euclidean norm $psi(vx) = 1/2 norm(vx)_2^2$ gives rise to the (non-reflected) _optimistic online gradient ascent_ algorithm, whose update rule is
   #set math.equation(numbering: "(1)")
   $
     vz^((t+1)) & := #text(size: 14pt, $Pi$) _(cX)(vz^((t)) + eta vg^((t))), qquad qquad
@@ -113,7 +98,7 @@ all times $t$. This corresponds to predicting that the feedback is slow-changing
 #example[Optimistic MWU][
   For the MWU algorithm, the optimistic version of FTRL, non-reflected OMD, and reflected OMD all coincide, and give rise to the following update rule:
   $
-    vx^((t+1)) prop exp(eta r^((t)) + eta (#html-math-color(black, $r^((t)) - r^((t-1))$))).
+    vx^((t+1)) prop exp(eta vr^((t)) + eta (#html-math-color(black, $vr^((t)) - vr^((t-1))$))).
   $
 ]
 
@@ -129,8 +114,8 @@ In two-player games, optimism serves as a form of _negative_ momentum that pushe
 
       As mentioned, the optimistic dynamics exhibit a "push" towards equilibrium, due to the negative momentum effect, which results in convergence towards the unique Nash equilibrium
       $
-        x^* & = (2/3, 1/3), \
-        y^* & = (1/3, 2/3).
+        vx^* & = (2/3, 1/3), \
+        vy^* & = (1/3, 2/3).
       $
     ],
     [
@@ -156,13 +141,13 @@ This is indeed the case, as shown by #citet(<syrgkanis2015fast>).
   $
     "Reg"^((
       T
-    )) <= max_(xhat in cX)( psi(xhat) - psi(vx^((1))) ) / ( eta ) + eta sum_(t=1)^T norm(vg^((t)) - m^((t)))_*^2 - 1 / (8 eta) sum_(t=2)^T norm(x^((t)) - x^((t-1)))^2,
+    )) <= max_(xhat in cX)( psi(xhat) - psi(vx^((1))) ) / ( eta ) + eta sum_(t=1)^T norm(vg^((t)) - vm^((t)))_*^2 - 1 / (8 eta) sum_(t=2)^T norm(vx^((t)) - vx^((t-1)))^2,
   $
   where $norm(dot.c)_*$ is the dual norm of $norm(dot.c)$.
 ]
 
 #remark[
-  A consequence of the previous regret bound is the fact that---assuming $m^((t)) = vg^((t))$ is _omniscent_---the regret of the learning algorithm _does not grow with time_.]
+  A consequence of the previous regret bound is the fact that---assuming $vm^((t)) = vg^((t))$ is _omniscent_---the regret of the learning algorithm _does not grow with time_.]
 
 == Accelerated learning of Nash equilibria in two-player zero-sum games <sec-fast-zero-sum>
 
@@ -179,7 +164,7 @@ As noted by #citep(<syrgkanis2015fast>), the RVU bound implies accelerated conve
     )) &<= (Omega_2) / eta + eta sum_(t=1)^T norm(mU^top (vx^((t)) - vx^((t-1))))_*^2 - 1 / (8 eta) sum_(t=1)^T norm(vy^((t)) - vy^((t-1)))^2,
   $
   and $eta <= 1\/(4 norm(mU)_"op")$, where
-  $norm(mU)_"op" := max_(z in RR^n) norm(mU z)_* \/ norm(z)$
+  $norm(mU)_"op" := max_(vz in RR^n) norm(mU vz)_* \/ norm(vz)$
   is the operator norm of $mU$, then, at any time $T$, the sum of the regrets of the players satisfies the bound
   $ "Reg"_1^((T)) + "Reg"_2^((T)) <= (Omega_1 + Omega_2) / eta $
   which is _constant_ with respect to time. The #lecture-link("learning_intro", <thm-regret-gap>)[regret-to-saddle-point-gap identity] then implies convergence to the set of Nash equilibria in two-player zero-sum games at the rate of $O_T (1\/T)$.
@@ -236,8 +221,8 @@ last-iterate convergence of OMWU were in the air, just "one good trick" away. Af
 #example[Poor last-iterate convergence of FTRL, #citep(<Cai2024Jun>)][
   Consider the two-player zero-sum game with utility matrix for Player 1 given by
   $ mU(delta) := mat(1/2 + delta, 1/2; 0, 1). $
-  The game admits the unique Nash equilibrium $(x^*, y^*)$, where $ x^* = (1/(1+delta), delta/(1+delta)) qquad "and" qquad y^* = (1/(2(1+delta)), (1+2delta)/(2(1+delta))). $
-  In particular, when $delta$ is small, the equilibrium strategy for Player 1 is approximately $x^* = (1 - delta, delta)$ and thus very close to the boundary of the strategy polytope of the player. This proximity to the boundary affects the performance of all known instantiations of the the optimistic FTRL algorithm. To see this numerically, the next four plots show the evolution of three optimistic FTRL variants (entropic, Euclidean, and logarithmic) and the optimistic gradient ascent algorithm, in the game defined by $delta = 10^(-2).$
+  The game admits the unique Nash equilibrium $(vx^*, vy^*)$, where $ vx^* = (1/(1+delta), delta/(1+delta)) qquad "and" qquad vy^* = (1/(2(1+delta)), (1+2delta)/(2(1+delta))). $
+  In particular, when $delta$ is small, the equilibrium strategy for Player 1 is approximately $vx^* = (1 - delta, delta)$ and thus very close to the boundary of the strategy polytope of the player. This proximity to the boundary affects the performance of all known instantiations of the the optimistic FTRL algorithm. To see this numerically, the next four plots show the evolution of three optimistic FTRL variants (entropic, Euclidean, and logarithmic) and the optimistic gradient ascent algorithm, in the game defined by $delta = 10^(-2).$
 
   #align(center, image(
     "figures/learning2/plots.svg",

@@ -1,6 +1,6 @@
 // HTML renderer for the course's Lovelace pseudocode. Share the line data
 // constructors with the paged library, but never invoke its grid renderer.
-#import "lovelace.typ": normalize-line, indent, no-number, with-line-label, line-label
+#import "lovelace.typ": normalize-line, indent, no-number, with-line-label, line-label, identify-algorithm
 
 #let _html-pseudo-is-not-empty(it) = {
   (
@@ -147,7 +147,15 @@
 // paged renderer, callers attach labels and captions to the pseudocode call.
 #let pseudocode(caption: none, ..children) = {
   let named = children.named()
-  let title = named.at("numbered-title", default: named.at("title", default: none))
+  let title = named.at("title", default: none)
+  let numbered-title = named.at("numbered-title", default: none)
+  if numbered-title != none {
+    title = if numbered-title == [] {
+      strong(identify-algorithm)
+    } else {
+      [*#identify-algorithm:* #numbered-title]
+    }
+  }
   let line-numbering = named.at("line-numbering", default: "1.")
   let transformed = _html-pseudo-number-lines(children.pos().map(normalize-line)).children
 

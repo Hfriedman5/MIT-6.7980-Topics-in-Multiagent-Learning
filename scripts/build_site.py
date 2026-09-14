@@ -13,7 +13,7 @@ import subprocess
 import sys
 import zipfile
 
-from build_figures import build_figures
+from build_figures import HTML_FIGURES, build_figures
 from course_index import load_course, render_index
 from lecture_links import validate_lecture_links
 from public_files import copy_public_files, note_outputs, required_files, validate_public_path
@@ -54,19 +54,23 @@ def chapter_source_text(source: Path, chapter: dict | None = None) -> str:
     return content
 
 
-def relocate_source_paths(source: Path, content: str) -> str:
+def relocate_source_paths(source: Path, content: str, *, root: Path | None = None) -> str:
     """Resolve lecture-local dependencies before moving a source into .build/."""
+    root = (ROOT if root is None else root).resolve()
+
     def absolute_path(match: re.Match) -> str:
-        target = (source.parent / match[1]).resolve().relative_to(ROOT)
+        target = (source.parent / match[1]).resolve().relative_to(root)
         return '"/' + target.as_posix() + '"'
 
     return re.sub(r'"((?:meta|figures)/[^"]+)"', absolute_path, content)
 
 
-def prepare_pdf_source(source: Path, chapter: dict | None = None) -> Path:
+def prepare_pdf_source(source: Path, chapter: dict | None = None,
+                       *, root: Path | None = None) -> Path:
     """Apply scheduled headers and relocate paths, keeping the authored PDF style."""
-    content = relocate_source_paths(source, chapter_source_text(source, chapter))
-    target = ROOT / '.build' / 'pdf-source' / source.name
+    root = (ROOT if root is None else root).resolve()
+    content = relocate_source_paths(source, chapter_source_text(source, chapter), root=root)
+    target = root / '.build' / 'pdf-source' / source.name
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(content)
     return target
@@ -77,6 +81,9 @@ def prepare_html_source(source: Path, chapter: dict) -> Path:
     content = relocate_source_paths(source, content)
     content = content.replace('/content/meta/gabri_notes.typ',
                               '/content/meta/gabri_notes_html.typ')
+    content = re.sub(r'"/content/figures/([^"\n]+\.svg)"',
+                     lambda match: '"/' + HTML_FIGURES.as_posix() + '/' + match[1] + '"',
+                     content)
     target = ROOT / '.build' / 'html-source' / source.name
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(content)
@@ -122,8 +129,9 @@ def build_chapter(chapter: dict) -> str:
         raise RuntimeError(f"Lecture {chapter['number']} failed:\n{log.read_text()}")
     html = output.read_text()
     # Keep one shared stylesheet; KaTeX sources stay in the lecture HTML.
+    stylesheet_version = sha256((STAGE / 'assets/notes.css').read_bytes()).hexdigest()[:12]
     html, count = re.subn(r'<style>\s*.*?</style>',
-                         '<link rel="stylesheet" href="assets/notes.css">',
+                         f'<link rel="stylesheet" href="assets/notes.css?v={stylesheet_version}">',
                          html, count=1, flags=re.S)
     if count != 1:
         raise RuntimeError(f'Expected the converter stylesheet in {output}')

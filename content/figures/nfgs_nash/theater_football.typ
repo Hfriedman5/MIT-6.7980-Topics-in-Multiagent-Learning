@@ -1,6 +1,8 @@
 // Recovered from Costis Gabri monograph/texcontent/figures/L01/theater_football.typ
 #set page(width: auto, height: auto, fill: none, margin: 0mm)
-#set text(font: "New Computer Modern", size: 10pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 10pt)
+#show: figure-style
 #import "../libs/nash.typ": brown, game_table, nash_cmap, nashf
 #import "@preview/cetz:0.4.1"
 

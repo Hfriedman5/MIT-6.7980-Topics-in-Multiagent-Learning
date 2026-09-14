@@ -167,7 +167,7 @@ $ x = y $ <eq:whole>
             tag, attrs = page.labeled_elements[label]
             self.assertEqual(tag, 'figure')
             self.assertEqual(attrs['data-figure-kind'], kind)
-            self.assertEqual(attrs['data-figure-number'], '1')
+            self.assertEqual(attrs['data-figure-number'], 'L8.1')
 
     def test_labeled_proofs_keep_native_links_and_nested_targets(self):
         page = self.compile('''

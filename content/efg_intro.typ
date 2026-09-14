@@ -6,8 +6,6 @@
   instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)],
 )
 
-#let upsans = it => $upright(sans(#it))$
-
 Imperfect-information extensive-form games  model tree-form strategic interactions in which not all actions might be observed by all players. They represent an ample majority of strategic interactions encountered in the real world, ranging from recreational games such as poker, to negotiation, and auctions.
 
 = Game trees and information sets <sec-game-trees>
@@ -182,19 +180,19 @@ By considering the normal-form game in which each player's strategy space is the
 
 == Behavioral form <sec-behavioral-form>
 
-A different conceptualization of a strategy for a player is as a choice of (independent) distributions over the set of actions $A_j$ at each decision node $j in cal(J)$. This is called a _behavioral strategy_. We can represent it accordingly as a vector $x in bb(R)_(gt.eq 0)^Sigma$ indexed over sequences. Each entry $x_(j a)$ assigns to action $a$ at decision node $j$ the probability of picking that action at that decision node. The set of all possible behavioral strategies is clearly convex, as it is the Cartesian product of probability simplexes---one per each decision node.
+A different conceptualization of a strategy for a player is as a choice of (independent) distributions over the set of actions $A_j$ at each decision node $j in cal(J)$. This is called a _behavioral strategy_. We can represent it accordingly as a vector $vx in bb(R)_(gt.eq 0)^Sigma$ indexed over sequences. Each entry $x_(j a)$ assigns to action $a$ at decision node $j$ the probability of picking that action at that decision node. The set of all possible behavioral strategies is clearly convex, as it is the Cartesian product of probability simplexes---one per each decision node.
 
 *Cons*  However, this representation has a major drawback: the probability of reaching a particular terminal state in the decision process is the product of all actions on the path from the root to the terminal state. This makes many expressions of interest that depend on the probability of reaching terminal states (including crucially the expected utility in the game) non-convex.
 
 #example[
-  Consider the game of Kuhn poker, and let $x \, y$ be behavioral strategies for both players. The expected utility function for Player 1 is given by
+  Consider the game of Kuhn poker, and let $vx \, vy$ be behavioral strategies for both players. The expected utility function for Player 1 is given by
 
   $
-    u_1 (x \, y) & colon.eq (- 1) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, c h k)) + (- 1) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, b e t)) dot.op x_(upsans(D \, f o l d))\
+    u_1 (vx \, vy) & colon.eq (- 1) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, c h k)) + (- 1) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, b e t)) dot.op x_(upsans(D \, f o l d))\
     & #h(2em) + (- 2) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, b e t)) dot.op x_(upsans(D \, c a l l)) + dots.h.c .
   $
 
-  This is not a convex function of $x$, as it contains products of entries of $x$.
+  This is not a convex function of $vx$, as it contains products of entries of $vx$.
 ]
 
 *Pros*  One might wonder whether behavioral strategies have the same representational power as normal-form strategies. After all, a normal-form strategy is an object in a much larger space, so it is conceivable that "more might be possible" in the strategic form. A positive answer equating the powers of normal-form and behavioral strategies is given by Kuhn's theorem, which requires that the game is perfect recall.
@@ -205,17 +203,17 @@ A different conceptualization of a strategy for a player is as a choice of (inde
 
 == Sequence form <sec-sequence-form>
 
-The _sequence-form representation_ #citep(<Romanovskii62:Reduction>, <Koller96:Efficient>, <Stengel96:Efficient>) soundly resolves the issue of non-convexity. Like behavioral strategies, in the sequence-form representation a strategy is a vector $x in bb(R)_(gt.eq 0)^Sigma$ whose entries are indexed by $Sigma$. However, the generic entry $x_(j a)$ contains the _product_ of the probabilities of all actions at all decision nodes on the path from the root of the process to action $a$ at decision node $j$. In order to be a valid sequence-form strategy, the entries in $x$ must therefore satisfy the following probability-flow-conservation constraints:
+The _sequence-form representation_ #citep(<Romanovskii62:Reduction>, <Koller96:Efficient>, <Stengel96:Efficient>) soundly resolves the issue of non-convexity. Like behavioral strategies, in the sequence-form representation a strategy is a vector $vx in bb(R)_(gt.eq 0)^Sigma$ whose entries are indexed by $Sigma$. However, the generic entry $x_(j a)$ contains the _product_ of the probabilities of all actions at all decision nodes on the path from the root of the process to action $a$ at decision node $j$. In order to be a valid sequence-form strategy, the entries in $vx$ must therefore satisfy the following probability-flow-conservation constraints:
 
 #definition[
   The polytope of sequence-form strategies of a TFDP is the convex polytope
 
   $
-    cal(Q) colon.eq {x in bb(R)_(gt.eq 0)^Sigma : #h(2em) x_∅ = 1 \, #h(2em) sum_(a in A_j) x_(j a) = x_(p_j) quad forall j in cal(J)} .
+    cal(Q) colon.eq {vx in bb(R)_(gt.eq 0)^Sigma : #h(2em) x_∅ = 1 \, #h(2em) sum_(a in A_j) x_(j a) = x_(p_j) quad forall j in cal(J)} .
   $
 ] <def:sf>
 
-Conversely, it is easy to see that any $x$ that satisfies the above constraints is the sequence-form representation of at least one behavioral strategy.
+Conversely, it is easy to see that any $vx$ that satisfies the above constraints is the sequence-form representation of at least one behavioral strategy.
 
 #example[
   Consider the tree-form decision process faced by Player 1 in the small game of @ex:small-efg. The decision process has four decision nodes $J = {upsans(A) \, upsans(B) \, upsans(C) \, upsans(D)}$ and nine sequences including the empty sequence $∅$. For decision node D, the parent sequence is $p_(upsans(D)) = upsans(A 2)$; for $upsans(B)$ and $upsans(C)$ it is $p_(upsans(B)) = p_(upsans(C)) = upsans(A 1)$; for $upsans(A)$ it is the empty sequence $p_(upsans(A)) = ∅$. The constraints that define the sequence-form polytope @def:sf, besides nonnegativity, are

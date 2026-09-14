@@ -13,14 +13,14 @@ In this lecture, we turn our attention to _Markov games_, also known as _stochas
 The model of Markov games was introduced in the seminal work of #citet(<shapley1953stochastic>) as a generalization of Markov decision process from the single-agent to the multi-agent setting. In this model, the agents interact with each other and with the environment, and the environment is affected by the joint actions of the agents. In this lecture, we will draw a distinction between _infinite-horizon_ games, and _finite-horizon_ games (also known as _episodic_). We start with the former. While the definition is a mouthful, the model is very natural in its examination.
 
 #definition[Infinite-horizon stochastic game][
-  An $m$-player, infinite-horizon, finite state and action _stochastic game_, also called _Markov game_, is a tuple $G = (S \, A \, ℙ \, r \, gamma \, mu)$ where
+  An $m$-player, infinite-horizon, finite state and action _stochastic game_, also called _Markov game_, is a tuple $G = (S \, A \, ℙ \, r \, gamma \, vmu)$ where
 
   - $S$ is a finite set of states that the environment can be in;
   - $A = A_1 times A_2 times dots.h times A_m$ is the set of action profiles, where $A_i$ are the actions available to player $i$;
   - $ℙ (s' med \| med s \, a)$, for $s \, s' in S$ and $a in A$ are the transition probabilities of the environment; in particular, $ℙ (s' med \| med s \, a)$ is the probability that the state of the environment becomes $s'$ if action profile $a in A$ is taken by the players in some state $s$;
   - $r = (r_1 \, dots.h \, r_m)$ is a tuple of reward functions, where $r_i (s \, a)$ specifies the immediate reward received by player $i$ when the action profile $a in A$ is taken by the players in some state $s$;
   - $gamma in lr([0 \, 1))$ is the discount factor; and
-  - $mu in Delta \( S \)$ is the initialization distribution, sampling the state $s^(\( 0 \))$ of the environment at the beginning of the interaction.
+  - $vmu in Delta \( S \)$ is the initialization distribution, sampling the state $s^(\( 0 \))$ of the environment at the beginning of the interaction.
 
   Given an infinite state-action sequence $(s^(\( t \)) \, a^(\( t \)))_(t = 0)^oo$, each player derives a _discounted utility_ of
 
@@ -60,14 +60,14 @@ When further restrictions are imposed on how the policy can depend on the histor
 Given a collection of policies $pi_1 \, dots.h \, pi_m$ for the players of a stochastic game, the expected utility of each player is naturally defined as follows:
 
 $
-  u_i \( pi_1 \, dots.h \, pi_m \) = EE_(s_0 tilde.op mu \;\
+  u_i \( pi_1 \, dots.h \, pi_m \) = EE_(s_0 tilde.op vmu \;\
   forall t > 0 : s^(\( t \)) tilde.op ℙ (dot.op \| med s^(\( t - 1 \)) \, a^(\( t - 1 \)))\
   forall t gt.eq 0 \, i : med a_i^(\( t \)) tilde.op pi_i (s^(\( t \)) \, \( s^(\( tau \)) \, a^(\( tau \)) \)_(tau < t))) [sum_(t gt.eq 0) gamma^t r_i \( s^(\( t \)) \, a^(\( t \)) \)] .
 $
 
 For the finite-horizon version, truncate the sum at $t=H-1$ and restrict the trajectory to those $H$ stages.
 
-In particular, $u_i \( pi_1 \, dots.h \, pi_m \)$ is the expected discounted utility of player $i$ under the random trajectory which starts at $s^(\( 0 \)) tilde.op mu$ and is sampled by having each player sampling an action from their policy at each state, and having the environment transition according to its dynamics. In terms of these utilities, Nash equilibrium is defined in the natural way as follows. Notice that this  definition generalizes the concept of Nash equilibrium in normal-form games.
+In particular, $u_i \( pi_1 \, dots.h \, pi_m \)$ is the expected discounted utility of player $i$ under the random trajectory which starts at $s^(\( 0 \)) tilde.op vmu$ and is sampled by having each player sampling an action from their policy at each state, and having the environment transition according to its dynamics. In terms of these utilities, Nash equilibrium is defined in the natural way as follows. Notice that this  definition generalizes the concept of Nash equilibrium in normal-form games.
 
 #definition[Nash equilibrium][
   A collection of policies $pi = \( pi_1 \, dots.h \, pi_m \)$ is a _Nash equilibrium_ of a stochastic game iff for all players $i$, for all policies $pi' : S times (S times A)^(*) arrow.r Delta (A_i)$ it holds that
@@ -154,7 +154,7 @@ Finally, we remark that in finite-horizon games, there typically do not exist Na
 
     Notice that~#ref(label("eq:player value functions"), supplement: none) is a linear system of equations in the variables $\( v_i^pi \( s \) \)_s$, which we can rewrite more compactly as
 
-    $ (I - gamma Gamma^pi) v_i^pi = r_i^pi . $
+    $ (I - gamma Gamma^pi) vv_i^pi = vr_i^pi . $
 
     We now argue that the matrix $I - gamma Gamma^pi$ is invertible. To see this, note that the matrix $Gamma^pi$ is a row-stochastic matrix:
 
@@ -164,16 +164,16 @@ Finally, we remark that in finite-horizon games, there typically do not exist Na
 
     Since $gamma < 1$ by #ref(label("def:infinite horizon stochastic game")), we have that $I - gamma Gamma^pi$ is _strictly_ diagonally dominant, which implies that $I - gamma Gamma^pi$ cannot be singular. Therefore, the system of equations has a unique solution, which corresponds to
 
-    $ v_i^pi = (I - gamma Gamma^pi)^(- 1) r_i^pi . $
+    $ vv_i^pi = (I - gamma Gamma^pi)^(- 1) vr_i^pi . $
 
-    Furthermore, the values $v_i^pi$ are _continuous_ in the policies $pi$, because the inverse matrix of the non-singular matrix $I - gamma Gamma^pi$ is continuous in the values of the entries, and these are continuous in $pi$.
+    Furthermore, the value vectors $vv_i^pi$ are _continuous_ in the policies $pi$, because the inverse matrix of the non-singular matrix $I - gamma Gamma^pi$ is continuous in the values of the entries, and these are continuous in $pi$.
   - $q_i^pi (s \, a_i)$, for $s in S$ and $a_i in A_i$, is the infinite discounted utility of player $i$ if the game started at state $s$, and players used policies $pi_1 \, dots.h \, pi_m$, with the only exception that the very first action of player $i$ is set to $a_i$. In symbols,
 
     $
       q_i^pi (s \, a_i) = sum_(a_(- i)) r_i (s \, a) dot.op pi_(- i) (a_(- i) \| s) + gamma sum_(s') v_i^pi \( s' \) sum_(a_(- i)) pi_(- i) (a_(- i) \| s) dot.op ℙ (s' \| s \, a) .
     $
 
-    Like before, the function $q_i^pi$ is continuous in the policies $pi$, since everything on the right-hand side is continuous, including the $v_i^pi$ as discussed above. Furthermore,
+    Like before, the function $q_i^pi$ is continuous in the policies $pi$, since everything on the right-hand side is continuous, including the $vv_i^pi$ as discussed above. Furthermore,
 
     #math.equation(
       block: true,
@@ -265,58 +265,58 @@ The mathematical engine behind Shapley's result is the following fundamental the
 
 === Shapley's Operator
 
-Shapley used this machinery to prove that zero-sum stochastic games have a value. He constructed a contraction mapping over the space of _value functions_ (not strategies). Let $V in RR^(abs(S))$ be a vector representing the value of the game to Player 1 at each state. We use the infinity norm $norm(V)_oo = max_s abs(V(s))$.
+Shapley used this machinery to prove that zero-sum stochastic games have a value. He constructed a contraction mapping over the space of _value functions_ (not strategies). Let $vV in RR^(abs(S))$ be a vector representing the value of the game to Player 1 at each state. We use the infinity norm $norm(vV)_oo = max_s abs(V(s))$.
 
-We define the _Shapley Operator_ (or Bellman Operator) $cal(T) : RR^(abs(S)) arrow.r RR^(abs(S))$ as follows. For a given estimate of future values $V$, we construct a “local” matrix game at each state $s$ where the payoff for joint action $a$ is the immediate reward plus the discounted future value:
+We define the _Shapley Operator_ (or Bellman Operator) $cal(T) : RR^(abs(S)) arrow.r RR^(abs(S))$ as follows. For a given estimate of future values $vV$, we construct a “local” matrix game at each state $s$ where the payoff for joint action $a$ is the immediate reward plus the discounted future value:
 
-$ Q_(s \, V) \( a \) colon.eq r \( s \, a \) + gamma sum_(s') ℙ \( s' \| s \, a \) V \( s' \) . $
+$ Q_(s \, vV) \( a \) colon.eq r \( s \, a \) + gamma sum_(s') ℙ \( s' \| s \, a \) V \( s' \) . $
 
 The operator updates the value of state $s$ to be the #lecture-link("correlated", <sec-zero-sum>)[minimax value] of this local game:
 
 $
-  \( cal(T) V \) \( s \) colon.eq max_(pi_1 in Delta \( A_1 \)) min_(pi_2 in Delta \( A_2 \)) EE_(a tilde.op \( pi_1 \, pi_2 \)) \[ Q_(s \, V) \( a \) \] .
+  \( cal(T) vV \) \( s \) colon.eq max_(vpi_1 in Delta \( A_1 \)) min_(vpi_2 in Delta \( A_2 \)) EE_(a tilde.op \( vpi_1 \, vpi_2 \)) \[ Q_(s \, vV) \( a \) \] .
 $
 
 #theorem[Shapley's Minimax Theorem][
-  The operator $cal(T)$ is a contraction mapping with modulus $gamma$. That is, $norm(cal(T) U - cal(T) V)_oo lt.eq gamma norm(U - V)_oo$. Consequently, there exists a unique value vector $V^(*)$ such that $cal(T) V^(*) = V^(*)$. This $V^(*)$ is the value of the stochastic game.
+  The operator $cal(T)$ is a contraction mapping with modulus $gamma$. That is, $norm(cal(T) vU - cal(T) vV)_oo lt.eq gamma norm(vU - vV)_oo$. Consequently, there exists a unique value vector $vV^(*)$ such that $cal(T) vV^(*) = vV^(*)$. This $vV^(*)$ is the value of the stochastic game.
 ]
 
 #proofsketch[
-  The proof relies on the fact that the value of a zero-sum matrix game is _non-expansive_ with respect to its payoffs (if payoffs change by $delta$, the value changes by at most $delta$). Here, if future values $U$ and $V$ differ by $epsilon.alt$, the payoffs in the local matrix games differ by at most $gamma epsilon.alt$. Thus, the values of these local games differ by at most $gamma epsilon.alt$.
+  The proof relies on the fact that the value of a zero-sum matrix game is _non-expansive_ with respect to its payoffs (if payoffs change by $delta$, the value changes by at most $delta$). Here, if future values $vU$ and $vV$ differ by $epsilon.alt$, the payoffs in the local matrix games differ by at most $gamma epsilon.alt$. Thus, the values of these local games differ by at most $gamma epsilon.alt$.
 
-  At the fixed point, choose a saddle pair in each local matrix game. Fixing either player's policy gives the other player a discounted MDP. Its optimal Bellman operator fixes $V^*$ because the chosen local strategies are a saddle pair. Uniqueness of the MDP value therefore shows that these stationary policies secure $V^*$ against arbitrary history-dependent opponents. This proves the value and equilibrium assertions, as well as the contraction claim.
+  At the fixed point, choose a saddle pair in each local matrix game. Fixing either player's policy gives the other player a discounted MDP. Its optimal Bellman operator fixes $vV^*$ because the chosen local strategies are a saddle pair. Uniqueness of the MDP value therefore shows that these stationary policies secure $vV^*$ against arbitrary history-dependent opponents. This proves the value and equilibrium assertions, as well as the contraction claim.
 ]
 
 === Computation: value iteration and a stopping certificate
 
-Value iteration starts from $V_0=0$ and computes $V_(t+1)=cal(T)V_t$. Each step solves one matrix game per state. To extract policies with a specified equilibrium error, we need to relate the Bellman residual to deviation gains.
+Value iteration starts from $vV_0=0$ and computes $vV_(t+1)=cal(T)vV_t$. Each step solves one matrix game per state. To extract policies with a specified equilibrium error, we need to relate the Bellman residual to deviation gains.
 
 #theorem[Residual certificate for an approximate equilibrium][
-  Let $V$ be any value vector and choose a saddle pair $pi=(pi_1,pi_2)$ in every local matrix game $Q_(s,V)$. Set
-  $ rho=norm(cal(T)V-V)_oo. $
+  Let $vV$ be any value vector and choose a saddle pair $pi=(pi_1,pi_2)$ in every local matrix game $Q_(s,vV)$. Set
+  $ rho=norm(cal(T)vV-vV)_oo. $
   The resulting stationary profile is a $2 rho/(1-gamma)$-Nash equilibrium from every initial state, for the unnormalized discounted utilities used in this lecture.
 ]
 #proof[
   Let $cal(T)_pi$ be the affine Bellman operator obtained by fixing both policies. Let $cal(T)_1$ be the maximizing player's best-response operator with $pi_2$ fixed, and $cal(T)_2$ the minimizing player's best-response operator with $pi_1$ fixed. The local saddle conditions give
-  $ cal(T)_pi V = cal(T)_1 V = cal(T)_2 V = cal(T)V. $
-  All three operators are $gamma$-contractions. For any contraction $F$ with fixed point $w$,
-  $ norm(w-V)_oo <= gamma norm(w-V)_oo + norm(F V-V)_oo. $
-  Thus its fixed point lies within $rho/(1-gamma)$ of $V$. Applied to the three operators, this bounds the profile value and both best-response values. Their pairwise differences are at most $2 rho/(1-gamma)$, which bounds either player's unilateral gain. Discounted MDP optimality includes history-dependent deviations.
+  $ cal(T)_pi vV = cal(T)_1 vV = cal(T)_2 vV = cal(T)vV. $
+  All three operators are $gamma$-contractions. For any contraction $F$ with fixed point $vw$,
+  $ norm(vw-vV)_oo <= gamma norm(vw-vV)_oo + norm(F vV-vV)_oo. $
+  Thus its fixed point lies within $rho/(1-gamma)$ of $vV$. Applied to the three operators, this bounds the profile value and both best-response values. Their pairwise differences are at most $2 rho/(1-gamma)$, which bounds either player's unilateral gain. Discounted MDP optimality includes history-dependent deviations.
 ]
 
 A concrete algorithm is therefore:
 
-1. Set $V=0$.
-2. For each state, solve $Q_(s,V)$, retaining its value $W(s)$ and saddle strategies $pi_1(s),pi_2(s)$.
-3. If $norm(W-V)_oo <= epsilon.alt(1-gamma)/2$, return the retained policies.
-4. Otherwise set $V=W$ and repeat.
+1. Set $vV=0$.
+2. For each state, solve $Q_(s,vV)$, retaining its value $W(s)$ and saddle strategies $pi_1(s),pi_2(s)$.
+3. If $norm(vW-vV)_oo <= epsilon.alt(1-gamma)/2$, return the retained policies.
+4. Otherwise set $vV=vW$ and repeat.
 
-The returned policies are those computed from the same $V$ whose residual was tested. The proof also handles $gamma=0$ without dividing by $gamma$. If the stage games are solved numerically, their optimization errors must be included in the residual and best-response bounds; the displayed certificate assumes exact local solutions.
+The returned policies are those computed from the same $vV$ whose residual was tested. The proof also handles $gamma=0$ without dividing by $gamma$. If the stage games are solved numerically, their optimization errors must be included in the residual and best-response bounds; the displayed certificate assumes exact local solutions.
 
 === Discount dependence and computational complexity
 
 Suppose $|r(s,a)| <= R$ and $0<gamma<1$. Contraction implies
-$ norm(V_(t+1)-V_t)_oo <= gamma^t norm(V_1-V_0)_oo <= gamma^t R. $
+$ norm(vV_(t+1)-vV_t)_oo <= gamma^t norm(vV_1-vV_0)_oo <= gamma^t R. $
 Consequently the stopping criterion is met once $gamma^t R <= epsilon.alt(1-gamma)/2$. For fixed $R>0$, the number of iterations is bounded by
 $ 1 + O(frac(1, 1-gamma) log max{1, frac(2R, epsilon.alt(1-gamma))}). $
 Each iteration solves $|S|$ matrix games. This is an arithmetic/optimization bound; bit complexity also accounts for rational input lengths and the precision of the local solves. If $1-gamma$ is exponentially small in its binary encoding length, this iteration bound is not polynomial in the input length.

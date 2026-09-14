@@ -6,16 +6,6 @@
   title: "Learning in games: Foundations",
 )
 
-#let vx = $x$
-#let vy = $y$
-#let cX = $X$
-#let cY = $Y$
-#let cR = $R$
-#let xhat = $hat(vx)$
-#let yhat = $hat(vy)$
-
-#let mU = $upright(U)_1$
-
 #v(.8cm)
 With this lecture we begin to explore what it means to "learn" in a game, and how that "learning", which is intrinsically a _dynamic_ and _local_ (per-player) concept, relates to the much more _static_ and _global_ concept of game-theoretic equilibrium.
 
@@ -118,8 +108,8 @@ As discussed, regret minimization is _one_ instantiation of $Phi$-regret minimiz
 To establish regret minimization as a meaningful abstraction for learning
 in games, we check that regret minimizing and $Phi$-regret minimizing dynamics indeed lead to the expected behavior in common scenarios.
 
-#definition[Canonical learning setup][In the cases that we will mention, a recurring idea will be to consider the setup in which all players $i in [n]$ play according to the outputs $x_i^((t))$ of a $Phi$-regret minimizer. At each iteration, the utility function that each player $i$ observes from the environment is the utility function $u_i$ of that player, evaluated in the strategies played by all players, that is,
-  $ u^((t)) : Delta(A_i) -> RR qquad qquad u^((t)) (x_i) := u_i lr(size: #70%, (x_i, x^((t))_(-i))). $
+#definition[Canonical learning setup][In the cases that we will mention, a recurring idea will be to consider the setup in which all players $i in [n]$ play according to the outputs $vx_i^((t))$ of a $Phi$-regret minimizer. At each iteration, the utility function that each player $i$ observes from the environment is the utility function $u_i$ of that player, evaluated in the strategies played by all players, that is,
+  $ u^((t)) : Delta(A_i) -> RR qquad qquad u^((t)) (vx_i) := u_i lr(size: #70%, (vx_i, vx^((t))_(-i))). $
   Given its importance, we give to this natural setup the name of _canonical learning setup_.
 ] <def-canonical-learning>
 
@@ -132,7 +122,7 @@ $
 
 Player $n$, on the other hand, is learning in the game, picking strategies according to some algorithm that guarantees sublinear external regret, where the feedback observed by Player $n$ at each time $t$ is their own linear utility function:
 $
-  bold(u)^((t)) := cX_n in.rev vx_n |-> u_n (vx_1^((t)), ..., vx_(n-1)^((t)), vx_n).
+  u^((t)) := cX_n in.rev vx_n |-> u_n (vx_1^((t)), ..., vx_(n-1)^((t)), vx_n).
 $
 
 Then, the average of the strategies played by Player~$n$ converges almost surely to a best response to $overline(vx)_1, ...,overline(vx)_(n-1)$, that is,
@@ -254,23 +244,23 @@ The very _existence_ of regret minimizers is a powerful enough fact to imply the
 The previous result is in fact a direct corollary of the more general connection between $Phi$-regret minimization and the set of coarse-correlated equilibria in multiplayer general-sum games. We present a general form of this connection in the next theorem.
 
 #theorem[Formal version of #ref(<thmce-informal>, supplement: "Theorems") and #ref(<thmcce-informal>, supplement: "")][
-  Let $vx^((t))_1, ..., vx^((t))_n$ the strategies played by the players at any time $t$, and let $Phi"-Reg"_i^((t))$ denote the internal regret incurred by Player $i$ up to time $t$. Consider now the average correlated distribution of play up to any time $T$, that is, the distribution $mu^((T))$ that selects a time $overline(t)$ uniformly at random from the set ${1,...,T }$, and selects actions $(a_1,..., a_n)$ independendently according to the $vx_i^((overline(t)))$, that is,
+  Let $vx^((t))_1, ..., vx^((t))_n$ the strategies played by the players at any time $t$, and let $Phi"-Reg"_i^((t))$ denote the internal regret incurred by Player $i$ up to time $t$. Consider now the average correlated distribution of play up to any time $T$, that is, the distribution $vmu^((T))$ that selects a time $overline(t)$ uniformly at random from the set ${1,...,T }$, and selects actions $(a_1,..., a_n)$ independendently according to the $vx_i^((overline(t)))$, that is,
   $
-    mu^((T)) := 1 / T sum_(t=1)^T vx_1^((t))⊗...⊗ vx_n^((t)).
+    vmu^((T)) := 1 / T sum_(t=1)^T vx_1^((t))⊗...⊗ vx_n^((t)).
   $
   This distribution satisfies the inequality
   $
-    max_(phi.alt in Phi) EE_(a ~ mu^((T))) [u_i (phi.alt(a_i), a_(-i)) - u_i (a_i, a_(-i))] <= (Phi"-Reg"^((T))_i) / T.
+    max_(phi.alt in Phi) EE_(a ~ vmu^((T))) [u_i (phi.alt(a_i), a_(-i)) - u_i (a_i, a_(-i))] <= (Phi"-Reg"^((T))_i) / T.
   $
 ] <thmce-formal>
 #proof[
-  Pick an arbitrary $phi.alt in Phi$. With the usual slight abuse of notation, we will denote with $phi.alt(a)$, where $a$ is an action, as the strategy returned by $phi.alt$ when evaluated in the _deterministic_ strategy that places all the mass on $a$. Expanding the specific structure of $mu^((T))$, we can decompose the expectation
+  Pick an arbitrary $phi.alt in Phi$. With the usual slight abuse of notation, we will denote with $phi.alt(a)$, where $a$ is an action, as the strategy returned by $phi.alt$ when evaluated in the _deterministic_ strategy that places all the mass on $a$. Expanding the specific structure of $vmu^((T))$, we can decompose the expectation
   $
-    EE_(a ~ mu^((T))) [u_i (phi.alt(a_i), a_(-i)) - u_i (a_i, a_(-i))]
+    EE_(a ~ vmu^((T))) [u_i (phi.alt(a_i), a_(-i)) - u_i (a_i, a_(-i))]
   $
   as
   $
-    & EE_(a ~ mu^((T))) [u_i (phi.alt(a_i), a_(-i)) - u_i (a_i, a_(-i))] \
+    & EE_(a ~ vmu^((T))) [u_i (phi.alt(a_i), a_(-i)) - u_i (a_i, a_(-i))] \
     & qquad = 1 / T sum_(t=1)^T EE_(a ~ vx_1^((t))⊗...⊗ vx_n^((t))) [
         (u_i (phi.alt(a_i), a_(-i)) - u_i (a_i, a_(-i)))
       ] \

@@ -24,9 +24,9 @@ In two-player zero-sum games the Nash equilibria are exactly those strategy prof
     #image("figures/correlated/game_table.svg")
   ]
 
-  Let $x in Delta (A_1)$ denote a strategy of Player 1, and $y in Delta (A_2)$ a strategy of Player 2. We can express the expected utilities for the players according to the bilinear expressions
+  Let $vx in Delta (A_1)$ denote a strategy of Player 1, and $vy in Delta (A_2)$ a strategy of Player 2. We can express the expected utilities for the players according to the bilinear expressions
 
-  $ u_1 (x \, y) = x^top U_1 y \, #h(2em) #h(2em) u_2 (x \, y) = x^top U_2 y \, $
+  $ u_1 (vx \, vy) = vx^top U_1 vy \, #h(2em) #h(2em) u_2 (vx \, vy) = vx^top U_2 vy \, $
 
   where
 
@@ -38,10 +38,10 @@ In two-player zero-sum games the Nash equilibria are exactly those strategy prof
 From now on, we will assume that a two-player game has been defined, and we will use the notation with $U_1$ and $U_2$ defined above to refer to the utility matrices of the players.
 
 #theorem[
-  Consider a two-player zero-sum game, that is, one for which $U_2 = - U_1$. Then, a strategy profile $(x^(*) \, y^(*)) in Delta (A_1) times Delta (A_2)$ is a Nash equilibrium if and only if it is a maxmin strategy, _i.e._, if and only if
+  Consider a two-player zero-sum game, that is, one for which $U_2 = - U_1$. Then, a strategy profile $(vx^(*) \, vy^(*)) in Delta (A_1) times Delta (A_2)$ is a Nash equilibrium if and only if it is a maxmin strategy, _i.e._, if and only if
 
   $
-    x^(*) in "arg max"_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y \, #h(2em) upright("and") #h(2em) y^(*) in "arg max"_(y in Delta (A_2)) min_(x in Delta (A_1)) x^top U_2 y .
+    vx^(*) in "arg max"_(vx in Delta (A_1)) min_(vy in Delta (A_2)) vx^top U_1 vy \, #h(2em) upright("and") #h(2em) vy^(*) in "arg max"_(vy in Delta (A_2)) min_(vx in Delta (A_1)) vx^top U_2 vy .
   $
 ]#label("thm:nash is mm")
 
@@ -49,57 +49,57 @@ From now on, we will assume that a two-player game has been defined, and we will
   We prove the result assuming we trust von Neumann's minimax theorem, which states that
 
   $
-    max_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y = min_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y .
+    max_(vx in Delta (A_1)) min_(vy in Delta (A_2)) vx^top U_1 vy = min_(vy in Delta (A_2)) max_(vx in Delta (A_1)) vx^top U_1 vy .
   $
 
-  $(arrow.r.double.long)$~~Suppose that $(x^(*) \, y^(*))$ is a Nash equilibrium. Then, by the definition of Nash equilibrium and using the fact that $U_2 = - U_1$, we have that
+  $(arrow.r.double.long)$~~Suppose that $(vx^(*) \, vy^(*))$ is a Nash equilibrium. Then, by the definition of Nash equilibrium and using the fact that $U_2 = - U_1$, we have that
 
   $
-    (x^(*))^top U_1 y^(*) = max_(x in Delta (A_1)) x^top U_1 y^(*) \, #h(2em) upright("and") #h(2em) (x^(*))^top U_1 y^(*) = min_(y in Delta (A_2)) (x^(*))^top U_1 y .
+    (vx^(*))^top U_1 vy^(*) = max_(vx in Delta (A_1)) vx^top U_1 vy^(*) \, #h(2em) upright("and") #h(2em) (vx^(*))^top U_1 vy^(*) = min_(vy in Delta (A_2)) (vx^(*))^top U_1 vy .
   $
 
   Hence, we can write the chain of equalities and inequalities
 
   $
-    min_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y lt.eq max_(x in Delta (A_1)) x^top U_1 y^(*) = min_(y in Delta (A_2)) (x^(*))^top U_1 y lt.eq max_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y .
+    min_(vy in Delta (A_2)) max_(vx in Delta (A_1)) vx^top U_1 vy lt.eq max_(vx in Delta (A_1)) vx^top U_1 vy^(*) = min_(vy in Delta (A_2)) (vx^(*))^top U_1 vy lt.eq max_(vx in Delta (A_1)) min_(vy in Delta (A_2)) vx^top U_1 vy .
   $
 
-  By the minimax theorem, all inequalities must be equalities; hence, $(x^(*) \, y^(*))$ satisfies
+  By the minimax theorem, all inequalities must be equalities; hence, $(vx^(*) \, vy^(*))$ satisfies
 
   $
-    min_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y & = max_(x in Delta (A_1)) x^top U_1 y^(*) & & quad arrow.l.r.double quad y^(*) in "arg min"_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y\
-    max_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y & = min_(y in Delta (A_2)) (x^(*))^top U_1 y & & quad arrow.l.r.double quad x^(*) in "arg max"_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y .
+    min_(vy in Delta (A_2)) max_(vx in Delta (A_1)) vx^top U_1 vy & = max_(vx in Delta (A_1)) vx^top U_1 vy^(*) & & quad arrow.l.r.double quad vy^(*) in "arg min"_(vy in Delta (A_2)) max_(vx in Delta (A_1)) vx^top U_1 vy\
+    max_(vx in Delta (A_1)) min_(vy in Delta (A_2)) vx^top U_1 vy & = min_(vy in Delta (A_2)) (vx^(*))^top U_1 vy & & quad arrow.l.r.double quad vx^(*) in "arg max"_(vx in Delta (A_1)) min_(vy in Delta (A_2)) vx^top U_1 vy .
   $
 
-  $(arrow.l.double.long)$~~Conversely, suppose that $x^(*)$ and $y^(*)$ are maxmin strategies. Let $v^(*)$ be the common value of both sides of the minimax theorem, that is,
+  $(arrow.l.double.long)$~~Conversely, suppose that $vx^(*)$ and $vy^(*)$ are maxmin strategies. Let $v^(*)$ be the common value of both sides of the minimax theorem, that is,
 
   $
-    v^(*) colon.eq max_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y = min_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y .
+    v^(*) colon.eq max_(vx in Delta (A_1)) min_(vy in Delta (A_2)) vx^top U_1 vy = min_(vy in Delta (A_2)) max_(vx in Delta (A_1)) vx^top U_1 vy .
   $
 
-  We now show that $(x^(*) \, y^(*))$ is a Nash equilibrium. By definition, this means we need to show that
+  We now show that $(vx^(*) \, vy^(*))$ is a Nash equilibrium. By definition, this means we need to show that
 
   $
-    (x^(*))^top U_1 y^(*) = max_(x in Delta (A_1)) x^top U_1 y^(*) & #h(2em) upright("and") #h(2em) (x^(*))^top U_1 y^(*) = min_(y in Delta (A_2)) (x^(*))^top U_1 y .
+    (vx^(*))^top U_1 vy^(*) = max_(vx in Delta (A_1)) vx^top U_1 vy^(*) & #h(2em) upright("and") #h(2em) (vx^(*))^top U_1 vy^(*) = min_(vy in Delta (A_2)) (vx^(*))^top U_1 vy .
   $
 
   Using the hypothesis,
 
   $
-    x^(*) & in "arg max"_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y \, quad & & arrow.r.double.long quad v^(*) = min_(y in Delta (A_2)) (x^(*))^top U_1 y \,\
-    y^(*) & in "arg min"_(y in Delta (A_2)) max_(x in Delta (A_1)) x^top U_1 y \, quad & & arrow.r.double.long quad v^(*) = max_(x in Delta (A_1)) x^top U_1 y^(*) .
+    vx^(*) & in "arg max"_(vx in Delta (A_1)) min_(vy in Delta (A_2)) vx^top U_1 vy \, quad & & arrow.r.double.long quad v^(*) = min_(vy in Delta (A_2)) (vx^(*))^top U_1 vy \,\
+    vy^(*) & in "arg min"_(vy in Delta (A_2)) max_(vx in Delta (A_1)) vx^top U_1 vy \, quad & & arrow.r.double.long quad v^(*) = max_(vx in Delta (A_1)) vx^top U_1 vy^(*) .
   $
 
-  These equalities imply that $v^(*) lt.eq (x^(*))^top U_1 y^(*)$ and $v^(*) gt.eq (x^(*))^top U_1 y^(*)$, and thus $v^(*) = (x^(*))^top U_1 y^(*)$. This shows that the players are best responding to the strategy of the opponent, completing the proof that $(x^(*) \, y^(*))$ is a Nash equilibrium.
+  These equalities imply that $v^(*) lt.eq (vx^(*))^top U_1 vy^(*)$ and $v^(*) gt.eq (vx^(*))^top U_1 vy^(*)$, and thus $v^(*) = (vx^(*))^top U_1 vy^(*)$. This shows that the players are best responding to the strategy of the opponent, completing the proof that $(vx^(*) \, vy^(*))$ is a Nash equilibrium.
 ]
 
 *Computation*  As we will see shortly, #ref(label("thm:nash is mm")) gives us nontrivial information about the structure of Nash equilibria in two-player zero-sum games. But it also gives us a computational tool. Indeed, the theorem above tells us that finding a Nash equilibrium in a two-player zero-sum game can be expressed as an optimization problem. Let's show that this optimization problem is a linear program. Without loss of generality, let's focus on Player 1's optimization problem, that is,
 
-$ x^(*) in "arg max"_(x in Delta (A_1)) min_(y in Delta (A_2)) x^top U_1 y . $
+$ vx^(*) in "arg max"_(vx in Delta (A_1)) min_(vy in Delta (A_2)) vx^top U_1 vy . $
 
 The key insight is that this problem can be rewritten as
 
-$ cases(max_v v, upright("s.t.") v lt.eq x^top U_1 a_2 quad forall a_2 in A_2, upright("") 1^top x = 1, x gt.eq 0 .) $
+$ cases(max_v v, upright("s.t.") v lt.eq vx^top U_1 ve_(a_2) quad forall a_2 in A_2, upright("") vone^top vx = 1, vx gt.eq 0 .) $
 
 which is a linear program with a linear number of constraints in the number of actions of Player 2. We can use any linear programming solver to find such a solution. The #lecture-link("learning_intro", <sec-learning-zero-sum>)[self-play construction] gives more scalable methods to compute maxmin strategies from repeated play.
 
@@ -114,14 +114,14 @@ which is a linear program with a linear number of constraints in the number of a
       columns: 3,
       align: center + horizon,
       inset: .7em,
-      [$max_(x in Delta \( A_1 \)) min_(y in Delta \( A_2 \)) x^top U_1 y$],
+      [$max_(vx in Delta \( A_1 \)) min_(vy in Delta \( A_2 \)) vx^top U_1 vy$],
       [],
-      [$min_(y in Delta \( A_2 \)) max_(x in Delta \( A_1 \)) x^top U_1 y$],
+      [$min_(vy in Delta \( A_2 \)) max_(vx in Delta \( A_1 \)) vx^top U_1 vy$],
 
       [$arrow.t.b$], [], [$arrow.t.b$],
-      [$ cases(max v, v lt.eq x^top U_1 a_2 quad forall a_2, 1^top x = 1, x gt.eq 0 .) $],
+      [$ cases(max v, v lt.eq vx^top U_1 ve_(a_2) quad forall a_2, vone^top vx = 1, vx gt.eq 0 .) $],
       [$limits(arrow.l.r.long)^(upright("  linear programming  "))_(upright("duality"))$],
-      [$ cases(min w, w gt.eq a_1^top U_1 y quad forall a_1, 1^top y = 1, y gt.eq 0 .) $],
+      [$ cases(min w, w gt.eq ve_(a_1)^top U_1 vy quad forall a_1, vone^top vy = 1, vy gt.eq 0 .) $],
     )
 
   ]
@@ -174,7 +174,7 @@ In the general two-player case, often referred to as _two-player general-sum gam
 *Computation*  In two-player general-sum games, computation of Nash equilibria is not a linear program. However, it is a _linear complementarity problem_ (LCP), a more general class of problems than linear feasibility programs, and which are written in the form
 
 $
-  upright(f i n d) quad x \, w in bb(R)^d #h(2em) upright("s.t.") #h(2em) w = M x + q \, #h(2em) x \, w gt.eq 0 \, #h(2em) x^top w = 0 .
+  upright(f i n d) quad vx \, vw in bb(R)^d #h(2em) upright("s.t.") #h(2em) vw = M vx + vq \, #h(2em) vx \, vw gt.eq 0 \, #h(2em) vx^top vw = 0 .
 $
 
 The Lemke-Howson algorithm is a well-known algorithm to solve LCPs, and it can be used to find Nash equilibria in two-player general-sum games. However, the algorithm is not polynomial-time in the worst case, and it can be hard to find Nash equilibria in practice. An important corollary of the connection between two-player general-sum games and LCPs is the following:
@@ -200,7 +200,7 @@ In games with more than two players, the behavior of Nash equilibria can be even
     #image("figures/correlated/nash_irrational.svg")
   ]
 
-  A simple calculation shows that the only Nash equilibrium $(x^(*) \, y^(*) \, z^(*))$ of this game satisfies
+  A simple calculation shows that the only Nash equilibrium $(vx^(*) \, vy^(*) \, vz^(*))$ of this game satisfies
 
   $
     (x_1^(*) \, y_1^(*) \, z_1^(*)) = (53 / 46 - sqrt(601) / 46 \, - 13 / 24 + sqrt(601) / 24 \, - 23 / 4 + sqrt(601) / 4) approx (0.619 \, 0.480 \, 0.379) .
@@ -229,31 +229,31 @@ The discussion above shows that Nash equilibria can be hard to compute and might
 
 == Coarse correlated equilibrium <sec-cce>
 
-Remember that in a Nash equilibrium we are seeking a strategy profile $(x_1 \, dots.h \, x_n) in Delta (A_1) times dots.h.c times Delta (A_n)$ such that no player can unilaterally deviate to improve their payoff, that is,
+Remember that in a Nash equilibrium we are seeking a strategy profile $(vx_1 \, dots.h \, vx_n) in Delta (A_1) times dots.h.c times Delta (A_n)$ such that no player can unilaterally deviate to improve their payoff, that is,
 
-$ u_i (a'_i \, x_(- i)) gt.eq u_i (x_i \, x_(- i)) #h(2em) forall i in \[ n \] \, a'_i in A_i . $
+$ u_i (a'_i \, vx_(- i)) gt.eq u_i (vx_i \, vx_(- i)) #h(2em) forall i in \[ n \] \, a'_i in A_i . $
 
 Here, $u_i$ was defined as the expected payoff when all the players randomize _independently_.
 
 The concept of _coarse correlated equilibrium_ is a relaxation of this definition. In a coarse correlated equilibrium, instead of asking for the players to pick _independent_ strategies, we allow coordination. In particular, we define the following.
 
 #definition[Coarse correlated equilibrium #citep(<moulin1978strategically>)][
-  A _coarse correlated equilibrium (CCE)_ is a correlated strategy $mu in Delta (A_1 times dots.h times A_n)$ such that
+  A _coarse correlated equilibrium (CCE)_ is a correlated strategy $vmu in Delta (A_1 times dots.h times A_n)$ such that
 
   #math.equation(
     block: true,
     numbering: "(1)",
-    $bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (a'_1 \, dots.h \, a_n)] lt.eq bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (a_1 \, dots.h \, a_n)] #h(2em) forall i in \[ n \] \, a'_i in A_i .$.body,
+    $bb(E)_((a_1 \, dots.h \, a_n) tilde.op vmu) [u_i (a'_1 \, dots.h \, a_n)] lt.eq bb(E)_((a_1 \, dots.h \, a_n) tilde.op vmu) [u_i (a_1 \, dots.h \, a_n)] #h(2em) forall i in \[ n \] \, a'_i in A_i .$.body,
   ) <eq:cce>
 ] <def-cce>
 
 #remark[
-  The definition of a CCE is a relaxation of the definition of a Nash equilibrium. In a Nash equilibrium, the players randomize independently; in a CCE, they can randomize in a correlated way. _A Nash equilibrium is a CCE $mu$ that happens to be a product distribution_, that is, $mu = x_1 ⊗ dots.h.c ⊗ x_n .$
+  The definition of a CCE is a relaxation of the definition of a Nash equilibrium. In a Nash equilibrium, the players randomize independently; in a CCE, they can randomize in a correlated way. _A Nash equilibrium is a CCE $vmu$ that happens to be a product distribution_, that is, $vmu = vx_1 ⊗ dots.h.c ⊗ vx_n .$
 
   This shows that the set of CCEs is a superset of the set of Nash equilibria. Thus, a coarse correlated equilibria always exists in every game.
 ]
 
-*Properties and computation*  We can turn @def-cce into an optimization problem. The variables are the entries of the probability distribution $mu$. This is a $(A_1 times dots.h.c times A_n)$-dimensional nonnegative vector whose entries must satisfy the linear equality constraint
+*Properties and computation*  We can turn @def-cce into an optimization problem. The variables are the entries of the probability distribution $vmu$. This is a $(A_1 times dots.h.c times A_n)$-dimensional nonnegative vector whose entries must satisfy the linear equality constraint
 
 $ sum_(a_1 in A_1) dots.h.c sum_(a_n in A_n) mu_(a_1 \, dots.h \, a_n) = 1 . $
 
@@ -277,10 +277,10 @@ It is worth knowing that a CCE can also be computed in polynomial time in imperf
 The concept of _correlated equilibrium_ is an intermediate relaxation between Nash equilibrium and coarse correlated equilibrium.
 
 #definition[Correlated equilibrium #citep(<Aumann1974Mar>)][
-  A _correlated equilibrium (CE)_ is a correlated strategy $mu in Delta (A_1 times dots.h times A_n)$ such that
+  A _correlated equilibrium (CE)_ is a correlated strategy $vmu in Delta (A_1 times dots.h times A_n)$ such that
 
   $
-    bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (phi.alt_i (a_i) \, a_(- i))] lt.eq bb(E)_((a_1 \, dots.h \, a_n) tilde.op mu) [u_i (a_i \, a_(- i))] #h(2em) forall i in \[ n \] \, phi.alt_i : A_i arrow.r A_i \,
+    bb(E)_((a_1 \, dots.h \, a_n) tilde.op vmu) [u_i (phi.alt_i (a_i) \, a_(- i))] lt.eq bb(E)_((a_1 \, dots.h \, a_n) tilde.op vmu) [u_i (a_i \, a_(- i))] #h(2em) forall i in \[ n \] \, phi.alt_i : A_i arrow.r A_i \,
   $
 
   where the function $phi.alt_i : A_i arrow.r A_i$ is arbitrary.
@@ -296,7 +296,7 @@ However, the remark about computation in imperfect-information sequential games 
 
 == How to think about correlated play in games
 
-We can think of the correlation between the strategies of the players in a correlated or coarse correlated equilibrium as arising from some _correlation device_ in the game. This is a trusted mediator that can recommend but not enforce behavior. The distribution $mu$ from which the correlation device samples recommendations is public knowledge, but the players only get to observe the recommended action that was sampled for them. A correlated / coarse correlated equilibrium is then a distribution $mu$ such that no player can unilaterally deviate from the recommended action to improve their payoff.
+We can think of the correlation between the strategies of the players in a correlated or coarse correlated equilibrium as arising from some _correlation device_ in the game. This is a trusted mediator that can recommend but not enforce behavior. The distribution $vmu$ from which the correlation device samples recommendations is public knowledge, but the players only get to observe the recommended action that was sampled for them. A correlated / coarse correlated equilibrium is then a distribution $vmu$ such that no player can unilaterally deviate from the recommended action to improve their payoff.
 
 The distinction between correlated and coarse correlated equilibrium is in when the players decide when to commit to the recommended action. In a coarse correlated equilibrium, the players commit to the recommended action _before_ the recommendation is made. In a correlated equilibrium, the players commit to the recommended action _after_ the recommendation is made.
 

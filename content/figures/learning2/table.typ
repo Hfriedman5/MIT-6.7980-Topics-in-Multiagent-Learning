@@ -1,25 +1,17 @@
+#import "../../meta/notation.typ": va, vb, vx, vy
+#import "../../meta/notation.typ": vg, vm, vr, vz
+#import "../../meta/notation.typ": cX, cY, cR, html-argmax as argmax
+#import "../../meta/notation.typ": ip
 // Recovered from Costis Gabri monograph/texcontent/figures/L06/table.typ
 #set page(width: auto, height: auto, fill: none, margin: (left: 1mm, right: 0mm, y: .5mm))
-#set text(font: "New Computer Modern", size: 9pt)
+#import "../libs/typography.typ": figure-font, figure-style
+#set text(font: figure-font, size: 9pt)
+#show: figure-style
 #import "../../meta/dyns.typ": dynplot, entropy-prox, euc-prox
 #import "@preview/cetz:0.4.1"
 #import "@preview/cetz-plot:0.1.2"
 
-#let va = $a$
-#let vb = $b$
-#let vx = $x$
-#let vy = $y$
-#let vg = $g$
-#let vm = $m$
-#let vr = $r$
-#let vz = $z$
-#let cX = math.cal("X")
-#let cY = math.cal("Y")
-#let cR = math.cal("R")
 #let darkblue = blue.darken(20%)
-
-#let argmax = math.op($arg#h(1mm)max$, limits: true)
-#let ip(a, b) = $lr(⟨#a, #b⟩)$
 
 #table(
   columns: (auto, auto, auto),
