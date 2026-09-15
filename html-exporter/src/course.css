@@ -63,7 +63,8 @@
 .supplementary-table .suggested-after { font: 0.875rem/1.5 var(--sans); white-space: nowrap; }
 .supplementary-table thead th:nth-child(2) { width: 140px; }
 .supplementary-title { font: 700 1.0625rem/1.5 var(--sans); }
-.improving-material, .course-project { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--rule); }
+.improving-material, .course-project { margin-top: 36px; padding-top: 28px; }
+.course-project { border-top: 1px solid var(--rule); }
 .improving-material > p, .course-project > p { margin-top: 14px; }
 .html-notes-preview { margin: 20px 0; }
 .html-notes-preview > a { display: block; }
