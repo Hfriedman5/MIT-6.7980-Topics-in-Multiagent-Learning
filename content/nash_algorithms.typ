@@ -1,6 +1,6 @@
 #import "meta/gabri_notes.typ": *
 #show: gabri_notes.with(
-  lec_num: "S2",
+  lec_num: "S1",
   date: [Fall 2026],
   title: "Centralized algorithms for Nash equilibrium computation",
   instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)],

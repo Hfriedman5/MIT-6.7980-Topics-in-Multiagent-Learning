@@ -1,6 +1,6 @@
 #import "meta/gabri_notes.typ": *
 #show: gabri_notes.with(
-  lec_num: "S5",
+  lec_num: "S6",
   date: [Fall 2026],
   title: "Markov (aka stochastic) games",
   instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)],

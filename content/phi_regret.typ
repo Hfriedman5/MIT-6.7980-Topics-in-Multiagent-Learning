@@ -1,7 +1,7 @@
 #import "meta/gabri_notes.typ": *
 #show: gabri_notes.with(
   instructor: [Max Fishelson (`maxfish@mit.edu`)],
-  lec_num: "S6",
+  lec_num: "S3",
   date: [Fall 2026],
   title: "Phi-regret minimization",
 )

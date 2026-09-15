@@ -1,7 +1,7 @@
 #import "meta/gabri_notes.typ": *
 #show: gabri_notes.with(
   instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)],
-  lec_num: "S3",
+  lec_num: "S4",
   date: [Fall 2026],
   title: "Learning algorithms (II)",
 )

@@ -81,8 +81,11 @@ stable ID with its topic so its notes remain linked after reordering.
 
 `html-export.json` has a `notes` list (one entry per note document) and a separate
 `slides` map from stable lecture ID to PDF path. Scheduled note numbers and dates
-are generated from `syllabus_ids`; supplementary notes receive S1, S2, … in their
-listed order. Do not author `number`, `syllabus_numbers`, or `date` in this JSON.
+are generated from `syllabus_ids`. Supplementary notes map through
+`supplementary_id` to the syllabus's `course.supplementary_readings` list, which
+sets their titles, S1, S2, … order, and suggested reading points. Each reading's
+`after` field is a stable lecture ID, so its suggested lecture number follows
+schedule changes. Do not author `number`, `syllabus_numbers`, or `date` in this JSON.
 The generated `.build/html-export.json` is the configuration read by the Rust
 exporter. Use `python3 scripts/course_index.py --resolve-only` to refresh it
 without rebuilding pages.

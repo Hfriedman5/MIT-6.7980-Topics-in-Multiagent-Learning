@@ -1,6 +1,6 @@
 #import "meta/gabri_notes.typ": *
 #show: gabri_notes.with(
-  lec_num: "S1",
+  lec_num: "S2",
   date: [Fall 2026],
   title: "A second look at the minimax theorem",
   instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)],

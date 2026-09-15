@@ -56,9 +56,13 @@
 .break-topic span { margin-left: 10px; }
 .supplementary-section { margin-top: 36px; }
 .supplementary-section > p { font-size: 0.9375rem; color: var(--muted); margin-top: 10px; }
-.supplementary-list { list-style: none; padding: 0; margin: 12px 0 0; }
-.supplementary-list li { display: flex; justify-content: space-between; align-items: baseline; gap: 20px; border-bottom: 1px solid var(--rule); padding-block: 10px; }
-.supplementary-list li > a:first-child { font: 700 1.0625rem/1.5 var(--sans); }
+.supplementary-table { width: 100%; border-collapse: collapse; text-align: left; margin-top: 12px; }
+.supplementary-table :is(th, td) { padding: 10px 20px 10px 0; border-bottom: 1px solid var(--rule); vertical-align: baseline; }
+.supplementary-table thead th { font: 700 0.875rem/1.5 var(--sans); color: var(--muted); }
+.supplementary-table :is(th, td):last-child { padding-right: 0; text-align: right; }
+.supplementary-table .suggested-after { font: 0.875rem/1.5 var(--sans); white-space: nowrap; }
+.supplementary-table thead th:nth-child(2) { width: 140px; }
+.supplementary-title { font: 700 1.0625rem/1.5 var(--sans); }
 .improving-material, .course-project { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--rule); }
 .improving-material > p, .course-project > p { margin-top: 14px; }
 .html-notes-preview { margin: 20px 0; }

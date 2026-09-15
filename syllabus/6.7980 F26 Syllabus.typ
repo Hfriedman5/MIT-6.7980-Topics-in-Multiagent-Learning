@@ -27,6 +27,15 @@
     (name: "Rui Yao", email: "rayyao@mit.edu", office_hours: "Tuesdays, 3:30-4:30 pm, room 32-G5 (lounge of 5th floor, Gates tower)"),
   ),
   grading: (attendance: 20, material: 30, project: 50),
+  // Website metadata only; these readings are not displayed in the syllabus PDF.
+  supplementary_readings: (
+    (id: "nash-algorithms", title: "Centralized algorithms for Nash equilibrium computation", after: "nash"),
+    (id: "minimax", title: "A second look at the minimax theorem", after: "nash-properties"),
+    (id: "phi-regret", title: "Phi-regret minimization", after: "learning-foundations"),
+    (id: "learning-2", title: "Learning algorithms (II)", after: "learning-algorithms"),
+    (id: "perfection", title: "Sequential irrationality and perfect equilibria", after: "efg-learning"),
+    (id: "stochastic-games", title: "Markov (aka stochastic) games", after: "efg-learning"),
+  ),
   github: "https://github.com/gabrfarina/MIT-6.7980-Topics-in-Multiagent-Learning",
   challenge: "https://www.mit.edu/~6.7980/fow",
 )

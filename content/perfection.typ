@@ -1,6 +1,6 @@
 #import "meta/gabri_notes.typ": *
 #show: gabri_notes.with(
-  lec_num: "S4",
+  lec_num: "S5",
   date: [Fall 2026],
   title: "Sequential irrationality and perfect equilibria",
   instructor: [Prof. Gabriele Farina (`gfarina@mit.edu`)],

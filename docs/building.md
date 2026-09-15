@@ -162,7 +162,7 @@ working PDF style.
 ## Source files
 
 - Edit `content/*.typ` for explanations, equations, and proofs.
-- Edit `html-export.json` for note documents, supplementary reading order, stable syllabus mappings, slides, and export settings.
+- Edit `html-export.json` for note documents, stable syllabus and supplementary mappings, slides, and export settings. Edit `course.supplementary_readings` in the syllabus for supplementary titles, order, and suggested reading points.
 - Edit `syllabus/6.7980 F26 Syllabus.typ` for course facts, formatted prose, and the ordered lecture/module outline.
 - Edit `syllabus/fall-2026-calendar.typ` for verified class dates and fixed academic-calendar exceptions.
 - Edit `scripts/course_index.py` for course-home markup, not a duplicate of syllabus content.
@@ -197,7 +197,7 @@ downloadable bundle work without a web server at that address.
 The syllabus calls `schedule(class-dates, outline)`. Its outline contains
 `lecture("stable-id", [Title], description: [...], instructor: [...])`,
 `module[Part title]`, and `no-class(title: [...], description: [...])` entries.
-Lecture numbers and dates are generated from the linked syllabus rows. Authored note titles must match the corresponding syllabus title (or `short_title` for supplementary notes). Edit both the syllabus and the Typst header when renaming a lecture: the build rejects mismatches and never substitutes a different title into the note. Author `short_title` only for supplementary notes. Tests cover title agreement and rejection of divergence; the site checker also validates rendered HTML titles.
+Lecture numbers and dates are generated from the linked syllabus rows. Authored note titles must match the corresponding syllabus title, including the syllabus's supplementary reading list. Edit both the syllabus and the Typst header when renaming a reading: the build rejects mismatches and never substitutes a different title into the note. The resolved configuration derives `short_title` for all notes. Tests cover title agreement and rejection of divergence; the site checker also validates rendered HTML titles.
 
 Lectures consume the next class date and receive a zero-based lecture number.
 An undated `no-class` consumes a class date without advancing that number;
@@ -231,8 +231,12 @@ resolved exporter configuration to `.build/html-export.json`. The authored
 `notes` list contains no `number`, `syllabus_numbers`, or `date` fields; these
 fields are generated and should not be edited in `.build/` either.
 Generated HTML/PDF note sources receive the derived header metadata without
-rewriting the authored lecture files. Supplementary readings receive S1, S2,
-and so on in their listed order, with the term in place of a class date.
+rewriting the authored lecture files. Supplementary notes use `supplementary_id`
+to map to `course.supplementary_readings` in the syllabus. That list supplies
+their titles and S1, S2, … order, with the term in place of a class date.
+Each entry's `after` field names a stable lecture ID; its current number appears
+in the website's suggested reading links. This list is metadata for the website
+and is not displayed in the syllabus PDF.
 
 For example, a scheduled note and an independent slide attachment are configured as:
 

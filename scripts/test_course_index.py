@@ -85,7 +85,7 @@ class CourseIndexTests(unittest.TestCase):
         nash = next(c for c in resolved['notes'] if c['syllabus_ids'] == ['nash'])
         self.assertEqual((nash['number'], nash['date']), (8, 'Thu, Oct 8, 2026'))
         page = render_index(self.config, modules)
-        row = re.search(r'<tr class="schedule-row">\s*<th[^>]*>08</th>.*?</tr>', page, re.S).group()
+        row = re.search(r'<tr class="schedule-row"[^>]*>\s*<th[^>]*>08</th>.*?</tr>', page, re.S).group()
         self.assertIn('nfgs_nash.html', row)
         self.assertNotIn('learning_efg.html', row)
 
@@ -120,7 +120,7 @@ class CourseIndexTests(unittest.TestCase):
         self.assertEqual(chapters['bandit']['number'], 6)
         self.assertEqual(chapters['learning2']['syllabus_numbers'], [])
         self.assertTrue(chapters['learning2']['supplementary'])
-        self.assertEqual(chapters['learning2']['number'], 'S3')
+        self.assertEqual(chapters['learning2']['number'], 'S4')
         config = copy.deepcopy(resolved)
         config['notes'][0], config['notes'][1] = config['notes'][1], config['notes'][0]
         with self.assertRaisesRegex(ValueError, 'out of syllabus order'):
@@ -131,6 +131,65 @@ class CourseIndexTests(unittest.TestCase):
         config['notes'][0]['syllabus_ids'] = ['missing-topic']
         with self.assertRaisesRegex(ValueError, 'Invalid syllabus_ids'):
             resolve_readings(config, self.modules)
+
+    def test_supplementary_readings_follow_the_suggested_sequence(self):
+        readings = [c for c in self.config['notes'] if c.get('supplementary')]
+        expected = [
+            ('S1', 'nash_algorithms', 'nash', 1),
+            ('S2', 'eah', 'nash-properties', 3),
+            ('S3', 'phi_regret', 'learning-foundations', 4),
+            ('S4', 'learning2', 'learning-algorithms', 5),
+            ('S5', 'perfection', 'efg-learning', 8),
+            ('S6', 'stochastic_games', 'efg-learning', 8),
+        ]
+        self.assertEqual([(c['number'], Path(c['source']).stem,
+                           c['suggested_after']['id'], c['suggested_after']['number'])
+                          for c in readings], expected)
+        html = render_index(self.config, self.modules)
+        for _, _, id, number in expected:
+            self.assertIn(f'id="lecture-{id}"', html)
+            self.assertRegex(html, f'href="#lecture-{id}"[^>]*>L{number:02}</a>')
+
+    def test_reading_points_follow_topics_when_lectures_move(self):
+        first, second = self.lecture_block('nash'), self.lecture_block('efg-learning')
+        modules = self.evaluate(self.syllabus.replace(first, 'MARKER').replace(second, first).replace('MARKER', second))
+        resolved = resolve_readings(self.config, modules)
+        after = {c['supplementary_id']: c['suggested_after']['number']
+                 for c in resolved['notes'] if c.get('supplementary')}
+        self.assertEqual(after['nash-algorithms'], 8)
+        self.assertEqual(after['perfection'], 1)
+        html = render_index(self.config, modules)
+        self.assertRegex(html, r'href="#lecture-nash"[^>]*>L08</a>')
+
+    def test_supplementary_order_and_titles_come_from_the_syllabus(self):
+        config = copy.deepcopy(self.config)
+        # The source-file map can be in any order; the syllabus controls labels.
+        config['notes'].reverse()
+        readings = config['course']['info']['supplementary_readings']
+        readings[0], readings[1] = readings[1], readings[0]
+        readings[0]['title'] = 'Updated supplementary title'
+        resolved = resolve_readings(config, self.modules)
+        first = next(c for c in resolved['notes'] if c.get('supplementary'))
+        self.assertEqual((first['number'], first['supplementary_id'], first['title']),
+                         ('S1', 'minimax', 'Updated supplementary title'))
+
+    def test_supplementary_mapping_rejects_lost_or_duplicate_readings(self):
+        for variant in ('missing-id', 'duplicate-note', 'unmapped-note', 'duplicate-id', 'bad-after'):
+            config = copy.deepcopy(self.config)
+            readings = config['course']['info']['supplementary_readings']
+            supplement = next(c for c in config['notes'] if c.get('supplementary'))
+            if variant == 'missing-id':
+                supplement['supplementary_id'] = 'missing'
+            elif variant == 'duplicate-note':
+                config['notes'].append(copy.deepcopy(supplement))
+            elif variant == 'unmapped-note':
+                config['notes'].remove(supplement)
+            elif variant == 'duplicate-id':
+                readings[1]['id'] = readings[0]['id']
+            else:
+                readings[0]['after'] = 'missing-lecture'
+            with self.subTest(variant=variant), self.assertRaises(ValueError):
+                resolve_readings(config, self.modules)
 
     def test_syllabus_title_change_requires_explicit_typst_title_edit(self):
         from build_site import chapter_source_text
@@ -154,7 +213,7 @@ class CourseIndexTests(unittest.TestCase):
 
     def test_course_overview_has_slides_but_no_notes_or_pending_label(self):
         html = render_index(self.config, self.modules)
-        overview = re.search(r'<tr class="schedule-row">\s*<th[^>]*>00</th>.*?</tr>', html, re.S).group()
+        overview = re.search(r'<tr class="schedule-row"[^>]*>\s*<th[^>]*>00</th>.*?</tr>', html, re.S).group()
         self.assertIn('href="slides/L00_course_intro.pdf"', overview)
         self.assertIn('>Slides (PDF)</a>', overview)
         self.assertNotIn('class="reading-link"', overview)
@@ -167,6 +226,8 @@ class CourseIndexTests(unittest.TestCase):
         self.assertNotIn('year', authored['site'])
         for note in authored['notes']:
             self.assertFalse({'number', 'syllabus_numbers', 'date'} & note.keys())
+            if note.get('supplementary'):
+                self.assertFalse({'short_title', 'suggested_after'} & note.keys())
         ppad = next(n for n in self.config['notes'] if n['syllabus_ids'] == ['ppad'])
         self.assertEqual(ppad['number'], 19)
         self.assertEqual(ppad['date'], 'Thu, Nov 19, 2026')
@@ -199,7 +260,7 @@ class CourseIndexTests(unittest.TestCase):
         config = copy.deepcopy(self.config)
         config['slides'] = {'nash': 'slides/L00_course_intro.pdf'}
         page = render_index(config, modules)
-        row = re.search(r'<tr class="schedule-row">\s*<th[^>]*>08</th>.*?</tr>', page, re.S).group()
+        row = re.search(r'<tr class="schedule-row"[^>]*>\s*<th[^>]*>08</th>.*?</tr>', page, re.S).group()
         self.assertIn('slides/L00_course_intro.pdf', row)
 
     def test_new_unsupported_prose_does_not_silently_disappear(self):

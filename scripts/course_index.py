@@ -49,20 +49,33 @@ def schedule_modules(entries: list[dict], year: int) -> list[dict]:
 
 
 def resolve_readings(config: dict, modules: list[dict]) -> dict:
-    """Resolve stable lecture IDs to syllabus titles, numbers, and dates."""
+    """Resolve stable IDs to syllabus titles, numbers, dates, and reading points."""
     resolved = copy.deepcopy(config)
     rows = {r['id']: r for m in modules for r in m['rows'] if r['kind'] == 'lecture'}
-    supplement_number = 0
+    supplements = config['course']['info']['supplementary_readings']
+    supplement_ids = [s['id'] for s in supplements]
+    if len(supplement_ids) != len(set(supplement_ids)):
+        raise ValueError('Supplementary reading IDs must be unique.')
+    mapped_supplements = set()
     for chapter in resolved['notes']:
         ids = chapter.get('syllabus_ids', [])
         if chapter.get('supplementary'):
             if ids:
                 raise ValueError('Supplementary notes cannot claim syllabus lectures.')
-            supplement_number += 1
-            chapter['number'] = f'S{supplement_number}'
+            id = chapter.get('supplementary_id')
+            if id not in supplement_ids or id in mapped_supplements:
+                raise ValueError(f'Invalid or duplicate supplementary_id: {id!r}')
+            mapped_supplements.add(id)
+            index = supplement_ids.index(id)
+            reading = supplements[index]
+            if reading['after'] not in rows:
+                raise ValueError(f"Invalid suggested lecture: {reading['after']}")
+            after = rows[reading['after']]
+            chapter['number'] = f'S{index + 1}'
             chapter['syllabus_numbers'] = []
             chapter['date'] = config['site']['term']
-            chapter['title'] = chapter['short_title']
+            chapter['title'] = chapter['short_title'] = reading['title']
+            chapter['suggested_after'] = {key: after[key] for key in ('id', 'number', 'title')}
             continue
         if not ids or len(ids) != len(set(ids)) or not set(ids) <= rows.keys():
             raise ValueError(f"Invalid syllabus_ids for {chapter['source']}: {ids}")
@@ -73,6 +86,8 @@ def resolve_readings(config: dict, modules: list[dict]) -> dict:
         chapter['number'] = sessions[0]['number']
         day = date.fromisoformat(sessions[0]['iso_date'])
         chapter['date'] = f'{day:%a, %b} {day.day}, {day.year}'
+    if mapped_supplements != set(supplement_ids):
+        raise ValueError('Every supplementary reading must have a mapped note source.')
     resolved['notes'].sort(key=lambda c: (bool(c.get('supplementary')),
         int(str(c['number'])[1:]) if c.get('supplementary') else c['number']))
     validate_readings(resolved, modules)
@@ -152,7 +167,7 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
             if not links:
                 links = ('<span class="notes-pending">Not yet posted</span>'
                          if number != 0 and module['title'] != 'Project work and presentations' else '')
-            rows.append(f'''<tr class="schedule-row">
+            rows.append(f'''<tr class="schedule-row" id="lecture-{escape(row['id'], quote=True)}">
   <th scope="row" class="session-number">{number:02}</th>
   <td class="session-date"><time datetime="{row['iso_date']}">{escape(row['date'])}</time>{badge_html}</td>
   <td class="session-topic"><h4>{title_html}</h4><p>{escape(row['description'])}</p></td>
@@ -174,9 +189,12 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
                         '<th scope="col">Topic</th><th scope="col">Notes</th></tr></thead>'
                         f'<tbody>{"".join(rows)}</tbody></table></section>')
     supplementary = ''.join(
-        f'<li><a href="{note_outputs(c)["html"]}">{escape(str(c["number"]))} · {escape(c["short_title"])} <span aria-hidden="true">↗</span></a>'
-        f'<a class="pdf-link" href="{note_outputs(c)["pdf"]}" '
-        f'aria-label="PDF: {escape(c["short_title"], quote=True)}">PDF</a></li>'
+        f'<tr><th scope="row"><a class="supplementary-title" href="{note_outputs(c)["html"]}">{escape(str(c["number"]))} · {escape(c["short_title"])}</a></th>'
+        f'<td class="suggested-after">'
+        f'<a href="#lecture-{escape(c["suggested_after"]["id"], quote=True)}" '
+        f'title="{escape(c["suggested_after"]["title"], quote=True)}">L{c["suggested_after"]["number"]:02}</a></td>'
+        f'<td><a class="pdf-link" href="{note_outputs(c)["pdf"]}" '
+        f'aria-label="PDF: {escape(c["short_title"], quote=True)}">PDF</a></td></tr>'
         for c in config['notes'] if c.get('supplementary'))
     return f'''<!doctype html>
 <html lang="en">
@@ -208,7 +226,13 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
 <section id="schedule" class="course-schedule" aria-labelledby="schedule-title">
   <h2 id="schedule-title">Schedule &amp; lecture notes</h2>
   {''.join(sections)}
-  <section class="supplementary-section" aria-labelledby="supplementary-title"><h3 id="supplementary-title">Supplementary reading</h3><ul class="supplementary-list">{supplementary}</ul></section>
+  <section class="supplementary-section" aria-labelledby="supplementary-title">
+    <h3 id="supplementary-title">Supplementary reading</h3>
+    <table class="supplementary-table" aria-labelledby="supplementary-title">
+      <thead><tr><th scope="col">Reading</th><th scope="col">Suggested after</th><th scope="col">Notes</th></tr></thead>
+      <tbody>{supplementary}</tbody>
+    </table>
+  </section>
   <section id="improving-material" class="improving-material" aria-labelledby="improving-material-title">
     <h2 id="improving-material-title">Improving Material</h2>
     {paragraphs(prose['improving-intro'])}

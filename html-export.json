@@ -93,38 +93,38 @@
       ]
     },
     {
-      "source": "content/eah.typ",
-      "short_title": "A second look at the minimax theorem",
-      "supplementary": true,
-      "syllabus_ids": []
-    },
-    {
       "source": "content/nash_algorithms.typ",
-      "short_title": "Centralized algorithms for Nash equilibrium computation",
+      "supplementary_id": "nash-algorithms",
       "supplementary": true,
       "syllabus_ids": []
     },
     {
-      "source": "content/learning2.typ",
-      "short_title": "Learning algorithms (II)",
-      "supplementary": true,
-      "syllabus_ids": []
-    },
-    {
-      "source": "content/perfection.typ",
-      "short_title": "Sequential irrationality and perfect equilibria",
-      "supplementary": true,
-      "syllabus_ids": []
-    },
-    {
-      "source": "content/stochastic_games.typ",
-      "short_title": "Markov (aka stochastic) games",
+      "source": "content/eah.typ",
+      "supplementary_id": "minimax",
       "supplementary": true,
       "syllabus_ids": []
     },
     {
       "source": "content/phi_regret.typ",
-      "short_title": "Phi-regret minimization",
+      "supplementary_id": "phi-regret",
+      "supplementary": true,
+      "syllabus_ids": []
+    },
+    {
+      "source": "content/learning2.typ",
+      "supplementary_id": "learning-2",
+      "supplementary": true,
+      "syllabus_ids": []
+    },
+    {
+      "source": "content/perfection.typ",
+      "supplementary_id": "perfection",
+      "supplementary": true,
+      "syllabus_ids": []
+    },
+    {
+      "source": "content/stochastic_games.typ",
+      "supplementary_id": "stochastic-games",
       "supplementary": true,
       "syllabus_ids": []
     }
