@@ -21,10 +21,10 @@
      url: "https://www.mit.edu/~gfarina"),
   ),
   tas: (
-    (name: "Kat Federova", email: "fedorova@mit.edu", office_hours: "TBD"),
-    (name: "Mingyang Liu", email: "liumy19@mit.edu", office_hours: "TBD"),
-    (name: "Daniel Xia", email: "dxia03@mit.edu", office_hours: "TBD"),
-    (name: "Rui Yao", email: "rayyao@mit.edu", office_hours: "TBD"),
+    (name: "Kat Fedorova", email: "fedorova@mit.edu", office_hours: "Wednesdays, 2-3 pm, room 32-G5 (lounge of 5th floor, Gates tower)"),
+    (name: "Mingyang Liu", email: "liumy19@mit.edu", office_hours: "Fridays, 5:30-6:30 pm, room 45-500A"),
+    (name: "Daniel Xia", email: "dxia03@mit.edu", office_hours: "Mondays, 10-11 am, room TBD"),
+    (name: "Rui Yao", email: "rayyao@mit.edu", office_hours: "Tuesdays, 3:30-4:30 pm, room 32-G5 (lounge of 5th floor, Gates tower)"),
   ),
   grading: (attendance: 20, material: 30, project: 50),
   github: "https://github.com/gabrfarina/MIT-6.7980-Topics-in-Multiagent-Learning",
@@ -51,10 +51,10 @@
 
 #align(center)[
   #text(size: 24pt)[*#course.title*]
-  #v(3mm)
+  #v(0mm)
   #text(size: 16pt)[*#course.event --- #course.term*]
 ]
-#v(6mm)
+#v(0mm)
 
 #item("Lecture")[#course.days, #course.time, in room #raw(course.room).]
 

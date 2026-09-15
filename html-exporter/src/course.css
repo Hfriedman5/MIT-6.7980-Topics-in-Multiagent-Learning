@@ -83,7 +83,7 @@
 .course-home .person-name::before { content: ""; position: absolute; left: -12px; top: .45em; width: 0; height: 0; border-top: 3.5px solid transparent; border-bottom: 3.5px solid transparent; border-left: 6px solid #000; }
 .instructor-list .person-name { color: var(--ink); }
 .instructor-list .person-name:hover { color: var(--accent); }
-.instructor-list li > span { color: var(--muted); font-size: 0.75rem; }
+.instructor-list li > span, .ta-list li > span:not(.person-name) { color: var(--muted); font-size: 0.75rem; }
 .course-home .office-hours { font-size: 0.75rem; color: var(--muted); margin-top: 8px; }
 .course-people #ta-title { margin-top: 22px; }
 .ta-list { display: grid; gap: 10px; }

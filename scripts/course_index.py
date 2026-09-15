@@ -115,7 +115,7 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
     tas = ''.join(
         f'<li><span class="person-name">{escape(p["name"])}</span>'
         f'<a href="mailto:{escape(p["email"], quote=True)}">{escape(p["email"])}</a>'
-        f'<span>Office hours: {escape(p["office_hours"])}</span></li>' for p in course['tas'])
+        f'<span>Office hours: {escape(p["office_hours"].replace(", room ", ", "))}</span></li>' for p in course['tas'])
     grading = ''.join(f'<li><strong>{label} {course["grading"][key]}%</strong></li>'
         for key, label in [('attendance', 'Attendance and participation'),
                            ('material', 'Improving material'), ('project', 'Project')])
