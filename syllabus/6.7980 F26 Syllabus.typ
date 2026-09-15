@@ -232,7 +232,7 @@ The project is the central component of the course and accounts for #course.grad
   lecture(
     "deep-rl-1",
     [Multiagent deep RL],
-    description: [Reinforcement learning in games. Self-play and deep learning methods for perfect-information games.],
+    description: [Modern multiagent deep reinforcement learning methods for imperfect-information games.],
     instructor: [Gabriele Farina],
   ),
   lecture(
