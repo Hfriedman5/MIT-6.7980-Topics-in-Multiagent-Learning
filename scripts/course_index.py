@@ -189,12 +189,16 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
                         '<th scope="col">Topic</th><th scope="col">Notes</th></tr></thead>'
                         f'<tbody>{"".join(rows)}</tbody></table></section>')
     supplementary = ''.join(
-        f'<tr><th scope="row"><a class="supplementary-title" href="{note_outputs(c)["html"]}">{escape(str(c["number"]))} · {escape(c["short_title"])}</a></th>'
+        f'<tr><th scope="row" class="session-number">{escape(str(c["number"]))}</th>'
+        f'<td class="session-topic"><h4><a class="lecture-title-link" href="{note_outputs(c)["html"]}">{escape(c["short_title"])}</a></h4></td>'
         f'<td class="suggested-after">'
         f'<a href="#lecture-{escape(c["suggested_after"]["id"], quote=True)}" '
         f'title="{escape(c["suggested_after"]["title"], quote=True)}">L{c["suggested_after"]["number"]:02}</a></td>'
-        f'<td><a class="pdf-link" href="{note_outputs(c)["pdf"]}" '
-        f'aria-label="PDF: {escape(c["short_title"], quote=True)}">PDF</a></td></tr>'
+        f'<td class="materials-cell"><div class="session-links">'
+        f'<a class="reading-link" href="{note_outputs(c)["html"]}" '
+        f'aria-label="Read notes: {escape(c["short_title"], quote=True)}">HTML</a>'
+        f'<a class="pdf-link" href="{note_outputs(c)["pdf"]}" '
+        f'aria-label="PDF: {escape(c["short_title"], quote=True)}">PDF</a></div></td></tr>'
         for c in config['notes'] if c.get('supplementary'))
     return f'''<!doctype html>
 <html lang="en">
@@ -229,7 +233,8 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
   <section class="supplementary-section" aria-labelledby="supplementary-title">
     <h3 id="supplementary-title">Supplementary reading</h3>
     <table class="supplementary-table" aria-labelledby="supplementary-title">
-      <thead><tr><th scope="col">Reading</th><th scope="col">Suggested after</th><th scope="col">Notes</th></tr></thead>
+      <colgroup><col class="number-column"><col><col class="suggested-after-column"><col class="materials-column"></colgroup>
+      <thead><tr><th scope="col">#</th><th scope="col">Reading</th><th scope="col">Suggested after</th><th scope="col">Notes</th></tr></thead>
       <tbody>{supplementary}</tbody>
     </table>
   </section>
