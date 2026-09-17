@@ -31,7 +31,7 @@ The idea of the CFR algorithm is simple: construct a regret minimizer for the wh
 
 ] <ex:cfr-kuhn>
 
-The local distributions output by the different local regret minimizers is then combined to form a _sequence-form strategy_ that plays according to the local distributions at each decision point.
+The local distributions output by the different local regret minimizers are then combined to form a _sequence-form strategy_ that plays according to the local distributions at each decision point.
 
 == Where the magic happens: Counterfactual utilities
 
@@ -59,7 +59,7 @@ In order to formally introduce counterfactual utility, we recall a bit of notati
 - Given a decision point $j in cal(J)$, we denote by $p_j$ its _parent sequence_, defined as the last sequence (that is, decision point-action pair) encountered on the path from the root of the decision process to $j$. If the agent does not act before $j$ (that is, $j$ is the root of the process or only observation points are encountered on the path from the root to $j$), we let $p_j = ∅$.
 
 #example[
-  As an example, consider again the TFDP faced by Player~1 in the game of Kuhn poker~#citep(<Kuhn50:Simplified>), which was also recalled above in @ex:cfr-kuhn. We have that $J = {j_1 \, dots.h \, j_6}$ and $K = {k_1 \, dots.h \, k_4}$. We have:
+  As an example, consider again the TFDP faced by Player~1 in the game of Kuhn poker~#citep(<Kuhn50:Simplified>), which was also recalled above in @ex:cfr-kuhn. We have that $cal(J) = {j_1 \, dots.h \, j_6}$ and $cal(K) = {k_1 \, dots.h \, k_4}$. We have:
 
   $
     A_(j_1) = S_(k_4) & = {sans(c h e c k) \, sans(r a i s e)} \, #h(2em) & A_(j_5) & = {sans(f o l d) \, sans(c a l l)} \, #h(2em) & S_(k_1) & = {sans(j a c k) \, sans(q u e e n) \, sans(k i n g)}\
@@ -94,8 +94,8 @@ In order to formally introduce counterfactual utility, we recall a bit of notati
     [$rho$],
     [Transition function:
 
-      - given $j in cal(J)$ and $a in A_j$, $rho \( j \, a \)$ returns the next decision or observation point $v$ in $cal(J) union cal(K)$ in the decision tree that is reached after selecting legal action $a in j$, or $tack.t$ if the decision process ends;
-      - given $k in cal(K)$ and $s in S_k$ , $rho \( k \, s \)$ returns the next decision or observation point $v in cal(J) union K$ in the decision tree that is reached after observing signal $s$ at $k$, or $tack.t$ if the decision process ends
+      - given $j in cal(J)$ and $a in A_j$, $rho \( j \, a \)$ returns the next decision or observation point $v$ in $cal(J) union cal(K)$ in the decision tree that is reached after selecting legal action $a in A_j$, or $tack.t$ if the decision process ends;
+      - given $k in cal(K)$ and $s in S_k$, $rho \( k \, s \)$ returns the next decision or observation point $v in cal(J) union cal(K)$ in the decision tree that is reached after observing signal $s$ at $k$, or $tack.t$ if the decision process ends.
     ],
 
     [$Sigma$], [Set of sequences, defined as $Sigma := { \( j \, a \) : j in cal(J) \, a in A_j }$],
