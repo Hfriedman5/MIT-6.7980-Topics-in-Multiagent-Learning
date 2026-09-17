@@ -12,7 +12,8 @@
     "url_prefix": "https://www.mit.edu/~6.7980/"
   },
   "slides": {
-    "overview": "slides/L00_course_intro.pdf"
+    "overview": "slides/L00_course_intro.pdf",
+    "nash": "slides/L01_nash_equilibrium.pdf"
   },
   "notes": [
     {

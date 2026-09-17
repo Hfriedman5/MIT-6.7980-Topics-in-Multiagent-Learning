@@ -17,6 +17,7 @@
 # Publish configured course slide PDFs, while keeping editable decks private.
 /slides/*
 !/slides/L00_course_intro.pdf
+!/slides/L01_nash_equilibrium.pdf
 
 # Build products, editor state, and local secrets.
 **/target/
@@ -30,6 +31,7 @@
 content/.*-check/
 content/*.pdf
 syllabus/macros.pdf
+/syllabus/6.7980 Fall 2026 Syllabus.pdf
 
 # Private migration records stay in the local workspace.
 /docs/migration/
