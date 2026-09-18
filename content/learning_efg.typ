@@ -42,12 +42,12 @@ Remember that in the sequence form representation, the dimensionality of the str
 It can be shown that the regret cumulated by the CFR algorithm satisfies the following bound.
 
 #theorem[
-  Let $upright(R e g)_j^(\( T \))$, for $j in cal(J)$, denote the regret cumulated up to time $T$ by each of the regret minimizers $R_j$. Then, the regret $upright(R e g)^(\( T \))$ cumulated by @algo:cfr up to time $T$ satisfies
+  Let $upright("Reg")_j^(\( T \))$, for $j in cal(J)$, denote the regret cumulated up to time $T$ by each of the regret minimizers $R_j$. Then, the regret $upright("Reg")^(\( T \))$ cumulated by @algo:cfr up to time $T$ satisfies
 
-  $ upright(R e g)^(\( T \)) lt.eq sum_(j in cal(J)) max {0 \, upright(R e g)_j^(\( T \))} . $
+  $ upright("Reg")^(\( T \)) lt.eq sum_(j in cal(J)) max {0 \, upright("Reg")_j^(\( T \))} . $
 ]
 
-It is then immediate to see that if each $upright(R e g)_j^(\( T \))$ grows sublinearly in $T$, then so does $upright(R e g)^(\( T \))$.
+It is then immediate to see that if each $upright("Reg")_j^(\( T \))$ grows sublinearly in $T$, then so does $upright("Reg")^(\( T \))$.
 
 In order to formally introduce counterfactual utility, we recall a bit of notation to deal with tree-form decision processes.
 
@@ -62,14 +62,14 @@ In order to formally introduce counterfactual utility, we recall a bit of notati
   As an example, consider again the TFDP faced by Player~1 in the game of Kuhn poker~#citep(<Kuhn50:Simplified>), which was also recalled above in @ex:cfr-kuhn. We have that $cal(J) = {j_1 \, dots.h \, j_6}$ and $cal(K) = {k_1 \, dots.h \, k_4}$. We have:
 
   $
-    A_(j_1) = S_(k_4) & = {sans(c h e c k) \, sans(r a i s e)} \, #h(2em) & A_(j_5) & = {sans(f o l d) \, sans(c a l l)} \, #h(2em) & S_(k_1) & = {sans(j a c k) \, sans(q u e e n) \, sans(k i n g)}\
-    p_(j_4) & = (j_1 \, sans(c h e c k)) \, #h(2em) & p_(j_6) & = (j_3 \, sans(c h e c k)) \, #h(2em) & p_(j_1) & = p_(j_2) = p_(j_3) = ∅ .
+    A_(j_1) = S_(k_4) & = {sans("check") \, sans("raise")} \, #h(2em) & A_(j_5) & = {sans("fold") \, sans("call")} \, #h(2em) & S_(k_1) & = {sans("jack") \, sans("queen") \, sans("king")}\
+    p_(j_4) & = (j_1 \, sans("check")) \, #h(2em) & p_(j_6) & = (j_3 \, sans("check")) \, #h(2em) & p_(j_1) & = p_(j_2) = p_(j_3) = ∅ .
   $
 
   Furthermore,
 
   $
-    rho (k_3 \, sans(c h e c k)) & = rho (j_2 \, sans(r a i s e)) = tack.t \, #h(2em) & rho (k_1 \, sans(k i n g)) & = j_3 \, #h(2em) rho (j_2 \, sans(c h e c k)) = k_3 .
+    rho (k_3 \, sans("check")) & = rho (j_2 \, sans("raise")) = tack.t \, #h(2em) & rho (k_1 \, sans("king")) & = j_3 \, #h(2em) rho (j_2 \, sans("check")) = k_3 .
   $
 ]
 
