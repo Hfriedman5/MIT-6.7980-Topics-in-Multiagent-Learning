@@ -12,8 +12,9 @@ Reflect every user-requested course change in both the current index page and th
 - Use Frutiger only for bold text and headings in the syllabus PDF. Use New Computer Modern for regular and italic body text. Do not use PT Sans, and check the embedded fonts when changing typography.
 - Load the bundled regular and bold Frutiger faces with `--font-path html-exporter/assets/fonts` when compiling the syllabus. `make syllabus` rebuilds and synchronizes both PDF copies with this setting; the full site build uses it too.
 
-# FoW backend address privacy
+# FoW arena connection settings
 
-- Never hardcode the backend URL or its real hostname in the FoW frontend, public documentation, example links, or downloadable assets. Do not disclose the student-code execution host through the public course site.
-- Supply the backend address at runtime through an instructor-provided arena link or explicit connection settings. Keep real deployment addresses in private deployment configuration, outside public source and assets.
-- Build-time environment variables that embed an address in the published JavaScript do not satisfy this rule. Check the final static deployment payload for backend hostnames before publishing.
+- The user has approved hardcoding `https://6s890.lids.mit.edu` as the default FoW arena. It may appear in the public frontend and documentation.
+- An explicit arena link takes precedence over the browser's remembered successful connection, which takes precedence over the default. Remember only the validated backend origin after a successful connection.
+- Keep team tokens in memory only and scrub them from the URL before making requests. A token-bearing link must provide its own explicit arena address; never send its token to a remembered or default destination implicitly.
+- Label ratings as `ELO` in the FoW interface; keep the BayesElo calculation and backend API identifier unchanged.
