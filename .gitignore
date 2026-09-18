@@ -18,6 +18,7 @@
 /slides/*
 !/slides/L00_course_intro.pdf
 !/slides/L01_nash_equilibrium.pdf
+!/slides/L02_sperner.pdf
 
 # Build products, editor state, and local secrets.
 **/target/
