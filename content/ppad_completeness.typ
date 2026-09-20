@@ -1,4 +1,6 @@
 #import "meta/gabri_notes.typ": *
+#import "/syllabus/6.7980 F26 Syllabus.typ": course
+#import "/syllabus/note-status.typ": note-status
 #show: gabri_notes.with(
   lec_num: 20,
   date: [Tue, Nov 24, 2026],
@@ -6,6 +8,8 @@
   instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)],
   extrathanks: [Some of the content of the lecture was adapted from material from Costis Daskalakis.],
 )
+
+#note-status(course.note_statuses.ppad)
 
 // HTML cell padding and math fonts need more room for labels such as x = 0.
 #let payoff-table-columns() = {
