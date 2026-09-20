@@ -27,7 +27,6 @@
     (name: "Rui Yao", email: "rayyao@mit.edu", office_hours: "Tuesdays, 3:30-4:30 pm, room 32-G5 (lounge of 5th floor, Gates tower)"),
   ),
   grading: (attendance: 20, material: 30, project: 50),
-  note_statuses: (ppad: "Lecture note unfinished - work in progress."),
   // Website metadata only; these readings are not displayed in the syllabus PDF.
   supplementary_readings: (
     (id: "nash-algorithms", title: "Centralized algorithms for Nash equilibrium computation", after: "nash"),
@@ -308,7 +307,6 @@ The project is the central component of the course and accounts for #course.grad
   lecture(
     "ppad",
     [PPAD-hardness of Nash equilibrium],
-    note-status: course.note_statuses.ppad,
     description: [Reductions and the computational hardness of finding Nash equilibria.],
     instructor: [Constantinos Daskalakis],
   ),

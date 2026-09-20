@@ -1,5 +1,4 @@
 #import "@preview/cetz:0.4.1"
-#import "note-status.typ": note-status
 
 #let item(title, body) = {
   set par(hanging-indent: 1cm)
@@ -38,7 +37,7 @@
 
 // Lecture IDs stay with their topics when the outline is reordered. Dates and
 // zero-based lecture numbers are assigned by schedule, never by the author.
-#let lecture(id, title, description: [], instructor: [], standalone: false, badge: [], note-status: none) = (
+#let lecture(id, title, description: [], instructor: [], standalone: false, badge: []) = (
   kind: "lecture",
   id: id,
   title: title,
@@ -46,7 +45,6 @@
   instructor: instructor,
   standalone: standalone,
   badge: badge,
-  note-status: note-status,
 )
 
 // An undated no-class consumes one class slot without a lecture number.
@@ -164,7 +162,6 @@
       instructor: schedule-text(e.instructor),
       standalone: e.standalone,
       badge: schedule-text(e.badge),
-      note_status: e.at("note-status", default: none),
     )
   })
   [#metadata(exported) <course-schedule>]
@@ -176,7 +173,7 @@
       cells += (
         [#entry.number],
         [#schedule-date(entry.date)#if entry.badge != [] [#linebreak()#entry.badge]],
-        [*#entry.title*#if not hide-instructors and entry.instructor != [] [#h(1fr)#box[#text(size: 8.5pt)[_#(entry.instructor)_]]]#if entry.description != [] [#desc(entry.description)]#if entry.at("note-status", default: none) != none { note-status(entry.note-status) }],
+        [*#entry.title*#if not hide-instructors and entry.instructor != [] [#h(1fr)#box[#text(size: 8.5pt)[_#(entry.instructor)_]]]#if entry.description != [] [#desc(entry.description)]],
       )
     }
   }

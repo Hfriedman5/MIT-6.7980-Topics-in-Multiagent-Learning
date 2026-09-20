@@ -51,8 +51,6 @@
 .course-home .pdf-link { font: 0.8125rem/1.5 var(--sans); color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .reading-kind { flex-basis: 100%; font-size: 0.8125rem; color: var(--muted); }
 .notes-pending { font-size: 0.8125rem; line-height: 1.5; color: var(--muted); }
-.note-status { display: flex; align-items: center; gap: 7px; margin-top: 8px; padding: 6px 8px; border-radius: 4px; background: #fff4e6; color: #88410c; font: 0.8125rem/1.4 var(--sans); }
-.note-status img { flex: none; }
 .schedule-break { background: var(--soft); color: var(--muted); font-size: 0.9375rem; }
 .schedule-table .schedule-break :is(th, td) { padding-block: 8px; }
 .break-topic span { margin-left: 10px; }

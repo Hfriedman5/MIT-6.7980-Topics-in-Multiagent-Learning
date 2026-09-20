@@ -149,9 +149,6 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
                             f'<span>{escape(row["description"])}</span></td></tr>')
                 continue
             notes = [c for c in config['notes'] if number in c.get('syllabus_numbers', [])]
-            note_status = (f'<span class="note-status"><img src="assets/course/traffic-cone.svg" '
-                           f'width="20" height="20" alt=""><span>{escape(row["note_status"])}</span></span>'
-                           if row.get('note_status') else '')
             title_html = escape(row['title'])
             if notes:
                 title_href = escape(note_outputs(notes[0])['html'], quote=True)
@@ -173,7 +170,7 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
             rows.append(f'''<tr class="schedule-row" id="lecture-{escape(row['id'], quote=True)}">
   <th scope="row" class="session-number">{number:02}</th>
   <td class="session-date"><time datetime="{row['iso_date']}">{escape(row['date'])}</time>{badge_html}</td>
-  <td class="session-topic"><h4>{title_html}</h4><p>{escape(row['description'])}</p>{note_status}</td>
+  <td class="session-topic"><h4>{title_html}</h4><p>{escape(row['description'])}</p></td>
   <td class="materials-cell"><div class="session-links">{links}</div></td>
 </tr>''')
         title = re.sub(r' \(\d+ lectures\)$', '', module['title'])

@@ -4,7 +4,7 @@ import shutil
 import subprocess
 
 COURSE_FIGURES = {
-    'traffic-cone.svg': 'website/traffic-cone.svg',
+    'traffic-cone.svg': 'content/meta/traffic-cone.svg',
     'course-image-transparent.svg': 'website/thumbnail-transparent.svg',
     'html-notes-collage.svg': 'syllabus/assets/html-notes-collage.svg',
     'fog-of-war-challenge.png': 'syllabus/assets/fog-of-war-challenge.png',
