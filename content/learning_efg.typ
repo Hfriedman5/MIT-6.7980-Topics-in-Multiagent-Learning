@@ -155,4 +155,5 @@ The CFR algorithm can be used to learn a Nash equilibrium in a two-player zero-s
 
 #changelog[
   - 2025-10-09: Fixed typos (thanks Josh Rountree!).
+  - 2026-09-21: Fixed notation and typos (thanks Hannah Friedman!).
 ]
