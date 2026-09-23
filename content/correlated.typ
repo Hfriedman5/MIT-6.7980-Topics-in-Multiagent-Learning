@@ -216,7 +216,7 @@ In games with more than two players, the behavior of Nash equilibria can be even
 #remark[
   The issues with irrational numbers do not stop at square roots. In fact, _any polynomial root_ might be required to represent a Nash equilibrium. This was shown by #citet(<bubelis1979equilibria>), who showed how to construct games with arbitrary polynomial roots.
 
-  Beyond the representation, the topology of Nash equilibria is also in general arbitrarily complex in three-player games. In particular, #citet(<datta2003universality>) showed that for any real algebraic variety, one can come up with some three-player game whose set of Nash equilibria is isomorphic to that variety.
+  Beyond the representation, the topology of Nash equilibria is also in general arbitrarily complex in three-player games. In particular, #citet(<datta2003universality>) showed that for any real algebraic variety, one can come up with some three-player game whose set of fully mixed Nash equilibria is isomorphic to that variety.
 ]
 
 *Computation*  On the computational side, the situation is even more dire. As a first consideration, because Nash equilibria might require irrational numbers, even the question of how to _represent_ the output equilibrium needs attention. In general, we cannot hope for an _exact_ value. However, even asking for a _constant_ approximation turns out to be hard. We will talk about this in more detail at the end of the course, where we relate the computation of (approximate) Nash equilibria to a complexity class called PPAD.
@@ -231,7 +231,7 @@ The discussion above shows that Nash equilibria can be hard to compute and might
 
 Remember that in a Nash equilibrium we are seeking a strategy profile $(vx_1 \, dots.h \, vx_n) in Delta (A_1) times dots.h.c times Delta (A_n)$ such that no player can unilaterally deviate to improve their payoff, that is,
 
-$ u_i (a'_i \, vx_(- i)) gt.eq u_i (vx_i \, vx_(- i)) #h(2em) forall i in \[ n \] \, a'_i in A_i . $
+$ u_i (a'_i \, vx_(- i)) <= u_i (vx_i \, vx_(- i)) #h(2em) forall i in \[ n \] \, a'_i in A_i . $
 
 Here, $u_i$ was defined as the expected payoff when all the players randomize _independently_.
 
@@ -243,7 +243,7 @@ The concept of _coarse correlated equilibrium_ is a relaxation of this definitio
   #math.equation(
     block: true,
     numbering: "(1)",
-    $bb(E)_((a_1 \, dots.h \, a_n) tilde.op vmu) [u_i (a'_1 \, dots.h \, a_n)] lt.eq bb(E)_((a_1 \, dots.h \, a_n) tilde.op vmu) [u_i (a_1 \, dots.h \, a_n)] #h(2em) forall i in \[ n \] \, a'_i in A_i .$.body,
+    $bb(E)_((a_1 \, dots.h \, a_n) tilde.op vmu) [u_i (a'_i \, a_(- i))] <= bb(E)_((a_1 \, dots.h \, a_n) tilde.op vmu) [u_i (a_1 \, dots.h \, a_n)] #h(2em) forall i in \[ n \] \, a'_i in A_i .$.body,
   ) <eq:cce>
 ] <def-cce>
 
