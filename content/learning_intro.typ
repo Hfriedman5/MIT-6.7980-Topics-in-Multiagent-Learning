@@ -127,7 +127,7 @@ $
 
 Then, the average of the strategies played by Player~$n$ converges almost surely to a best response to $overline(vx)_1, ...,overline(vx)_(n-1)$, that is,
 $
-  1 / T sum_(t=1)^T vx_n^((t)) quad limits(arrow.r.long)^"a.s." quad argmax_(hat(vx)_n in cX_n) {
+  1 / T sum_(t=1)^T vx_n^((t)) quad limits(-->)^"a.s." quad argmax_(hat(vx)_n in cX_n) {
     u_n (overline(vx)_1, ..., overline(vx)_(n-1), hat(vx)_n)
   }.
 $

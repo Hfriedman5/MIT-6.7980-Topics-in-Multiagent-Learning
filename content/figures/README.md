@@ -4,8 +4,8 @@ Every SVG in this directory has an editable Typst source. Usually it has the
 same basename beside the SVG. The six `ppad_completeness/gate_*.svg` files share
 `ppad_completeness/gate.typ` and select their gate with a compiler input.
 
-`make`, `make html`, and `make bundle` regenerate all figure SVGs before
-compiling the notes. Run `make figures` to rebuild just the figures. The builder
+`make`, `make html`, and `make bundle` rebuild stale figure SVGs before
+compiling the notes. Run `make figures` to update just the figures. The builder
 also writes HTML variants under `.build/html-figures/`, using Georgia for body
 labels and Frutiger for bold labels, matching the HTML pages. Georgia must be
 installed or available through `TYPST_FONT_PATHS`. Mathematical notation keeps
@@ -49,59 +49,21 @@ reuse `kernelized/vertices.typ`.
 including those whose SVG has not been generated yet. It excludes `libs/`
 directories and the include-only files listed in `SUPPORT_SOURCES`. New shared
 libraries should go in `libs/`; add other include-only files to that exclusion
-list. Every build recompiles the figures so changes to shared libraries and
-component plots are reflected in the output. Historical font metrics and
+list. The builder records each variant's actual dependencies, including imported
+libraries, included plots, and data files. It skips an output when its contents,
+dependencies, compiler inputs, fonts, and rendering tools are unchanged. PDF and
+HTML variants are checked separately, including all six gate variants and resolved
+lecture-section labels. Missing outputs and failed builds are retried. Build
+records live in `.build/figure-cache/`; removing that directory forces a rebuild.
+Use `make figures FORCE=1` (or `python3 scripts/build_figures.py --force`) to
+rebuild all figure variants without deleting the records yourself.
+Historical font metrics and
 lecture-level scaling can differ slightly under the current compiler.
 
-## Recovered sources
+## Rendering conventions
 
-Recovered from the **Costis Gabri monograph** directory, using both its
-`typst_content` lectures and the standalone exports in `texcontent/figures`.
-The following paths are relative to that original directory. Inline drawings
-were extracted into standalone files with their required imports and page setup.
-Existing SVGs were retained during recovery.
-
-Compatibility edits replace the old point-list `path` API with `curve` commands,
-replace obsolete MiTeX labels and angle symbols with native Typst math, and
-convert sampled gradient colors to RGB so that SVG embedding in PDFs retains
-the colors. Unavailable New Computer Modern Sans labels use the bundled
-Frutiger font. Figure pages have transparent backgrounds. Some inline figures
-also need explicit widths or removal of lecture-level scale wrappers.
-
-| Local source | Original source |
-| --- | --- |
-| `brouwer/example_games.typ` | `texcontent/figures/L17/example_games.typ` |
-| `brouwer/sperner_example.typ` | `texcontent/figures/L17/sperner_example.typ` |
-| `brouwer/sperner_padded.typ` | `texcontent/figures/L17/sperner_padded.typ` |
-| `brouwer/sperner_paths.typ` | `texcontent/figures/L17/sperner_paths.typ` |
-| `brouwer/sperner_triangulation.typ` | `texcontent/figures/L17/sperner_triangulation.typ` |
-| `correlated/km_game.typ` | `texcontent/figures/L03/km_game.typ` |
-| `correlated/kohlberg_mertens.typ` | `texcontent/figures/L03/kohlberg_mertens.typ` |
-| `correlated/nash_irrational.typ` | `texcontent/figures/L03/nash_irrational.typ` |
-| `learning1/entropy.typ` | `texcontent/figures/L05/entropy.typ` |
-| `learning2/plots.typ` | `texcontent/figures/L06/plots.typ` |
-| `learning2/table.typ` | `texcontent/figures/L06/table.typ` |
-| `nfgs_nash/color_wheel.typ` | `texcontent/figures/L01/color_wheel.typ` |
-| `nfgs_nash/nash_plots.typ` | `texcontent/figures/L01/nash_plots.typ` |
-| `nfgs_nash/prisoner_dilemma.typ` | `texcontent/figures/L01/prisoner_dilemma.typ` |
-| `nfgs_nash/theater_football.typ` | `texcontent/figures/L01/theater_football.typ` |
-| `brouwer/color_wheel.typ` | `texcontent/figures/L03/color_wheel.typ` |
-| `correlated/game_table.typ` | `texcontent/figures/L04/game_table.typ` |
-| `libs/nash.typ` | `texcontent/figures/libs/nash.typ` |
-| `libs/sperner.typ` | `typst_meta/sperner.typ` |
-| `libs/efgs.typ` | `typst_meta/efgs.typ` |
-| `learning2/ftr_ent.typ` | `texcontent/figures/L06/ftr_ent.typ` |
-| `learning2/ftr_euc.typ` | `texcontent/figures/L06/ftr_euc.typ` |
-| `learning2/ftr_log.typ` | `texcontent/figures/L06/ftr_log.typ` |
-| `learning2/omd_euc.typ` | `texcontent/figures/L06/omd_euc.typ` |
-| `efg_intro/kuhn.typ` | `typst_content/L09.typ (inline figure)` |
-| `efg_intro/variations.typ` | `typst_content/L09.typ (inline figure)` |
-| `efg_intro/small_efg.typ` | `typst_content/L09.typ (inline figure)` |
-| `efg_intro/nf_strategies.typ` | `typst_content/L09.typ (inline figure)` |
-| `perfection/guess-the-ace.typ` | `typst_content/L11.typ (inline figure)` |
-| `perfection/guess-the-ace-x.typ` | `typst_content/L11.typ (inline figure)` |
-| `perfection/venn.typ` | `typst_content/L11.typ (inline figure)` |
-| `perfection/uniform.typ` | `typst_content/L11.typ (inline figure)` |
-| `phi_regret/equation.typ` | `typst_content/L08.typ (inline figure)` |
-| `phi_regret/blum_mansour.typ` | `typst_content/L08.typ (inline figure)` |
-| `phi_regret/gordon.typ` | `typst_content/L08.typ (inline figure)` |
+Figures use native Typst math for labels and `curve` commands for point-list
+paths. Sampled gradient colors are converted to RGB so that SVG embedding in
+PDFs retains the colors. Sans-serif labels use the bundled Frutiger font.
+Figure pages have transparent backgrounds; standalone drawings set their own
+widths and scaling.

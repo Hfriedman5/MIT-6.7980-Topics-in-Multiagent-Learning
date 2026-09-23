@@ -110,13 +110,13 @@ Consider an $n$-player game with compact convex strategy sets $S_i$ and utilitie
 
 #definition[Phi-equilibrium][
   The distribution $mu$ is an $epsilon.alt$-$Phi$-equilibrium if
-  $ EE_(vs tilde.op mu)[u_i (phi_i (vs_i),vs_(-i))-u_i (vs)]<=epsilon.alt $
+  $ EE_(vs ~ mu)[u_i (phi_i (vs_i),vs_(-i))-u_i (vs)]<=epsilon.alt $
   for every player $i$ and every $phi_i in Phi_i$. Setting $epsilon.alt=0$ gives an exact $Phi$-equilibrium.
 ]
 
 The opponent of the mediator selects a distribution $nu$ over pairs $(i,phi_i)$. Its payoff is the expected deviation gain
 $
-  G(mu,nu)=EE_((i,phi_i) tilde.op nu) EE_(vs tilde.op mu)
+  G(mu,nu)=EE_((i,phi_i) ~ nu) EE_(vs ~ mu)
   [u_i (phi_i (vs_i),vs_(-i))-u_i (vs)].
 $
 Use $f(nu,mu)=-G(mu,nu)$ in our minimax construction, with $v=0$. A uniform guarantee $f(nu,mu)>=-epsilon.alt$ is exactly the equilibrium condition, since the opponent can concentrate on any one deviation. The mediator's strategy space can be enormous. We will only construct responses to particular $nu$.
@@ -124,9 +124,9 @@ Use $f(nu,mu)=-G(mu,nu)$ in our minimax construction, with $v=0$. A uniform guar
 == A defense oracle from fixed points
 
 Suppose each $Phi_i$ is a compact family of affine self-maps, and we can compute fixed points of their convex combinations. Let
-$ w_i=Pr_((j,phi_j) tilde.op nu)[j=i]. $
+$ w_i=Pr_((j,phi_j) ~ nu)[j=i]. $
 If $w_i>0$, let $nu_i$ be the conditional distribution of deviations given player $i$, and define the mean transformation
-$ macron(phi)_i=EE_(phi_i tilde.op nu_i)[phi_i]. $
+$ macron(phi)_i=EE_(phi_i ~ nu_i)[phi_i]. $
 It maps $S_i$ into itself by convexity. Choose $vs_i$ satisfying $macron(phi)_i (vs_i)=vs_i$. If $w_i=0$, choose any $vs_i in S_i$. Return the point distribution $mu=delta_vs$ on the resulting profile.
 
 #theorem[Fixed points give a defense response][
@@ -135,7 +135,7 @@ It maps $S_i$ into itself by convexity. Choose $vs_i$ satisfying $macron(phi)_i 
 #proof[
   By affinity in player $i$'s own strategy, each term with $w_i>0$ satisfies
   $
-    EE_(phi_i tilde.op nu_i)[u_i (phi_i (vs_i),vs_(-i))]
+    EE_(phi_i ~ nu_i)[u_i (phi_i (vs_i),vs_(-i))]
     =u_i (macron(phi)_i (vs_i),vs_(-i))=u_i (vs).
   $
   Sum with weights $w_i$; zero-weight terms contribute nothing.
@@ -149,8 +149,8 @@ Existence follows from #lecture-link("brouwer", <sec-brouwer-general>)[Brouwer's
 
 == Coarse correlated equilibria
 
-Take $Phi_i$ to be the constant maps $vs_i mapsto va_i$ for $va_i in S_i$. The mean map is constant too, so its fixed point is simply
-$ vs_i=EE_(va_i tilde.op nu_i)[va_i] quad "when" quad w_i>0. $
+Take $Phi_i$ to be the constant maps $vs_i |-> va_i$ for $va_i in S_i$. The mean map is constant too, so its fixed point is simply
+$ vs_i=EE_(va_i ~ nu_i)[va_i] quad "when" quad w_i>0. $
 For a finite normal-form game, write $nu_(i,a)$ for the mass of deviation to action $a$. The response is the product distribution with marginals
 $ p_i (a)=frac(nu_(i,a), w_i), quad w_i=sum_a nu_(i,a). $
 Choose any marginal when $w_i=0$. This is the normalized Hart--Schmeidler construction from the #lecture-link("eah", <sec-cce-existence>)[minimax supplement]. It avoids allocating a variable to every joint action. A final mixture of these product distributions is generally correlated.

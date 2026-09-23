@@ -18,24 +18,24 @@ To develop support enumeration algorithms, we will study whether knowing the _su
 
 == Two-player games
 
-Suppose we have a two-player game where one player has $m$ actions and the other player has $n$ actions. As described in earlier lectures, such games are commonly represented by a pair of $m times n$ matrices $\( R \, C \)$. The actions of one player, called “Row,” are  in one-to-one correspondence with the integers ${ 1 \, dots.h \, m }$ which  index  the rows of these matrices, and the actions of the other player, called “Column,” are in one-to-one correspondence with the integers ${ 1 \, dots.h \, n }$ which index the columns of these matrices. In particular, when Row plays action $i$ and Column plays action $j$, they receive payoffs $R_(i j)$ and $C_(i j)$ respectively. When Row uses a distribution $vx$ over ${ 1 \, dots.h \, m }$ and Column uses a distribution $vy$ over ${ 1 \, dots.h \, n }$, they  receive expected payoffs $vx^T R vy$ and $vx^T C vy$ respectively. We will assume that each payoff entry in $R$ and $C$ is a rational number whose numerator and denominator can be described using $L$ bits.
+Suppose we have a two-player game where one player has $m$ actions and the other player has $n$ actions. As described in earlier lectures, such games are commonly represented by a pair of $m times n$ matrices $\( R \, C \)$. The actions of one player, called “Row,” are  in one-to-one correspondence with the integers ${ 1 \, ... \, m }$ which  index  the rows of these matrices, and the actions of the other player, called “Column,” are in one-to-one correspondence with the integers ${ 1 \, ... \, n }$ which index the columns of these matrices. In particular, when Row plays action $i$ and Column plays action $j$, they receive payoffs $R_(i j)$ and $C_(i j)$ respectively. When Row uses a distribution $vx$ over ${ 1 \, ... \, m }$ and Column uses a distribution $vy$ over ${ 1 \, ... \, n }$, they  receive expected payoffs $vx^T R vy$ and $vx^T C vy$ respectively. We will assume that each payoff entry in $R$ and $C$ is a rational number whose numerator and denominator can be described using $L$ bits.
 
 Now, suppose that someone told us the supports $S_R$ and $S_C$ of the Row and Column players' mixed strategies, respectively, in some Nash equilibrium of the game. Using this information, we can construct the following linear program to find a Nash equilibrium $\( vx \, vy \)$:
 
 $
                upright("max ") 1 & \
-      upright("s.t. ") ve_i^T R vy & gt.eq ve_k^T R vy \, forall i in S_R \, forall k in \[ m \] \
-                       vx^T C ve_j & gt.eq vx^T C ve_k \, forall j in S_C \, forall k in \[ n \] \
+      upright("s.t. ") ve_i^T R vy & >= ve_k^T R vy \, forall i in S_R \, forall k in \[ m \] \
+                       vx^T C ve_j & >= vx^T C ve_k \, forall j in S_C \, forall k in \[ n \] \
                      sum x_i = 1 & upright(" and ") sum y_i = 1 \
-  x_i gt.eq 0 \, forall i in S_R & upright(" and ") x_i = 0 \, forall i in \[ m \] \\ S_R \
-  y_j gt.eq 0 \, forall j in S_C & upright(" and ") y_j = 0 \, forall j in \[ n \] \\ S_C
+  x_i >= 0 \, forall i in S_R & upright(" and ") x_i = 0 \, forall i in \[ m \] \\ S_R \
+  y_j >= 0 \, forall j in S_C & upright(" and ") y_j = 0 \, forall j in \[ n \] \\ S_C
 $
 
 The feasibility of this linear program follows from the fact that $S_R$ and $S_C$ are the supports in some Nash equilibrium of the game. This Nash equilibrium is a feasible solution to this linear program. In the other direction, any feasible solution to the above linear program is a Nash equilibrium. This is because if $\( vx \, vy \)$ is a feasible solution to the above linear program, then $vx$ places positive probability only on a subset of $S_R$ and  $vy$ places positive probability only on a subset of $S_C$. At the same time, the first couple of constraints imply that any action in $S_R$ must be a best response to $vy$ and any action in $S_C$ must be a best response to $vy$. Putting these together we have the implications, which mean that $\( vx \, vy \)$ is a Nash equilibrium:
 
 $
-  & forall i : med med x_i > 0 med med arrow.r.double i in S_R med med arrow.r.double i med upright("is a best response to ") vy \; med upright("and")\
-  & forall j : med med y_j > 0 med med arrow.r.double j in S_C med arrow.r.double j med upright("is a best response to ") vx .
+  & forall i : med med x_i > 0 med med => i in S_R med med => i med upright("is a best response to ") vy \; med upright("and")\
+  & forall j : med med y_j > 0 med med => j in S_C med => j med upright("is a best response to ") vx .
 $
 
 If we don't  know the supports of some Nash equilibrium, we can enumerate over all possible pairs of supports $\( S_R \, S_C \) subset.eq \[ m \] times \[ n \]$, and try to find a feasible solution of the corresponding linear program. As a Nash equilibrium always exists, at least one of these linear programs will be feasible. So the overall running time will be $2^(m + n) dot.op upright(p o l y) \( \| R \| \, \| C \| \)$, where the $2^(m + n)$ factor is due to trying all possible pairs of supports, and the polynomial factor in the descriptions of the matrices $R$ and $C$ is determined by the complexity of solving a linear program.
@@ -55,19 +55,19 @@ As illustrated by the #lecture-link("correlated", <sec-irrational-equilibria>)[i
 == $n$-player games
 #label("sec:support enumeration for n players")
 
-Now, let's consider how to generalize the approach to $n$-player games, for $n > 2$. Suppose that someone told us the support $S_i subset.eq A_i$ of each player $i$'s mixed strategy in some Nash equilibrium of the game. Given this information, we could solve the following program to find a Nash equilibrium $vx = \( vx_1 \, dots.h \, vx_n \) in Delta \( A_1 \) times dots.h times Delta \( A_n \)$:
+Now, let's consider how to generalize the approach to $n$-player games, for $n > 2$. Suppose that someone told us the support $S_i subset.eq A_i$ of each player $i$'s mixed strategy in some Nash equilibrium of the game. Given this information, we could solve the following program to find a Nash equilibrium $vx = \( vx_1 \, ... \, vx_n \) in Delta \( A_1 \) times ... times Delta \( A_n \)$:
 
 $
-  forall med upright(p l a y e r) med i : med med med & u_i \( a_i \; vx_(- i) \) gt.eq u_i \( a'_i \; vx_(- i) \) \, forall a_i in S_i \, forall a'_i in A_i \;\
+  forall med upright(p l a y e r) med i : med med med & u_i \( a_i \; vx_(- i) \) >= u_i \( a'_i \; vx_(- i) \) \, forall a_i in S_i \, forall a'_i in A_i \;\
   & sum_(a_i in A_i) x_(i \, a_i) = 1 \;\
-  & x_(i \, a_i) gt.eq 0 \, forall a_i in S_i \;\
+  & x_(i \, a_i) >= 0 \, forall a_i in S_i \;\
   & x_(i \, a_i) = 0 \, forall a_i in A_i \\ S_i .
 $
 
-Indeed, if there is a Nash equilibrium $vx = \( vx_1 \, dots.h \, vx_n \)$ where each $vx_i$ has support $S_i$, then this Nash equilibrium is a solution to the above system of polynomial equations and inequalities. In the other direction, any feasible solution $vx = \( vx_1 \, dots.h \, vx_n \)$ to the above system is a Nash equilibrium. Indeed, any feasible solution satisfies that for all players $i$, $vx_i$ assigns positive probability to a subset of $S_i$. Moreover, any action in $S_i$ is a best response to $vx_(- i)$. Putting these together we have the following implications, which mean that $vx$ is a Nash equilibrium:
+Indeed, if there is a Nash equilibrium $vx = \( vx_1 \, ... \, vx_n \)$ where each $vx_i$ has support $S_i$, then this Nash equilibrium is a solution to the above system of polynomial equations and inequalities. In the other direction, any feasible solution $vx = \( vx_1 \, ... \, vx_n \)$ to the above system is a Nash equilibrium. Indeed, any feasible solution satisfies that for all players $i$, $vx_i$ assigns positive probability to a subset of $S_i$. Moreover, any action in $S_i$ is a best response to $vx_(- i)$. Putting these together we have the following implications, which mean that $vx$ is a Nash equilibrium:
 
 $
-  forall med upright(p l a y e r s) med i \, forall a_i in A_i : med med x_(i \, a_i) > 0 med med arrow.r.double a_i in S_i med med arrow.r.double a_i med upright("is a best response to ") vx_(- i) .
+  forall med upright(p l a y e r s) med i \, forall a_i in A_i : med med x_(i \, a_i) > 0 med med => a_i in S_i med med => a_i med upright("is a best response to ") vx_(- i) .
 $
 
 However, notice that now $u_i \( a_i \; vx_(- i) \)$ is not linear in $vx$, but a polynomial of degree $n - 1$. So the above problem amounts to solving a system of polynomial equations and inequalities in the variables $vx$.
@@ -96,14 +96,14 @@ We will now discuss whether the running times of our algorithms from the previou
   That is, all players have the same set of actions, and all players have the same utility function that depends on their own action and the number of other players choosing each action.
 ]
 
-For example, rock-paper-scissors is a two-player symmetric game. Guess-$2 / 3$-of-the-average,#footnote[#link("https://en.wikipedia.org/wiki/Guess_2/3_of_the_average")] where $n$ players submit numbers in ${ 0 \, dots.h \, 100 }$ and whoever is closest to $2 \/ 3$s of the average wins $\$ 1$, which is split uniformly if there are ties, is a multi-player symmetric game. Also, congestion games, where players choose paths between the same source and destination nodes in some network and they suffer traffic depending on the number of players using each edge on their path, are symmetric games. Notice that describing symmetric games can be done much more succinctly than general games. In particular, a $n$-player $k$-action symmetric game can be described by specifying $O \( min { k n^(k - 1) \, k^n } \)$ numbers, which are exponentially fewer compared to the $O \( n k^n \)$ numbers needed to describe an abitrary game, when $n$ is large and $k$ is small.
+For example, rock-paper-scissors is a two-player symmetric game. Guess-$2 / 3$-of-the-average,#footnote[#link("https://en.wikipedia.org/wiki/Guess_2/3_of_the_average")] where $n$ players submit numbers in ${ 0 \, ... \, 100 }$ and whoever is closest to $2 \/ 3$s of the average wins $\$ 1$, which is split uniformly if there are ties, is a multi-player symmetric game. Also, congestion games, where players choose paths between the same source and destination nodes in some network and they suffer traffic depending on the number of players using each edge on their path, are symmetric games. Notice that describing symmetric games can be done much more succinctly than general games. In particular, a $n$-player $k$-action symmetric game can be described by specifying $O \( min { k n^(k - 1) \, k^n } \)$ numbers, which are exponentially fewer compared to the $O \( n k^n \)$ numbers needed to describe an abitrary game, when $n$ is large and $k$ is small.
 
 == Symmetric equilibria: existence and computation
 
 In rock-paper-scissors, the unique Nash equilibrium of the game is symmetric, i.e.~both players use the uniform mixture over their actions. More generally, a symmetric Nash equilibrium is defined as follows.
 
 #definition[
-  In a symmetric game, a Nash equilibrium $vx = \( vx_1 \, dots.h \, vx_n \)$ is called _symmetric_ if $vx_1 = vx_2 = dots.h = vx_n$, i.e.~all players use the same mixed strategy.
+  In a symmetric game, a Nash equilibrium $vx = \( vx_1 \, ... \, vx_n \)$ is called _symmetric_ if $vx_1 = vx_2 = ... = vx_n$, i.e.~all players use the same mixed strategy.
 ]
 
 While rock-paper-scissors has a symmetric Nash equilibrium, it is a priori not clear whether symmetric games ought to have a symmetric Nash equilibrium. As it turns out, this must be the case, as was shown by Nash in his 1951 paper. Indeed, Nash showed a more general statement than the statement below.
@@ -113,7 +113,7 @@ While rock-paper-scissors has a symmetric Nash equilibrium, it is a priori not c
 ]#label("thm:existence of symmetric equilibria")
 
 #proof[
-  Recall the #lecture-link("nfgs_nash", <def-nash-improvement>)[Nash improvement function] $f : times_i Delta \( A_i \) arrow.r times_i Delta \( A_i \)$, which maps some $vx$ to a $vy$ defined as follows, for all players $i$ and actions $a_i in A_i$:
+  Recall the #lecture-link("nfgs_nash", <def-nash-improvement>)[Nash improvement function] $f : times_i Delta \( A_i \) -> times_i Delta \( A_i \)$, which maps some $vx$ to a $vy$ defined as follows, for all players $i$ and actions $a_i in A_i$:
 
   $
     y_(i \, a_i) = frac(x_(i \, a_i) + max \( 0 \, u_i \( a_i \; vx_(- i) \) - u_i \( vx \) \), 1 + sum_(a'_i in A_i) max \( 0 \, u_i \( a'_i \; vx_(- i) \) - u_i \( vx \) \)) .
@@ -126,7 +126,7 @@ While rock-paper-scissors has a symmetric Nash equilibrium, it is a priori not c
   Then the range of the function will be a subset of this same restricted set, since every player performs the same “update” in the function $f$. So $f$ maps points of the restricted set to points in the same set. Moreover, the set is convex, closed and bounded. So we can use Brouwer's fixed point theorem to show the existence of a fixed point in the restricted set. This fixed point is a Nash equilibrium by the #lecture-link("nfgs_nash", <thm-nash-fixed-points>)[fixed-point characterization of Nash equilibria]. And since it belongs to the restricted set, it must be a symmetric one.
 ]
 
-A symmetric Nash equilibrium $vx = \( vx_1 \, dots.h \, vx_n \)$, where $vx_1 = dots.h = vx_n \,$ of a $n$-player $k$-action symmetric game can be found as follows:
+A symmetric Nash equilibrium $vx = \( vx_1 \, ... \, vx_n \)$, where $vx_1 = ... = vx_n \,$ of a $n$-player $k$-action symmetric game can be found as follows:
 
 - Guess the support of $vx_i$: $2^k$ possibilities;
 - Write down a system of polynomial equations and inequalities corresponding to the Nash equilibrium conditions for the guessed support. This is a simplified version of the system we wrote down for general games in Section~#ref(label("sec:support enumeration for n players"), supplement: none). Done well, the total number of constraints is $M = O \( k \)$. The polynomials involved have degree $D = n - 1$ in $N = k$ variables (c.f.~$k dot.op n$ variables for general games), so the system can be solved to $B$ bits of accuracy per variable using the existential theory of the reals in a number of operations equal to:
@@ -173,10 +173,10 @@ $ cal(G)_2 := mat(delim: "(", 0 \, 0, R \, C; C^T \, R^T, 0 \, 0) . $
     [$vy_1$], [$C^T \, R^T$], [$0 \, 0$],
   )
 
-  First, at least one of $vx_1$ and $vy_1$ must be nonzero. Assume WLOG that $vx_1 eq.not 0$. We claim the following:
+  First, at least one of $vx_1$ and $vy_1$ must be nonzero. Assume WLOG that $vx_1 != 0$. We claim the following:
 
   #claim[
-    $vx_1 eq.not 0$ implies that $vy_2 eq.not 0$.
+    $vx_1 != 0$ implies that $vy_2 != 0$.
   ] <claim1>
 
   #proof[
@@ -230,7 +230,7 @@ To simplify our presentation, we will assume that the input game is a symmetric 
 
 The idea of the algorithm is to perform pivoting steps between the vertices of a polytope related to the game until a Nash equilibrium is found. The ($n$-dimensional) polytope of interest is given by
 
-$ R dot.op vz lt.eq vone \, vz gt.eq 0 \, $
+$ R dot.op vz <= vone \, vz >= 0 \, $
 
 where $vz$ is an $n$-dimensional vector.
 
@@ -247,32 +247,32 @@ With the above setup, let us proceed to the meat of the algorithm. We make the f
 #definition[
   Action $i$ is _represented_ at a vertex $vz$ of the polytope if at least one of the following inequalities is tight:
 
-  $ z_i gt.eq 0 $
+  $ z_i >= 0 $
 
-  $ ve_i^T R vz lt.eq 1 $
+  $ ve_i^T R vz <= 1 $
 
   Furthermore, we call any vertex of the polytope where all actions are represented a _democracy_.
 ]
 
-Notice that $\( 0 \, 0 \, dots.h \, 0 \)$ is a democracy according to our definition. We make an interesting observation about democracies.
+Notice that $\( 0 \, 0 \, ... \, 0 \)$ is a democracy according to our definition. We make an interesting observation about democracies.
 
 #lemma[
-  If a vertex $vz eq.not 0$ of the polytope is a democracy, then $\( frac(vz, norm(vz)_1) \, frac(vz, norm(vz)_1) \)$ is a Nash equilibrium.
+  If a vertex $vz != 0$ of the polytope is a democracy, then $\( frac(vz, norm(vz)_1) \, frac(vz, norm(vz)_1) \)$ is a Nash equilibrium.
 ]
 
 #proof[
   At a democracy we have the following implication:
 
-  $ forall i : med med med z_i > 0 arrow.r.double.long ve_i^T R vz = 1 . $
+  $ forall i : med med med z_i > 0 ==> ve_i^T R vz = 1 . $
 
   Hence
 
-  $ forall i : med med med z_i > 0 arrow.r.double.long ve_i^T R vz gt.eq ve_j^T R vz \, forall j $
+  $ forall i : med med med z_i > 0 ==> ve_i^T R vz >= ve_j^T R vz \, forall j $
 
   and after normalization:
 
   $
-    forall i : med med med frac(1, norm(vz)_1) dot.op z_i > 0 arrow.r.double.long ve_i^T R dot.op frac(vz, norm(vz)_1) gt.eq ve_j^T R dot.op frac(vz, norm(vz)_1) \, forall j .
+    forall i : med med med frac(1, norm(vz)_1) dot.op z_i > 0 ==> ve_i^T R dot.op frac(vz, norm(vz)_1) >= ve_j^T R dot.op frac(vz, norm(vz)_1) \, forall j .
   $
 
   Notice that these are exactly the equilibrium conditions for $\( frac(vz, norm(vz)_1) \, frac(vz, norm(vz)_1) \)$ to be a symmetric Nash equilibrium of the game.
@@ -280,25 +280,25 @@ Notice that $\( 0 \, 0 \, dots.h \, 0 \)$ is a democracy according to our defini
 
 The goal of the Lemke-Howson algorithm is to find a democracy in the given polytope. The algorithm operates as follows. Let's call $n$ the “special action,” albeit this choice is arbitrary.
 
-- *Step $0$:* Start at  vertex $vv_0 := \( 0 \, 0 \, dots.h \, 0 \)$.
-- _Comment:_ By non-degeneracy, there are exactly $n$ edges of the polytope adjacent to $vv_0$. Each of these edges corresponds to un-tightening one of the $z_i gt.eq 0$ inequalities which are tight at $vv_0$.
-- Keeping all other inequalities tight, un-tighten the inequality $z_n gt.eq 0$ (which corresponds to our special action $n$). This defines an edge of the polytope adjacent to $vv_0$.
-- *Step 1:* Go to the other endpoint of this edge. If the obtained vertex $vv_1$ is a democracy, then a Nash equilibrium has been found because $vv_1 eq.not 0$.
-- Otherwise, one of the actions $1 \, dots.h \, n - 1$, say action $j_1$, is represented twice, by both $z_(j_1) = 0$ (which was already tight) and $ve_(j_1)^T R vz = 1$ (which just became tight).
-- _Comment:_ For the next step, we will un-tighten one of the two inequalities that are tight for $j_1$. If we un-tighten $ve_(j_1)^T R vz lt.eq 1$, this would define the same edge $\( vv_0 vv_1 \)$ that brought us to $vv_1$. To make progress we will un-tighten instead the other inequality representing action $j_1$.
-- Un-tightening $z_(j_1) gt.eq 0$ while keeping tight all other inequalities that were tight defines an edge $\( vv_1 vv_2 \) eq.not \( vv_0 vv_1 \)$ of the polytope.
+- *Step $0$:* Start at  vertex $vv_0 := \( 0 \, 0 \, ... \, 0 \)$.
+- _Comment:_ By non-degeneracy, there are exactly $n$ edges of the polytope adjacent to $vv_0$. Each of these edges corresponds to un-tightening one of the $z_i >= 0$ inequalities which are tight at $vv_0$.
+- Keeping all other inequalities tight, un-tighten the inequality $z_n >= 0$ (which corresponds to our special action $n$). This defines an edge of the polytope adjacent to $vv_0$.
+- *Step 1:* Go to the other endpoint of this edge. If the obtained vertex $vv_1$ is a democracy, then a Nash equilibrium has been found because $vv_1 != 0$.
+- Otherwise, one of the actions $1 \, ... \, n - 1$, say action $j_1$, is represented twice, by both $z_(j_1) = 0$ (which was already tight) and $ve_(j_1)^T R vz = 1$ (which just became tight).
+- _Comment:_ For the next step, we will un-tighten one of the two inequalities that are tight for $j_1$. If we un-tighten $ve_(j_1)^T R vz <= 1$, this would define the same edge $\( vv_0 vv_1 \)$ that brought us to $vv_1$. To make progress we will un-tighten instead the other inequality representing action $j_1$.
+- Un-tightening $z_(j_1) >= 0$ while keeping tight all other inequalities that were tight defines an edge $\( vv_1 vv_2 \) != \( vv_0 vv_1 \)$ of the polytope.
 - *Step 2:* Go to vertex $vv_2$. If $vv_2$ is a democracy, then stop.
 
-  _Comment:_ It will be shown (in the correctness analysis below) that it must be that $vv_2 eq.not 0$, and hence if $vv_2$ is a democracy then $vv_2 \/ norm(vv_2)_1$ is a symmetric Nash equilibrium.
-- Otherwise, again some action $j_2 eq.not n$ is doubly represented at $vv_2$, all other actions in ${ 1 \, dots.h \, n - 1 }$ are represented once, and the special action $n$ is not represented at all.
+  _Comment:_ It will be shown (in the correctness analysis below) that it must be that $vv_2 != 0$, and hence if $vv_2$ is a democracy then $vv_2 \/ norm(vv_2)_1$ is a symmetric Nash equilibrium.
+- Otherwise, again some action $j_2 != n$ is doubly represented at $vv_2$, all other actions in ${ 1 \, ... \, n - 1 }$ are represented once, and the special action $n$ is not represented at all.
 
   _Proof:_ This is because, for all actions who were singly represented at $vv_1$, i.e.~before the step was taken, their corresponding inequalities were maintained tight during the step. So they are still represented. Action $j_1$ was doubly represented at vertex $vv_1$ and we only un-tightened one of its tight inequalities. So it is still represented at vertex $vv_2$ via the inequality that we did not un-tighten. Finally, action $n$ was not represented before the step and since $vv_2$ is not a democracy it is still not represented.
 - …
 - *Step $t$:* At the generic step $t$ of the algorithm, the algorithm arrives at vertex $vv_t$ and performs the following case analysis:
 
-  - if $vv_t$ is a democracy, stop. _Comment:_ It will be shown that it must be that $vv_t eq.not 0$.
-  - if vertex $vv_t$ is not a democracy then one action $j_t$ is represented twice, all other actions in ${ 1 \, dots.h \, n - 1 }$ are represented once, and action $n$ is not represented at all; the proof of this property can be done by induction on $t$ assuming that this property holds for $vv_1 \, dots.h \, vv_(t - 1)$ and that the generic steps of the algorithm follow the description below.
-  - between $ve_(j_t)^T R vz lt.eq 1$ and $z_(j_t) gt.eq 0$, un-tighten the one that defines an edge $\( vv_t vv_(t + 1) \) eq.not \( vv_(t - 1) vv_t \)$.
+  - if $vv_t$ is a democracy, stop. _Comment:_ It will be shown that it must be that $vv_t != 0$.
+  - if vertex $vv_t$ is not a democracy then one action $j_t$ is represented twice, all other actions in ${ 1 \, ... \, n - 1 }$ are represented once, and action $n$ is not represented at all; the proof of this property can be done by induction on $t$ assuming that this property holds for $vv_1 \, ... \, vv_(t - 1)$ and that the generic steps of the algorithm follow the description below.
+  - between $ve_(j_t)^T R vz <= 1$ and $z_(j_t) >= 0$, un-tighten the one that defines an edge $\( vv_t vv_(t + 1) \) != \( vv_(t - 1) vv_t \)$.
   - for Step $t + 1$, jump to $vv_(t + 1)$.
 
 We are now ready to show that the algorithm is guaranteed to terminate at a non-zero democracy, thereby recovering a Nash equilibrium of the game.
@@ -308,7 +308,7 @@ We are now ready to show that the algorithm is guaranteed to terminate at a non-
 ]#label("thm:Lemke-Howson's correctness")
 
 #proof[
-  The Lemke-Howson algorithm defines a walk $vv_0 \, dots.h \, vv_t \, dots.h$ on the vertices of the polytope. We show that the vertices encountered in this walk satisfy a special property.
+  The Lemke-Howson algorithm defines a walk $vv_0 \, ... \, vv_t \, ...$ on the vertices of the polytope. We show that the vertices encountered in this walk satisfy a special property.
 
   #claim[
     For all $t$, $vv_t$ is either a democracy, or it satisfies the following property:
@@ -319,7 +319,7 @@ We are now ready to show that the algorithm is guaranteed to terminate at a non-
       align: left + top,
       inset: .5em,
       [$Pi:$],
-      [All of the actions in ${ 1 \, dots.h \, n - 1 }$ are represented at $vv_t$, exactly one of them is represented twice, and action $n$ is not represented at all.],
+      [All of the actions in ${ 1 \, ... \, n - 1 }$ are represented at $vv_t$, exactly one of them is represented twice, and action $n$ is not represented at all.],
     )
   ]
 
@@ -329,10 +329,10 @@ We are now ready to show that the algorithm is guaranteed to terminate at a non-
 
   Consider now all the vertices of the polytope that satisfy property $Pi$, as well as all the vertices of the polytope that are democracies. We define an auxiliary graph $G$ on these vertices, where the vertices satisfying property $Pi$ have exactly two neighbors in $G$, and those that are democracies have exactly one neighbor in $G$. In particular,
 
-  - The two neighbors (in $G$) of a vertex $vv$ satisfying property $Pi$ are obtained from the polytope as follows: If $j$ is the action that is represented twice at $vv$, consider un-tightening either $z_j gt.eq 0$ or $ve_j^T R vz lt.eq 1$. Either one will define an edge of the polytope adjacent to $vv$ whose other endpoint is either a democracy or a vertex satisfying property $Pi$. Set those two vertices to be the neighbors of $vv$ in $G$.
-  - The single neighbor (in $G$) of a vertex $vv$ that is a democracy is obtained from the polytope as follows: Since $vv$ is a democracy, either $z_n gt.eq 0$ or $ve_n^T R vz lt.eq 1$ is tight. Consider un-tightening whichever inequality is tight. This defines an edge of the polytope whose other endpoint is either a democracy or a vertex satisfying property $Pi$. Set that vertex to be the neighbor of $vv$ in $G$.
+  - The two neighbors (in $G$) of a vertex $vv$ satisfying property $Pi$ are obtained from the polytope as follows: If $j$ is the action that is represented twice at $vv$, consider un-tightening either $z_j >= 0$ or $ve_j^T R vz <= 1$. Either one will define an edge of the polytope adjacent to $vv$ whose other endpoint is either a democracy or a vertex satisfying property $Pi$. Set those two vertices to be the neighbors of $vv$ in $G$.
+  - The single neighbor (in $G$) of a vertex $vv$ that is a democracy is obtained from the polytope as follows: Since $vv$ is a democracy, either $z_n >= 0$ or $ve_n^T R vz <= 1$ is tight. Consider un-tightening whichever inequality is tight. This defines an edge of the polytope whose other endpoint is either a democracy or a vertex satisfying property $Pi$. Set that vertex to be the neighbor of $vv$ in $G$.
 
-  Clearly $G$ comprises paths and cycles, as every vertex has degree either $1$ or $2$. Moreover, all democracies are endpoints of paths in $G$, since they have degree $1$. Let's call “main path” the path that has $vv_0 = \( 0 \, dots.h \, 0 \)$ as one of its endpoints  and some democracy $vv^(*) eq.not vv_0$ as its other endpoint. The following can be easily shown by induction.
+  Clearly $G$ comprises paths and cycles, as every vertex has degree either $1$ or $2$. Moreover, all democracies are endpoints of paths in $G$, since they have degree $1$. Let's call “main path” the path that has $vv_0 = \( 0 \, ... \, 0 \)$ as one of its endpoints  and some democracy $vv^(*) != vv_0$ as its other endpoint. The following can be easily shown by induction.
 
   #claim[
     The Lemke-Howson algorithm traverses the main path starting from $vv_0$, moving in the direction of $vv^(*)$, visiting every vertex in this path once, and terminating at $vv^(*)$.

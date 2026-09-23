@@ -2008,3 +2008,16 @@ mark {
         line-height: 1.08
     }
 }
+.note-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-block: 20px;
+    padding: 12px 14px;
+    border-radius: 4px;
+    background: #fff4e6;
+    color: #88410c;
+    font: 0.9375rem/1.5 var(--sans);
+}
+.note-status img { flex: none; }
+.note-status p { margin: 0; }

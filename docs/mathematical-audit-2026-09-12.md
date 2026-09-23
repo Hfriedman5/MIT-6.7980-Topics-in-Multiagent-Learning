@@ -10,7 +10,7 @@ Date: September 12, 2026. Baseline: the live MIT 6.7980 homepage and its 15 lect
 
 ## Figures included
 
-The kernelized chapter includes an extensive-form tree, all seven highlighted pure-strategy vertices, and the vertex MWU/OMWU algorithm. The seven-strategy figure reuses `content/figures/efg_intro/nf_strategies.svg` from Lecture 7 at full width, including its gray grid, and the caption refers back to *Modeling extensive-form games*. Its separate tree drawing helper was copied from `typst_meta/vertices.typ`, updating the CeTZ version and font compatibility while preserving the game and labels.
+The kernelized chapter includes an extensive-form tree, all seven highlighted pure-strategy vertices, and the vertex MWU/OMWU algorithm. The seven-strategy figure reuses `content/figures/efg_intro/nf_strategies.svg` from Lecture 7 at full width, including its gray grid, and the caption refers back to *Modeling extensive-form games*. Its separate tree drawing helper is `content/figures/kernelized/vertices.typ`, with updated CeTZ and font compatibility while preserving the game and labels.
 
 The TFNP chapter retains the complexity-class schematic, with the total-search region labeled and a caption distinguishing known inclusions from conjectured separations. The six geometric illustrations remain in Lecture 2, where the coloring, padding, and path arguments are developed. Section L18.5 now refers back to that exposition and explains short cell encodings, local predecessor/successor circuits, decoding every endpoint, and the computational precision requirements. This removes the duplicated geometric recap from Lecture 18.
 
@@ -40,7 +40,7 @@ The perfection counterexample has a new editable tree and a native table, so the
 
 ### Correction to the original coverage report
 
-The uniform-lower-bound QPE appendix is present in the supplied `typst_content/L11.typ`. The original comparison incorrectly called it a website addition. The comparison report has been corrected. The erroneous 4-epsilon root probability was inherited by both versions. The original source files were not edited.
+The uniform-lower-bound QPE appendix was already present in the supplied perfect-equilibria notes. The original comparison incorrectly called it a website addition. The comparison report has been corrected. The erroneous 4-epsilon root probability was inherited by both versions. The original source files were not edited.
 
 ## Key arguments checked independently
 

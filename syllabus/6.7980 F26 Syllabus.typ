@@ -23,13 +23,13 @@
   tas: (
     (name: "Kat Fedorova", email: "fedorova@mit.edu", office_hours: "Wednesdays, 2-3 pm, room 32-G5 (lounge of 5th floor, Gates tower)"),
     (name: "Mingyang Liu", email: "liumy19@mit.edu", office_hours: "Fridays, 5:30-6:30 pm, room 45-500A"),
-    (name: "Daniel Xia", email: "dxia03@mit.edu", office_hours: "Mondays, 10-11 am, room TBD"),
+    (name: "Daniel Xia", email: "dxia03@mit.edu", office_hours: "Mondays, 10-11 am, room 45-509"),
     (name: "Rui Yao", email: "rayyao@mit.edu", office_hours: "Tuesdays, 3:30-4:30 pm, room 32-G5 (lounge of 5th floor, Gates tower)"),
   ),
   grading: (attendance: 20, material: 30, project: 50),
   // Website metadata only; these readings are not displayed in the syllabus PDF.
   supplementary_readings: (
-    (id: "nash-algorithms", title: "Centralized algorithms for Nash equilibrium computation", after: "nash"),
+    (id: "nash-algorithms", title: "Centralized algorithms for Nash equilibrium computation", after: "brouwer"),
     (id: "minimax", title: "A second look at the minimax theorem", after: "nash-properties"),
     (id: "phi-regret", title: "Phi-regret minimization", after: "learning-foundations"),
     (id: "learning-2", title: "Learning algorithms (II)", after: "learning-algorithms"),

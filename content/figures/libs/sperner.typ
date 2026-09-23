@@ -1,4 +1,3 @@
-// Recovered from Costis Gabri monograph/typst_meta/sperner.typ
 #import "@preview/cetz:0.3.4"
 
 #let sperner_w = 0.83

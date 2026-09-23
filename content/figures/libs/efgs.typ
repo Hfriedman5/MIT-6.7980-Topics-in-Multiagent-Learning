@@ -1,4 +1,3 @@
-// Recovered from Costis Gabri monograph/typst_meta/efgs.typ
 #import "@preview/cetz:0.3.4"
 
 #let _num-slash = key => {

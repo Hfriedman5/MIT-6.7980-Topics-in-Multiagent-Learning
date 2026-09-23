@@ -2,7 +2,6 @@
 #import "../../meta/notation.typ": vg, vm, vr, vz
 #import "../../meta/notation.typ": cX, cY, cR, html-argmax as argmax
 #import "../../meta/notation.typ": ip
-// Recovered from Costis Gabri monograph/texcontent/figures/L06/table.typ
 #set page(width: auto, height: auto, fill: none, margin: (left: 1mm, right: 0mm, y: .5mm))
 #import "../libs/typography.typ": figure-font, figure-style
 #set text(font: figure-font, size: 9pt)

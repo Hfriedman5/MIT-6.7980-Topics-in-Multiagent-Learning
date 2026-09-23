@@ -1,17 +1,22 @@
 PYTHON ?= python3
+FORCE ?= 0
+BUILD_FLAGS = $(if $(filter 1 true yes,$(FORCE)),--force,)
 
-.PHONY: all html bundle figures syllabus check check-pdf serve
+.PHONY: all html bundle figures force syllabus check check-pdf serve
 
 all: bundle
 
 html:
-	$(PYTHON) scripts/build_site.py
+	$(PYTHON) scripts/build_site.py $(BUILD_FLAGS)
 
 bundle:
-	$(PYTHON) scripts/build_site.py --zip
+	$(PYTHON) scripts/build_site.py --zip $(BUILD_FLAGS)
 
 figures:
-	$(PYTHON) scripts/build_figures.py
+	$(PYTHON) scripts/build_figures.py $(BUILD_FLAGS)
+
+force:
+	$(MAKE) bundle FORCE=1
 
 syllabus:
 	typst compile --root . --font-path html-exporter/assets/fonts 'syllabus/6.7980 F26 Syllabus.typ' 'syllabus/6.7980 Fall 2026 Syllabus.pdf'
