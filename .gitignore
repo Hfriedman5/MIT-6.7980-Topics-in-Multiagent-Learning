@@ -19,6 +19,7 @@
 !/slides/L00_course_intro.pdf
 !/slides/L01_nash_equilibrium.pdf
 !/slides/L02_sperner.pdf
+!/slides/L03_nash_properties.pdf
 
 # Build products, editor state, and local secrets.
 **/target/
@@ -35,6 +36,7 @@ syllabus/macros.pdf
 /syllabus/6.7980 Fall 2026 Syllabus.pdf
 
 # Private migration records stay in the local workspace.
+/private/
 /docs/migration/
 /migration/
 

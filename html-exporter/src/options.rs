@@ -20,6 +20,7 @@ pub(crate) struct Config {
     pub(crate) math_mode: MathMode,
     pub(crate) figure_svg: bool,
     pub(crate) figure_inputs: Vec<String>,
+    pub(crate) figure_deps: Option<PathBuf>,
 }
 
 /// Export the MIT 6.7980 Typst notes through Typst HTML plus postprocessing.
@@ -62,6 +63,9 @@ pub(crate) fn parse(
     /// Compiler input for a figure, e.g. gate=addition. May be repeated.
     #[opt(long = "figure-input")]
     figure_inputs: Vec<String>,
+    /// Write figure dependency paths as JSON for incremental builds.
+    #[opt(long = "figure-deps")]
+    figure_deps: Option<PathBuf>,
     /// Input Typst file.
     input: PathBuf,
     /// Output HTML file. Defaults to the input path with .html extension.
@@ -95,6 +99,7 @@ pub(crate) fn parse(
         math_mode,
         figure_svg,
         figure_inputs,
+        figure_deps,
     })
 }
 

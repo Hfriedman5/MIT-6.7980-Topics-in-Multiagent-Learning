@@ -1,5 +1,6 @@
 """Guard native bundle failures and the exported lecture downloads."""
 from pathlib import Path
+import json
 import subprocess
 import tempfile
 import unittest
@@ -26,10 +27,16 @@ Lecture prose.
 ''')
         self.chapter = {'source': 'content/lecture.typ', 'number': 3}
         self.original = self.source.read_text()
+        (self.root / '.build/native-html').mkdir()
+        (self.root / '.build/native-html/lecture.html').write_text('<p>Native lecture</p>')
+        (self.root / '.build/html-export.json').write_text('{}')
         for name, value in (('ROOT', self.root), ('STAGE', self.stage)):
             replacement = patch.object(build_site, name, value)
             replacement.start()
             self.addCleanup(replacement.stop)
+        replacement = patch.object(build_site, 'RESOLVED_CONFIG', self.root / '.build/html-export.json')
+        replacement.start()
+        self.addCleanup(replacement.stop)
 
     def test_pdf_source_preserves_prose_and_resolves_asset_paths(self):
         generated = build_site.prepare_pdf_source(self.source).read_text()
@@ -78,8 +85,52 @@ Lecture prose.
             (self.stage / 'assets/notes.css').write_text('body { color: black; }')
             build_site.build_chapter(self.chapter)
             self.assertNotEqual((self.stage / 'lecture.html').read_text(), first)
-        self.assertEqual(len(calls), 3)
+            build_site.build_chapter(self.chapter, force=True)
+        self.assertEqual(len(calls), 3)  # initial build, CSS change, forced build
         self.assertFalse((self.stage / 'source').exists())
+
+    def test_bundle_tracks_dependencies_outputs_and_force(self):
+        helper = self.root / 'content/helper.typ'
+        helper.write_text('first')
+        calls = []
+        def compile_bundle(args, **kwargs):
+            calls.append(args)
+            directory = Path(args[-1])
+            directory.mkdir(parents=True)
+            (directory / 'lecture.pdf').write_text(helper.read_text())
+            Path(args[args.index('--deps') + 1]).write_text(json.dumps({'inputs': [str(helper)]}))
+            return subprocess.CompletedProcess(args, 0)
+
+        with patch.object(build_site.subprocess, 'run', side_effect=compile_bundle):
+            output = build_site.compile_note_bundle('pdf')
+            build_site.compile_note_bundle('pdf')
+            self.assertEqual(len(calls), 1)
+            helper.write_text('second')
+            build_site.compile_note_bundle('pdf')
+            self.assertEqual((output / 'lecture.pdf').read_text(), 'second')
+            (output / 'lecture.pdf').unlink()
+            build_site.compile_note_bundle('pdf')
+            build_site.compile_note_bundle('pdf', force=True)
+            self.assertEqual(len(calls), 4)
+
+    def test_native_html_edit_reprocesses_only_the_changed_lecture(self):
+        second = dict(self.chapter, source='content/other.typ', number=4)
+        (self.root / second['source']).write_text('Other lecture')
+        native = self.root / '.build/native-html'
+        (native / 'other.html').write_text('Other native lecture')
+        for name in ('lecture', 'other'):
+            (self.stage / f'pdf/{name}.pdf').write_bytes(b'%PDF-1.7\n')
+        def export(args, **kwargs):
+            Path(args[-1]).write_text('<style>body {}</style>' + Path(args[args.index('--from-html') + 1]).read_text())
+            return subprocess.CompletedProcess(args, 0)
+        with patch.object(build_site.subprocess, 'run', side_effect=export) as run:
+            build_site.build_chapter(self.chapter)
+            build_site.build_chapter(second)
+            (native / 'lecture.html').write_text('Updated lecture')
+            build_site.build_chapter(self.chapter)
+            build_site.build_chapter(second)
+            self.assertEqual(run.call_count, 3)
+            self.assertIn('Updated lecture', (self.stage / 'lecture.html').read_text())
 
     def test_missing_pdf_stops_before_exporting_a_dead_link(self):
         with patch.object(build_site.subprocess, 'run') as run:

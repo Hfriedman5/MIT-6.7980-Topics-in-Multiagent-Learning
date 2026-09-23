@@ -162,7 +162,7 @@ def render_index(config: dict, modules: list[dict], *, stylesheet_version: str =
             slides = config.get('slides', {}).get(row['id'])
             if slides:
                 slides_href = escape(slide_output(slides), quote=True)
-                links += (f'<a class="pdf-link" href="{slides_href}" '
+                links += (f'<a class="pdf-link slides-link" href="{slides_href}" '
                           f'aria-label="Slides (PDF): {escape(row["title"], quote=True)}">Slides (PDF)</a>')
             if not links:
                 links = ('<span class="notes-pending">Not yet posted</span>'

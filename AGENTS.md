@@ -11,6 +11,11 @@ Reflect every user-requested course change in both the current index page and th
 - Reorder the syllabus's date-free `lecture(...)`, `no-class(...)`, and `module[...]` outline. `schedule(class-dates, outline)` assigns dates and lecture numbers; verified class dates and fixed academic-calendar exceptions are in `syllabus/fall-2026-calendar.typ`. Keep stable lecture IDs with their topics and map notes through `syllabus_ids` in `html-export.json`.
 - Use Frutiger only for bold text and headings in the syllabus PDF. Use New Computer Modern for regular and italic body text. Do not use PT Sans, and check the embedded fonts when changing typography.
 - Load the bundled regular and bold Frutiger faces with `--font-path html-exporter/assets/fonts` when compiling the syllabus. `make syllabus` rebuilds and synchronizes both PDF copies with this setting; the full site build uses it too.
+- Use idiomatic Typst symbol shorthands wherever an equivalent shorthand exists throughout the material, including notes, figures, and shared helpers: for example, `<=`, `>=`, `!=`, `~`, `:=`, `->`, `=>`, `<=>`, and `...`. Preserve named forms where required by code syntax or function calls, such as `tilde(x)`, and for symbols without an exact shorthand, such as the centered ellipsis `dots.c`.
+
+# Website date and time convention
+
+- Display and interpret all human-facing website dates and times in Boston time (`America/New_York`, US Eastern), including date/time inputs, tables, charts, and tooltips. Handle daylight saving time automatically; never use the visitor's browser timezone implicitly. Keep machine timestamps in UTC/ISO format.
 
 # FoW arena connection settings
 

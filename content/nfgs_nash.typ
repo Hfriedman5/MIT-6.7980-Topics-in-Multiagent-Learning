@@ -6,15 +6,15 @@
   instructor: [Prof. Constantinos Daskalakis (`costis@mit.edu`)],
 )
 
-Normal-form games model simultaneous-move interactions with a single move (think about rock-paper-scissors). Despite their simplicity, normal-form games will provide a natural ground for looking into important concepts in multiagent settings, such as notions of equilibria (Nash, maxmin, correlated, $dots.h$), and learning from repeated play. In the second part of the course, we will move on to notions of games that explicitly capture more complex phenomena, such as sequential moves and imperfect information.
+Normal-form games model simultaneous-move interactions with a single move (think about rock-paper-scissors). Despite their simplicity, normal-form games will provide a natural ground for looking into important concepts in multiagent settings, such as notions of equilibria (Nash, maxmin, correlated, $...$), and learning from repeated play. In the second part of the course, we will move on to notions of games that explicitly capture more complex phenomena, such as sequential moves and imperfect information.
 
 = Normal-form games and the Nash equilibrium <sec-normal-form>
 
 When introducing a (finite) normal-form game, we need to specify the following quantities:
 
-- The set of players $\[ n \] = {1 \, dots.h \, n}$.
+- The set of players $\[ n \] = {1 \, ... \, n}$.
 - For each player $i in \[ n \]$, a finite set of actions $A_i$.
-- For each player $i in \[ n \]$, the payoff function $u_i : A_1 times dots.h.c times A_n arrow.r bb(R)$.
+- For each player $i in \[ n \]$, the payoff function $u_i : A_1 times dots.h.c times A_n -> bb(R)$.
 
 To represent a normal-form game, it is common to use a matrix representation.
 
@@ -30,16 +30,16 @@ To represent a normal-form game, it is common to use a matrix representation.
 
 *Notation.* We write vectors in bold, including a player’s entire strategy $vx_i$, and scalar coordinates in plain type, such as $x_(i \, a_i)$. Hats, bars, and time indices preserve this distinction. Explicit indexing such as $vx[a]$ also denotes a scalar coordinate.
 
-*Strategies*  A _randomized strategy_ (also known as _mixed strategy_) for a generic player $i in \[ n \]$ is a distribution over the set of actions. We can represent such an object as a vector $vx_i in Delta (A_i)$, that is, such that $vx_i gt.eq 0$ and $sum_(a_i in A_i) x_(i \, a_i) = 1$. To lighten the notational burden, we will write the expected utility when all players play according to strategies $vx_1 \, dots.h \, vx_n$ reusing the same letter $u_i$ as the payoff, _i.e._,
+*Strategies*  A _randomized strategy_ (also known as _mixed strategy_) for a generic player $i in \[ n \]$ is a distribution over the set of actions. We can represent such an object as a vector $vx_i in Delta (A_i)$, that is, such that $vx_i >= 0$ and $sum_(a_i in A_i) x_(i \, a_i) = 1$. To lighten the notational burden, we will write the expected utility when all players play according to strategies $vx_1 \, ... \, vx_n$ reusing the same letter $u_i$ as the payoff, _i.e._,
 
 $
-  u_i (vx_1 \, dots.h \, vx_n) & colon.eq bb(E)_(a_1 tilde.op vx_1\
-  dots.h\
-  a_n tilde.op vx_n) [u_i (a_1 \, dots.h \, a_n)]\
-  & = sum_(a_1 in A_1) dots.h.c sum_(a_n in A_n) x_(1 \, a_1) dots.h.c x_(n \, a_n) dot.op u_i (a_1 \, dots.h \, a_n) .
+  u_i (vx_1 \, ... \, vx_n) & := bb(E)_(a_1 ~ vx_1\
+  ...\
+  a_n ~ vx_n) [u_i (a_1 \, ... \, a_n)]\
+  & = sum_(a_1 in A_1) dots.h.c sum_(a_n in A_n) x_(1 \, a_1) dots.h.c x_(n \, a_n) dot.op u_i (a_1 \, ... \, a_n) .
 $
 
-We will sometimes intersperse deterministic actions and mixed strategies freely and write expressions such as $u_i (a_1 \, vx_2 \, dots.h \, vx_n)$ to mean the expected utility when player 1 plays action $a_1$ and the other players play according to the strategies $vx_2 \, dots.h \, vx_n$.
+We will sometimes intersperse deterministic actions and mixed strategies freely and write expressions such as $u_i (a_1 \, vx_2 \, ... \, vx_n)$ to mean the expected utility when player 1 plays action $a_1$ and the other players play according to the strategies $vx_2 \, ... \, vx_n$.
 
 == Dominant-strategy equilibrium
 
@@ -53,27 +53,27 @@ One way to think about this is to consider the worst-case scenario: what is the 
 
 $
   vx_i in "arg max"_(vx_i in Delta (A_i)) min_(vx_j in Delta (A_j)\
-  upright("for all") j eq.not i) u_i (vx_i \, vx_(- i)) \,
+  upright("for all") j != i) u_i (vx_i \, vx_(- i)) \,
 $
 
-where the notation $vx_(- i)$ is popular syntactic sugar to denote the tuple $(vx_j)_(j eq.not i)$.#footnote[This notation appears often in game theory, since we are often interested in studying the effect of changing a _single_ player $i$'s strategy, while keeping all “the other” strategies $vx_(- i)$ fixed.]  Thinking back about rock-paper-scissors, it is clear that the maxmin strategy is to play uniformly at random: the opponent could exploit any other strategy more than the uniform one, by playing the counteraction more often.
+where the notation $vx_(- i)$ is popular syntactic sugar to denote the tuple $(vx_j)_(j != i)$.#footnote[This notation appears often in game theory, since we are often interested in studying the effect of changing a _single_ player $i$'s strategy, while keeping all “the other” strategies $vx_(- i)$ fixed.]  Thinking back about rock-paper-scissors, it is clear that the maxmin strategy is to play uniformly at random: the opponent could exploit any other strategy more than the uniform one, by playing the counteraction more often.
 
 The above idea has some merits, especially in two-player zero-sum games, that is, those two-player games where $u_1 (a_1 \, a_2) + u_2 (a_1 \, a_2) = 0$ for all combinations of actions. In those games, players are in direct competition, so it makes sense to assume that the opponent is “out to get us.” But in more general games, the maxmin strategy can be too conservative, since it assumes that all other players have nothing better going on than to minimize our payoff, even if that hurts them.
 
 == The Nash equilibrium <sec-nash-equilibrium>
 
-In general, defining what constitutes “optimal play” is tricky. But we can start from what is convincingly _not_ optimal play: if we predict that the players should play according to some strategies $vx_1 \, dots.h \, vx_n$, then it is not optimal if it turned out that any player would be better off by switching to something else. This is the idea behind the _Nash equilibrium_.
+In general, defining what constitutes “optimal play” is tricky. But we can start from what is convincingly _not_ optimal play: if we predict that the players should play according to some strategies $vx_1 \, ... \, vx_n$, then it is not optimal if it turned out that any player would be better off by switching to something else. This is the idea behind the _Nash equilibrium_.
 
 #definition[Nash equilibrium][
-  A strategy profile $(vx_1 \, dots.h \, vx_n) in Delta (A_1) times dots.h.c times Delta (A_n)$ is a _Nash equilibrium_ if no player benefits from unilaterally deviating from their strategy. In symbols,
+  A strategy profile $(vx_1 \, ... \, vx_n) in Delta (A_1) times dots.h.c times Delta (A_n)$ is a _Nash equilibrium_ if no player benefits from unilaterally deviating from their strategy. In symbols,
 
   $
-    forall i in \[ n \] \, vx'_i in Delta (A_i) \, #h(2em) #h(2em) u_i (vx'_i \, vx_(- i)) lt.eq u_i (vx_1 \, dots.h \, vx_n) .
+    forall i in \[ n \] \, vx'_i in Delta (A_i) \, #h(2em) #h(2em) u_i (vx'_i \, vx_(- i)) <= u_i (vx_1 \, ... \, vx_n) .
   $
 ] <def-nash-equilibrium>
 
 #remark[
-  Without loss of generality, when verifying if a profile $(vx_1 \, dots.h \, vx_n)$ is a Nash equilibrium, it is sufficient to consider only _deterministic_ deviations $a_i in A_i$. Indeed, if a player has a profitable randomized deviation, this must mean that at least one of the actions they are randomizing over is profitable.
+  Without loss of generality, when verifying if a profile $(vx_1 \, ... \, vx_n)$ is a Nash equilibrium, it is sufficient to consider only _deterministic_ deviations $a_i in A_i$. Indeed, if a player has a profitable randomized deviation, this must mean that at least one of the actions they are randomizing over is profitable.
 ]
 
 It is clear that a dominant-strategy equilibrium is a special case of a Nash equilibrium, since in a dominant-strategy equilibrium, by definition,
@@ -81,7 +81,7 @@ It is clear that a dominant-strategy equilibrium is a special case of a Nash equ
 #math.equation(
   block: true,
   numbering: (..nums) => "(Dominant-strategy eq.)",
-  $forall i in \[ n \] \, vx'_i in Delta (A_i) \, vx'_(- i) in Delta (A_(- i)) \, quad u_i (vx'_i \, vx'_(- i)) lt.eq u_i (vx_i \, vx'_(- i)) .$.body,
+  $forall i in \[ n \] \, vx'_i in Delta (A_i) \, vx'_(- i) in Delta (A_(- i)) \, quad u_i (vx'_i \, vx'_(- i)) <= u_i (vx_i \, vx'_(- i)) .$.body,
 )
 
 (note the stronger quantifiers.) As we will discuss more in depth shortly, in two-player zero-sum games, it turns out that Nash equilibrium and maxmin equilibrium are equivalent.
@@ -119,28 +119,28 @@ As mentioned above, one can think about Nash equilibria as fixed points of a “
 
 *Regret*  To formally define the Nash improvement function, we first introduce a simple quantity called _regret_, which will be a staple of this course. The _regret_ that Player $i$ experiences with respect to action $a_i in A_i$ is the difference between the payoff that Player $i$ would have obtained by playing $a_i$, and the payoff that Player $i$ actually obtained:
 
-$ r_(i \, a_i) (vx_1 \, dots.h \, vx_n) colon.eq u_i (a_i \, vx_(- i)) - u_i (vx_1 \, dots.h \, vx_n) . $
+$ r_(i \, a_i) (vx_1 \, ... \, vx_n) := u_i (a_i \, vx_(- i)) - u_i (vx_1 \, ... \, vx_n) . $
 
 *The Nash improvement function*  The idea is simple: if an action $a_i$ has very large regret, then the current strategy profile cannot be an equilibrium, because Player $i$ would want to increase the probability of playing $a_i$. Thus, an “improved” strategy for Player $i$ should move more probability mass to $a_i$. We need to handle two complications: (1) if multiple actions have positive regret, how should we prioritize adding mass to those? and (2) for those actions whose regret is negative (that is, “bad” actions), should we forcefully decrease the mass?
 
 Nash's answers to the above questions are as follows: (1) add mass to all actions with positive regret, and the amount of mass added should be proportional to the regret; (2) do not decrease the mass for actions with negative regret. To retain the fact that the output of the improvement function must be a valid strategy, the step is renormalized so that the sum of the mass across all actions of any player is $1$. We can formalize this process by using the following definition.
 
 #definition[Nash improvement function #citep(<Nash51:NonCooperative>)][
-  Let $vx_1 in Delta (A_1) \, dots.h \, vx_n in Delta (A_n)$ be arbitrary strategies. The _Nash improvement function_ $phi : Delta (A_1) times dots.h.c times Delta (A_n) arrow.r Delta (A_1) times dots.h.c times Delta (A_n)$ is the map
+  Let $vx_1 in Delta (A_1) \, ... \, vx_n in Delta (A_n)$ be arbitrary strategies. The _Nash improvement function_ $phi : Delta (A_1) times dots.h.c times Delta (A_n) -> Delta (A_1) times dots.h.c times Delta (A_n)$ is the map
 
   #math.equation(
     block: true,
     numbering: "(1)",
-    $phi_(i \, a_i) (vx_1 \, dots.h \, vx_n) colon.eq frac(x_(i \, a_i) + [r_(i \, a_i) (vx_1 \, dots.h \, vx_n)]^(+), 1 + sum_(a'_i in A_i) [r_(i \, a'_i) (vx_1 \, dots.h \, vx_n)]^(+))$.body,
+    $phi_(i \, a_i) (vx_1 \, ... \, vx_n) := frac(x_(i \, a_i) + [r_(i \, a_i) (vx_1 \, ... \, vx_n)]^(+), 1 + sum_(a'_i in A_i) [r_(i \, a'_i) (vx_1 \, ... \, vx_n)]^(+))$.body,
   ) <nif>
 
-  for every player $i in \[ n \]$ and action $a_i in A_i$. Here, $\[ r \]^(+) colon.eq max {0 \, r}$ denotes the positive part of $r$.
+  for every player $i in \[ n \]$ and action $a_i in A_i$. Here, $\[ r \]^(+) := max {0 \, r}$ denotes the positive part of $r$.
 ] <def-nash-improvement>
 
-It is straightforward to verify that $phi$ is well-defined and maps strategy profiles into strategy profiles. Indeed, the numerator in #ref(<nif>, supplement: none) is always nonnegative, and the denominator is always at least $1$, implying that $phi_(i \, a_i) gt.eq 0$ for all $a_i in A_i$ and player $i in \[ n \]$. Furthermore,
+It is straightforward to verify that $phi$ is well-defined and maps strategy profiles into strategy profiles. Indeed, the numerator in #ref(<nif>, supplement: none) is always nonnegative, and the denominator is always at least $1$, implying that $phi_(i \, a_i) >= 0$ for all $a_i in A_i$ and player $i in \[ n \]$. Furthermore,
 
 $
-  forall i in \[ n \] \, #h(2em) sum_(a_i in A_i) phi_(i \, a_i) \( vx_1 \, dots.h \, vx_n \) = frac(sum_(a_i in A_i) (x_(i \, a_i) + [r_(i \, a_i) (vx_1 \, dots.h \, vx_n)]^(+)), 1 + sum_(a'_i in A_i) [r_(i \, a'_i) (vx_1 \, dots.h \, vx_n)]^(+)) = 1 \,
+  forall i in \[ n \] \, #h(2em) sum_(a_i in A_i) phi_(i \, a_i) \( vx_1 \, ... \, vx_n \) = frac(sum_(a_i in A_i) (x_(i \, a_i) + [r_(i \, a_i) (vx_1 \, ... \, vx_n)]^(+)), 1 + sum_(a'_i in A_i) [r_(i \, a'_i) (vx_1 \, ... \, vx_n)]^(+)) = 1 \,
 $
 
 where we used the fact that $sum_(a_i in A_i) x_(i \, a_i) = 1$ since $vx_i$ is a valid strategy. Finally, observe that $phi$ is a continuous function.  The following example visualizes the Nash improvement function in the small games we have seen so far.
@@ -166,10 +166,10 @@ where we used the fact that $sum_(a_i in A_i) x_(i \, a_i) = 1$ since $vx_i$ is 
 We validate our intuition that the Nash improvement function is a “profitable response” function. The following result shows that if a player has positive regret for any action, then the Nash improvement function unilaterally increases that player's utility. This is a key property that will allow us to show that the fixed points of the Nash improvement functions must be Nash equilibria.
 
 #theorem[
-  For any strategy profile $(vx_1 \, dots.h \, vx_n)$, and any player $i in \[ n \]$, the Nash improvement function $phi$ satisfies
+  For any strategy profile $(vx_1 \, ... \, vx_n)$, and any player $i in \[ n \]$, the Nash improvement function $phi$ satisfies
 
   $
-    u_i (phi_i (vx_1 \, dots.h \, vx_n) \, vx_(- i)) - u_i (vx_1 \, dots.h \, vx_n) = frac(sum_(a_i in A_i) ([r_(i \, a_i) (vx_1 \, dots.h \, vx_n)]^(+))^2, 1 + sum_(a_i in A_i) [r_(i \, a_i) (vx_1 \, dots.h \, vx_n)]^(+)) .
+    u_i (phi_i (vx_1 \, ... \, vx_n) \, vx_(- i)) - u_i (vx_1 \, ... \, vx_n) = frac(sum_(a_i in A_i) ([r_(i \, a_i) (vx_1 \, ... \, vx_n)]^(+))^2, 1 + sum_(a_i in A_i) [r_(i \, a_i) (vx_1 \, ... \, vx_n)]^(+)) .
   $
 
   So, if even one action of a player $i$ has positive regret, then the Nash improvement function unilaterally _strictly_ increases the utility of that player.
@@ -179,12 +179,12 @@ We validate our intuition that the Nash improvement function is a “profitable 
   Since we are focusing on a generic player $i$ and keeping all the other ones fixed (and playing strategies $vx_(- i)$), we will reduce the notational burden by using the following shorthands:
 
   $
-    r_(i \, a_i) & colon.eq r_(i \, a_i) (vx_1 \, dots.h \, vx_n) \, & upright("(regret of action ") a_i upright(" fixing ") vx_(- i) \)\
-    u_(i \, a_i) & colon.eq u_i (a_i \, vx_(- i)) \, & upright("(utility of action ") a_i upright(" fixing ") vx_(- i) \)\
-    x'_(i \, a_i) & colon.eq phi_(i \, a_i) (vx_1 \, dots.h \, vx_n) = frac(x_(i \, a_i) + r_(i \, a_i)^(+), 1 + sum_(a'_i in A_i) r_(i \, a'_i)^(+)) quad & (upright("prob. of ") a_i upright(" in improved strat.")) \,
+    r_(i \, a_i) & := r_(i \, a_i) (vx_1 \, ... \, vx_n) \, & upright("(regret of action ") a_i upright(" fixing ") vx_(- i) \)\
+    u_(i \, a_i) & := u_i (a_i \, vx_(- i)) \, & upright("(utility of action ") a_i upright(" fixing ") vx_(- i) \)\
+    x'_(i \, a_i) & := phi_(i \, a_i) (vx_1 \, ... \, vx_n) = frac(x_(i \, a_i) + r_(i \, a_i)^(+), 1 + sum_(a'_i in A_i) r_(i \, a'_i)^(+)) quad & (upright("prob. of ") a_i upright(" in improved strat.")) \,
   $
 
-  where the notation $z^(+)$ is a shorthand for the positive part of $z$, that is, $z^(+) colon.eq \[ z \]^(+) colon.eq max {0 \, z}$.
+  where the notation $z^(+)$ is a shorthand for the positive part of $z$, that is, $z^(+) := \[ z \]^(+) := max {0 \, z}$.
 
   The increase in utility is then computed as
 
@@ -203,25 +203,25 @@ We validate our intuition that the Nash improvement function is a “profitable 
 At this point, the following is a simple corollary.
 
 #theorem[
-  A strategy profile $(vx_1 \, dots.h \, vx_n)$ is a Nash equilibrium if and only if it is a fixed point of the Nash improvement function $phi$.
+  A strategy profile $(vx_1 \, ... \, vx_n)$ is a Nash equilibrium if and only if it is a fixed point of the Nash improvement function $phi$.
 ] <thm-nash-fixed-points>
 
 #proof[
-  ($arrow.r.double.long$) If $(vx_1 \, dots.h \, vx_n)$ is a Nash equilibrium, then by definition for all $i in \[ n \]$ and $a_i in A_i$, we have $r_(i \, a_i) (vx_1 \, dots.h \, vx_n) lt.eq 0$. Hence, for all $i in \[ n \]$ and $a_i in A_i$, we have
+  ($==>$) If $(vx_1 \, ... \, vx_n)$ is a Nash equilibrium, then by definition for all $i in \[ n \]$ and $a_i in A_i$, we have $r_(i \, a_i) (vx_1 \, ... \, vx_n) <= 0$. Hence, for all $i in \[ n \]$ and $a_i in A_i$, we have
 
   $
-    phi_(i \, a_i) (vx_1 \, dots.h \, vx_n) = frac(x_(i \, a_i) + [r_(i \, a_i) (vx_1 \, dots.h \, vx_n)]^(+), 1 + sum_(a'_i in A_i) [r_(i \, a'_i) (vx_1 \, dots.h \, vx_n)]^(+)) = x_(i \, a_i) \,
+    phi_(i \, a_i) (vx_1 \, ... \, vx_n) = frac(x_(i \, a_i) + [r_(i \, a_i) (vx_1 \, ... \, vx_n)]^(+), 1 + sum_(a'_i in A_i) [r_(i \, a'_i) (vx_1 \, ... \, vx_n)]^(+)) = x_(i \, a_i) \,
   $
 
-  that is, $(vx_1 \, dots.h \, vx_n)$ is a fixed point of $phi$.
+  that is, $(vx_1 \, ... \, vx_n)$ is a fixed point of $phi$.
 
-  ($arrow.l.double.long$) Conversely, suppose that $(vx_1 \, dots.h \, vx_n)$ is a fixed point of $phi$. Then, for all $i in \[ n \]$, from @thm-nash-improvement we have
+  ($<==$) Conversely, suppose that $(vx_1 \, ... \, vx_n)$ is a fixed point of $phi$. Then, for all $i in \[ n \]$, from @thm-nash-improvement we have
 
   $
-    frac(sum_(a_i in A_i) ([r_(i \, a_i) (vx_1 \, dots.h \, vx_n)]^(+))^2, 1 + sum_(a_i in A_i) [r_(i \, a_i) (vx_1 \, dots.h \, vx_n)]^(+)) = u_i (phi_i (vx_1 \, dots.h \, vx_n) \, vx_(- i)) - u_i (vx_1 \, dots.h \, vx_n) = 0 .
+    frac(sum_(a_i in A_i) ([r_(i \, a_i) (vx_1 \, ... \, vx_n)]^(+))^2, 1 + sum_(a_i in A_i) [r_(i \, a_i) (vx_1 \, ... \, vx_n)]^(+)) = u_i (phi_i (vx_1 \, ... \, vx_n) \, vx_(- i)) - u_i (vx_1 \, ... \, vx_n) = 0 .
   $
 
-  Hence, it must be $r_(i \, a_i) (vx_1 \, dots.h \, vx_n) lt.eq 0$ for all $i in \[ n \]$ and $a_i in A_i$ (or the left-hand side would be strictly positive), and therefore $(vx_1 \, dots.h \, vx_n)$ is a Nash equilibrium.
+  Hence, it must be $r_(i \, a_i) (vx_1 \, ... \, vx_n) <= 0$ for all $i in \[ n \]$ and $a_i in A_i$ (or the left-hand side would be strictly positive), and therefore $(vx_1 \, ... \, vx_n)$ is a Nash equilibrium.
 ]
 
 By invoking #lecture-link("brouwer", <sec-brouwer-general>)[Brouwer's fixed-point theorem], we recover the central result of this lecture: Nash equilibria always exist.

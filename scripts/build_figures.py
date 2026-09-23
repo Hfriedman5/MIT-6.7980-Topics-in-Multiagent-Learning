@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
-"""Regenerate standalone figures with PDF and HTML typography."""
+"""Build stale standalone figures with PDF and HTML typography."""
+import argparse
 import json
+import os
 from pathlib import Path
 import subprocess
+from build_cache import fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
 HTML_FIGURES = Path('.build/html-figures')
@@ -26,6 +29,38 @@ SECTION_REFERENCES = {
         'sec-calibration-from-regret', 'sec-calibration-to-phi',
     )),
 }
+
+
+def build_variant(root: Path, output: Path, cache: Path, command: list[str],
+                  signature: dict, *, force: bool = False) -> bool:
+    """Record only successful builds; track actual imports, includes, and assets."""
+    try:
+        previous = json.loads(cache.read_text())
+        dependencies = previous['dependencies']
+        if (not force and previous['signature'] == signature
+                and isinstance(dependencies, dict) and dependencies
+                and fingerprint(output) == previous['output']
+                and all(fingerprint(Path(path)) == digest
+                        for path, digest in dependencies.items())):
+            return False
+    except (OSError, ValueError, KeyError, TypeError):
+        pass
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.unlink(missing_ok=True)
+    deps = cache.with_suffix('.deps.json')
+    deps.unlink(missing_ok=True)
+    subprocess.run(command, cwd=root, check=True)
+    inputs = json.loads(deps.read_text())['inputs']
+    dependencies = {str((root / path).resolve()): fingerprint(root / path)
+                    for path in inputs}
+    digest = fingerprint(output)
+    if not dependencies or None in dependencies.values() or digest is None:
+        raise RuntimeError(f'Incomplete figure build: {output}')
+    record = dict(signature=signature, dependencies=dependencies, output=digest)
+    temporary = cache.with_suffix('.tmp')
+    temporary.write_text(json.dumps(record, sort_keys=True) + '\n')
+    temporary.replace(cache)
+    return True
 
 
 def section_reference_inputs(root: Path, figure: Path) -> list[str]:
@@ -61,8 +96,10 @@ def section_reference_inputs(root: Path, figure: Path) -> list[str]:
             for arg in ('--input', f"{entry['label']}={entry['number']}")]
 
 
-def build_figures(root: Path = ROOT, *, exporter: Path = EXPORTER) -> None:
-    """Always rebuild figures, including when only an imported helper changed."""
+def build_figures(root: Path = ROOT, *, exporter: Path = EXPORTER, force: bool = False) -> None:
+    """Rebuild only outputs whose dependencies or rendering settings changed."""
+    root = root.resolve()
+    exporter = exporter.resolve()
     directory = root / 'content/figures'
     fonts = subprocess.check_output([
         'typst', 'fonts', '--font-path', str(root / 'html-exporter/assets/fonts'),
@@ -70,6 +107,20 @@ def build_figures(root: Path = ROOT, *, exporter: Path = EXPORTER) -> None:
     if 'Georgia' not in fonts:
         raise RuntimeError('Georgia is required to match the HTML figure text to the pages. '
                            'Install Georgia or provide it through TYPST_FONT_PATHS.')
+    font_dirs = [root / 'html-exporter/assets/fonts']
+    font_dirs.extend(Path(p) for p in os.environ.get('TYPST_FONT_PATHS', '').split(os.pathsep) if p)
+    signature = {
+        'builder': fingerprint(Path(__file__)),
+        'typst': subprocess.check_output(['typst', '--version'], text=True).strip(),
+        'font_families': fonts,
+        'font_files': {str(path.resolve()): fingerprint(path)
+                       for folder in font_dirs for path in sorted(folder.rglob('*'))
+                       if path.is_file()},
+        'environment': {key: value for key, value in os.environ.items()
+                        if key.startswith('TYPST_') or key == 'SOURCE_DATE_EPOCH'},
+    }
+    exporter_digest = fingerprint(exporter)
+    rebuilt = skipped = 0
     for source in sorted(directory.rglob('*.typ')):
         relative = source.relative_to(directory)
         if 'libs' in relative.parts or relative.as_posix() in SUPPORT_SOURCES:
@@ -92,22 +143,37 @@ def build_figures(root: Path = ROOT, *, exporter: Path = EXPORTER) -> None:
         for output, inputs in outputs:
             html_output = root / HTML_FIGURES / output.relative_to(directory)
             html_output.parent.mkdir(parents=True, exist_ok=True)
-            subprocess.run([
+            cache = root / '.build/figure-cache/pdf' / output.relative_to(directory).with_suffix('.json')
+            command = [
                 'typst', 'compile', '--root', str(root),
                 '--font-path', str(root / 'html-exporter/assets/fonts'),
+                '--deps', str(cache.with_suffix('.deps.json')),
                 '--input', 'figure-format=pdf',
                 *inputs, str(source), str(output),
-            ], cwd=root, check=True)
+            ]
+            pdf_built = build_variant(root, output, cache, command,
+                                      dict(signature, command=command), force=force)
             figure_inputs = ['--figure-input' if value == '--input' else value
                              for value in inputs]
-            subprocess.run([
+            cache = root / '.build/figure-cache/html' / output.relative_to(directory).with_suffix('.json')
+            command = [
                 str(exporter), '--figure-svg', '--root', str(root),
+                '--figure-deps', str(cache.with_suffix('.deps.json')),
                 *figure_inputs, str(source), str(html_output),
-            ], cwd=root, check=True)
-            print(f'Figure: {output.relative_to(directory)}', flush=True)
+            ]
+            html_built = build_variant(root, html_output, cache, command,
+                                       dict(signature, command=command, exporter=exporter_digest), force=force)
+            rebuilt += int(pdf_built) + int(html_built)
+            skipped += int(not pdf_built) + int(not html_built)
+            if pdf_built or html_built:
+                print(f'Figure: {output.relative_to(directory)}', flush=True)
+    print(f'Figures: {rebuilt} rebuilt, {skipped} up to date.', flush=True)
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--force', action='store_true', help='rebuild every figure variant')
+    args = parser.parse_args()
     subprocess.run(['cargo', 'build', '--release', '--locked',
                     '--manifest-path', 'html-exporter/Cargo.toml'], cwd=ROOT, check=True)
-    build_figures()
+    build_figures(force=args.force)

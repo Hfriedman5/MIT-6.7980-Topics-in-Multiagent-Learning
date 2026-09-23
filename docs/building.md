@@ -105,7 +105,7 @@ IDs and supplies the old numbered statement IDs as aliases.
 
 ## Build pipeline
 
-`make html` builds the Rust converter, regenerates every standalone Typst figure,
+`make html` builds the Rust converter, updates stale standalone Typst figures,
 compiles native HTML and PDF bundles, postprocesses the HTML,
 generates the course index and syllabus PDF, and assembles `html/`. The bundle
 target requires Typst 0.15.1 and currently uses its experimental feature flag.
@@ -127,6 +127,11 @@ KaTeX 0.16.22 renders supported expressions; unsupported expressions
 retain their Typst SVG rendering. No npm installation is needed for the course
 build: the browser runtime and its license are under `html-exporter/assets/katex/`.
 
+Use [Typst's built-in symbol shorthands](https://typst.app/docs/reference/symbols/#shorthands)
+whenever an equivalent exists, such as `<=`, `>=`, `!=`, `~`, `:=`, `->`, `=>`,
+`<=>`, and `...`. Keep named forms for symbols without an exact shorthand and
+where code syntax or function calls require them, such as the accent `tilde(x)`.
+
 When authoring indexed functions, group the index explicitly: `u_(i)(a)` and
 `EE_(t)[x]`. Typst parses `u_i(a)` and `EE_t[x]` with the argument inside the
 subscript. `scripts/test_lecture_math.py` checks the compiled math trees of all
@@ -141,6 +146,27 @@ After the Rust converter has been built, a quicker rebuild is:
 ```sh
 python3 scripts/build_site.py --skip-build --zip
 ```
+
+Builds reuse unchanged figure variants, native lecture bundles, individual
+postprocessed HTML pages, and the syllabus PDF. Dependency records include the
+files actually read by Typst, compiler settings, and output checksums; missing
+or modified outputs are rebuilt. Each lecture's final HTML is checked separately.
+The native PDF and HTML compilations are cached as whole bundles because their
+cross-document references share live labels and counters. A change to any
+dependency of a bundle recompiles that bundle, keeping incoming references correct.
+The index, public attachments, and validation checks still run on every build.
+
+To bypass all build caches:
+
+```sh
+make force               # rebuild figures, lectures, and syllabus; recreate ZIP
+make html FORCE=1        # force a site rebuild without the ZIP
+make figures FORCE=1     # force only the figures
+```
+
+Both Python builders also accept `--force`. Cached lecture products live under
+`.build/native-*`, `.build/lecture-pages/`, and `.build/lecture-cache/`.
+Deleting `.build/` safely forces regeneration on the next build.
 
 Compiler diagnostics are saved under `.build/logs/`. Build products in `.build/`,
 `html/`, `dist/`, and `html-exporter/target/` are not versioned.

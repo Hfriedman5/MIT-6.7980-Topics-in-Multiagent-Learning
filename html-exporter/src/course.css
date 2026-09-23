@@ -49,6 +49,7 @@
 .session-links { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline; padding-top: 1px; font-family: var(--sans); }
 .reading-link { font-size: 0.875rem; font-weight: 700; white-space: nowrap; text-decoration: underline; text-underline-offset: 3px; }
 .course-home .pdf-link { font: 0.8125rem/1.5 var(--sans); color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.course-home .slides-link { color: #65778a; }
 .reading-kind { flex-basis: 100%; font-size: 0.8125rem; color: var(--muted); }
 .notes-pending { font-size: 0.8125rem; line-height: 1.5; color: var(--muted); }
 .schedule-break { background: var(--soft); color: var(--muted); font-size: 0.9375rem; }

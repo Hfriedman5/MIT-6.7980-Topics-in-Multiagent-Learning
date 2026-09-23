@@ -1,5 +1,4 @@
 #import "../../meta/notation.typ": sf, eps
-// Extracted from Costis Gabri monograph/typst_content/L11.typ
 #set page(width: 372.3973pt, height: auto, margin: 0mm, fill: none)
 #import "../libs/typography.typ": figure-font, figure-style
 #set text(font: figure-font, size: 10pt)

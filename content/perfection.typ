@@ -56,7 +56,7 @@ Unfortunately, domination of strategies is not the root cause of sequential irra
 
 = Trembling-hand refinements
 
-The issue of sequential irrationality stems from the fact that some parts of the game tree are unreachable at equilibrium. For those excluded parts of the game tree, any strategy can be picked without affecting the equilibrium.  The idea behind trembling-hand refinements is simple: to avoid sequential irrationality, it forces all players to explore the whole game tree. It does so by forcing the players to _tremble_, that is, by constraining them to play all actions at all decision points with a strictly positive lower bound probability that grows as a function of a hyperparameter $epsilon.alt > 0$. For each $epsilon.alt > 0$, a Nash equilibrium subject to the trembling constraints is found. A trembling-hand refinements is then any limit points of such Nash equilibria as $epsilon.alt arrow.r 0^(+)$.
+The issue of sequential irrationality stems from the fact that some parts of the game tree are unreachable at equilibrium. For those excluded parts of the game tree, any strategy can be picked without affecting the equilibrium.  The idea behind trembling-hand refinements is simple: to avoid sequential irrationality, it forces all players to explore the whole game tree. It does so by forcing the players to _tremble_, that is, by constraining them to play all actions at all decision points with a strictly positive lower bound probability that grows as a function of a hyperparameter $epsilon.alt > 0$. For each $epsilon.alt > 0$, a Nash equilibrium subject to the trembling constraints is found. A trembling-hand refinements is then any limit points of such Nash equilibria as $epsilon.alt -> 0^(+)$.
 
 Different equilibrium notions differ as to how the lower bounds are set as a function of $epsilon.alt$. We will see two, which are the two best known: extensive-form perfect equilibrium and quasi-perfect equilibrium.
 
@@ -69,22 +69,22 @@ Since our game solving formalism is based around the #lecture-link("efg_intro", 
 #math.equation(
   block: true,
   numbering: "(1)",
-  $x_(j a) gt.eq cases(delim: "{", epsilon.alt & upright("if ") p_j = ∅, epsilon.alt dot.op x_(p_j) & upright("otherwise") .)$.body,
+  $x_(j a) >= cases(delim: "{", epsilon.alt & upright("if ") p_j = ∅, epsilon.alt dot.op x_(p_j) & upright("otherwise") .)$.body,
 )#label("eq:efpe constraint")
 
-Collecting all sequence-form trembling constraints (#ref(label("eq:efpe constraint"))) constraints across all decision points $j in J$ and actions $a in A_j$ of Player~$1$, we can express the whole set of trembling constraints in matrix form as $M_1 \( epsilon.alt \) vx gt.eq vm_1 \( epsilon.alt \)$. (An analogous statement holds for Player~$2$). So, given sufficiently small $epsilon.alt > 0$, and indicating with $F_1 vx = vf_1 \, vx gt.eq 0$ and $F_2 vy = vf_2 \, vy gt.eq 0$ the polytope of sequence form strategies of Player 1 and Player 2 respectively, a Nash equilibrium strategy for Player~$1$ under the trembling constraints can be expressed as the saddle point problem
+Collecting all sequence-form trembling constraints (#ref(label("eq:efpe constraint"))) constraints across all decision points $j in J$ and actions $a in A_j$ of Player~$1$, we can express the whole set of trembling constraints in matrix form as $M_1 \( epsilon.alt \) vx >= vm_1 \( epsilon.alt \)$. (An analogous statement holds for Player~$2$). So, given sufficiently small $epsilon.alt > 0$, and indicating with $F_1 vx = vf_1 \, vx >= 0$ and $F_2 vy = vf_2 \, vy >= 0$ the polytope of sequence form strategies of Player 1 and Player 2 respectively, a Nash equilibrium strategy for Player~$1$ under the trembling constraints can be expressed as the saddle point problem
 
 #math.equation(
   block: true,
   numbering: "(1)",
-  $cases(max_vx min_vy vx^top U_1 vy, upright("s.t.") upright("①") thin F_2 vy = vf_2, upright("") upright("②") thin M_2 \( epsilon.alt \) vy gt.eq vm_2 \( epsilon.alt \), upright("") upright("③") thin F_1 vx = vf_1, upright("") upright("④") thin M_1 \( epsilon.alt \) vx gt.eq vm_1 \( epsilon.alt \) .)$.body,
+  $cases(max_vx min_vy vx^top U_1 vy, upright("s.t.") upright("①") thin F_2 vy = vf_2, upright("") upright("②") thin M_2 \( epsilon.alt \) vy >= vm_2 \( epsilon.alt \), upright("") upright("③") thin F_1 vx = vf_1, upright("") upright("④") thin M_1 \( epsilon.alt \) vx >= vm_1 \( epsilon.alt \) .)$.body,
 ) <eq:efpe>
 
-We will look into how to compute a limit point of solutions to @eq:efpe as $epsilon.alt arrow.r 0^(+)$ in @sec:trembling-lp.
+We will look into how to compute a limit point of solutions to @eq:efpe as $epsilon.alt -> 0^(+)$ in @sec:trembling-lp.
 
 == Quasi-perfect equilibrium (QPE)
 
-_Quasi-perfected equilibrium (QPE)_, introduced by #citet(<vanDamme84:relation>), is a bit more intricate than EFPE.  Specifically, while in an EFPE each trembling constraints mandates a lower bound of $epsilon.alt$ on the probability of playing each _action_, in the case of a QPE the lower bounds are given on the probability of each _sequence_ of actions.  More precisely, for all sufficiently small $epsilon.alt > 0$ and player $i in { 1 \, 2 }$, let $vell_i : bb(R)_(> 0) arrow.r bb(R)_(> 0)^(Sigma_i)$ denote the vector parametrized on $epsilon.alt$ and indexed on the sequences $Sigma_i$ of Player~$i$, whose entries are defined as
+_Quasi-perfected equilibrium (QPE)_, introduced by #citet(<vanDamme84:relation>), is a bit more intricate than EFPE.  Specifically, while in an EFPE each trembling constraints mandates a lower bound of $epsilon.alt$ on the probability of playing each _action_, in the case of a QPE the lower bounds are given on the probability of each _sequence_ of actions.  More precisely, for all sufficiently small $epsilon.alt > 0$ and player $i in { 1 \, 2 }$, let $vell_i : bb(R)_(> 0) -> bb(R)_(> 0)^(Sigma_i)$ denote the vector parametrized on $epsilon.alt$ and indexed on the sequences $Sigma_i$ of Player~$i$, whose entries are defined as
 
 #math.equation(
   block: true,
@@ -97,12 +97,12 @@ where $\| sigma \|$ denotes the number of actions for Player~$i$ in the sequence
 #math.equation(
   block: true,
   numbering: "(1)",
-  $cases(max_vx min_vy vx^top U_1 vy, upright("s.t.") upright("①") thin F_2 vy = vf_2, upright("") upright("②") thin vy gt.eq vell_2 \( epsilon.alt \), upright("") upright("③") thin F_1 vx = vf_1, upright("") upright("④") thin vx gt.eq vell_1 \( epsilon.alt \))$.body,
+  $cases(max_vx min_vy vx^top U_1 vy, upright("s.t.") upright("①") thin F_2 vy = vf_2, upright("") upright("②") thin vy >= vell_2 \( epsilon.alt \), upright("") upright("③") thin F_1 vx = vf_1, upright("") upright("④") thin vx >= vell_1 \( epsilon.alt \))$.body,
 ) <eq:qpe>
 
 is a QPE. (Recently, #citet(<Gatti20:Characterization>) took this construction further, and showed that _any_ QPE can be expressed as a limit point of solutions to @eq:qpe, as long as more general vectors of polynomials $vell_1 \, vell_2$ are used than in (@eq:ms-ell). In this paper we will focus on Miltersen-Sørensen-style perturbation as defined in (@eq:ms-ell).)
 
-Once again, we will discuss how to compute a limit point of solutions to @eq:qpe as $epsilon.alt arrow.r 0^(+)$ in @sec:trembling-lp.
+Once again, we will discuss how to compute a limit point of solutions to @eq:qpe as $epsilon.alt -> 0^(+)$ in @sec:trembling-lp.
 
 == Relationships between the equilibria
 
@@ -163,16 +163,16 @@ $
   P(epsilon.alt) : cases(
     max_vx & vc(epsilon.alt)^top vx,
     upright("s.t.") & A(epsilon.alt) vx = vb(epsilon.alt),
-    & vx gt.eq 0 .,
+    & vx >= 0 .,
   )
 $
 
-where $vc \, A$ and $vb$ are _polynomial_ functions of $epsilon.alt$ with rational coefficients.  We will call an object of that form a _trembling linear program (TLP)_, and a limit point of solutions to $P \( epsilon.alt \)$ as $epsilon.alt arrow.r 0^(+)$ a _limit solution_ of the TLP.  With this formalism, we can reframe the computation of an EFPE or a QPE as the problem of finding a limit solution to their corresponding TLPs.
+where $vc \, A$ and $vb$ are _polynomial_ functions of $epsilon.alt$ with rational coefficients.  We will call an object of that form a _trembling linear program (TLP)_, and a limit point of solutions to $P \( epsilon.alt \)$ as $epsilon.alt -> 0^(+)$ a _limit solution_ of the TLP.  With this formalism, we can reframe the computation of an EFPE or a QPE as the problem of finding a limit solution to their corresponding TLPs.
 
 For the following discussion, assume the perturbed LP is feasible with a finite optimum for every sufficiently small positive perturbation, and that the optimal solutions under consideration have a finite limit. These conditions hold for the bounded strategy polytopes in our game applications. We will now discuss the complexity of solving a TLP, and two different computational approaches. Both of them are based on the concept of _basis stability_ (Recall that a _basis_ of an LP is a subset of the program's variables such that when only those columns of matrix $A$ that correspond to those variables are included in a new matrix $A$, the new matrix $A$ is invertible #citep(<Bertsimas97:Introduction>, [page 55]).
 
 #definition[Stable basis][
-  Let $P \( epsilon.alt \)$ be a TLP. The LP basis $B$ is said to be _stable_ if there exists $macron(epsilon.alt) > 0$ such that $B$ is optimal for $P \( epsilon.alt \)$ for all $epsilon.alt : 0 < epsilon.alt lt.eq macron(epsilon.alt)$.
+  Let $P \( epsilon.alt \)$ be a TLP. The LP basis $B$ is said to be _stable_ if there exists $macron(epsilon.alt) > 0$ such that $B$ is optimal for $P \( epsilon.alt \)$ for all $epsilon.alt : 0 < epsilon.alt <= macron(epsilon.alt)$.
 ] <def:stable-basis>
 
 If a stable basis were to be found, from there a limit solution of $P \( epsilon.alt \)$ could be computed in polynomial time. As it turns out, a stable basis always exists, and can be computed in polynomial time.
@@ -184,7 +184,7 @@ If a stable basis were to be found, from there a limit solution of $P \( epsilon
 #citet(<Farina18:Practical>), extending prior work by #citet(<Miltersen10:Computing>) and #citet(<Farina17:Extensive>), showed the following.
 
 #theorem[#citet(<Farina18:Practical>)][
-  Given as input a TLP $P \( epsilon.alt \)$, there exists $epsilon.alt^(*) > 0$---called a _negligible positive perturnation (NPP)_---such that for all $0 < macron(epsilon.alt) lt.eq epsilon.alt^(*)$, any optimal basis for the numerical LP $P (macron(epsilon.alt))$ is stable. Furthermore, such a value $epsilon.alt^(*)$ can be computed in polynomial time in the input size, assuming that a polynomial of degree $d$ requires $Omega \( d \)$ space in the input.#footnote[If this were not the case, evaluating a polynomial in an integer $n$ would not be an efficient operation, since it requires $Omega (d log n)$ bits to represent the output.]
+  Given as input a TLP $P \( epsilon.alt \)$, there exists $epsilon.alt^(*) > 0$---called a _negligible positive perturnation (NPP)_---such that for all $0 < macron(epsilon.alt) <= epsilon.alt^(*)$, any optimal basis for the numerical LP $P (macron(epsilon.alt))$ is stable. Furthermore, such a value $epsilon.alt^(*)$ can be computed in polynomial time in the input size, assuming that a polynomial of degree $d$ requires $Omega \( d \)$ space in the input.#footnote[If this were not the case, evaluating a polynomial in an integer $n$ would not be an efficient operation, since it requires $Omega (d log n)$ bits to represent the output.]
 ] <thm:npp>
 
 So, at least in principle, a solution to a TLP $P \( epsilon.alt \)$ could be computed as follows:

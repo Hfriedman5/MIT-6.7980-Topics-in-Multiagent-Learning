@@ -3,6 +3,7 @@ from contextlib import redirect_stdout
 import io
 from pathlib import Path
 import shutil
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -16,7 +17,7 @@ class FigureBuildTests(unittest.TestCase):
     def setUp(self):
         folder = tempfile.TemporaryDirectory()
         self.addCleanup(folder.cleanup)
-        self.root = Path(folder.name)
+        self.root = Path(folder.name).resolve()
         self.figures = self.root / 'content/figures'
         (self.root / 'html-exporter/assets/fonts').mkdir(parents=True)
 
@@ -26,12 +27,108 @@ class FigureBuildTests(unittest.TestCase):
         path.write_text(source)
         return path
 
-    def build(self):
+    def build(self, **kwargs):
         with redirect_stdout(io.StringIO()):
-            build_figures(self.root)
+            build_figures(self.root, **kwargs)
 
     def svg_width(self, name):
         return float(ET.parse(self.figures / name).getroot().attrib['viewBox'].split()[2])
+
+    def output_times(self, name='example/plot.svg'):
+        return tuple(path.stat().st_mtime_ns for path in (
+            self.figures / name, self.root / HTML_FIGURES / name))
+
+    def test_current_figures_and_unrelated_edits_do_not_run_compilers(self):
+        self.write('example/plot.typ', '#set page(width: 12pt, height: 10pt)\nHello')
+        self.build()
+        before = self.output_times()
+        self.write('libs/unused.typ', '#panic("not imported")')
+        with patch('build_figures.subprocess.run', wraps=subprocess.run) as run:
+            self.build()
+        self.assertFalse([call for call in run.call_args_list
+                          if "compile" in call.args[0] or "--figure-svg" in call.args[0]])
+        self.assertEqual(before, self.output_times())
+        self.build(force=True)
+        after = self.output_times()
+        self.assertNotEqual(before[0], after[0])
+        self.assertNotEqual(before[1], after[1])
+
+    def test_format_specific_dependencies_and_missing_outputs(self):
+        self.write('libs/pdf.typ', '#let size = 12pt')
+        self.write('libs/html.typ', '#let size = 15pt')
+        self.write('example/plot.typ', '''
+#let path = if sys.inputs.at("figure-format") == "html" {
+  "../libs/html.typ"
+} else {
+  "../libs/pdf.typ"
+}
+#import path as style
+#set page(width: auto, height: auto, margin: 0pt)
+#rect(width: style.size, height: 10pt, stroke: none)
+''')
+        self.build()
+        before = self.output_times()
+        self.write('libs/html.typ', '#let size = 29pt')
+        self.build()
+        after = self.output_times()
+        self.assertEqual(before[0], after[0])
+        self.assertNotEqual(before[1], after[1])
+        html = self.root / HTML_FIGURES / 'example/plot.svg'
+        self.assertEqual(float(ET.parse(html).getroot().attrib['viewBox'].split()[2]), 29)
+        html.unlink()
+        self.build()
+        self.assertEqual(after[0], self.output_times()[0])
+        self.assertTrue(html.is_file())
+
+    def test_transitive_data_dependencies_and_failed_build_recovery(self):
+        self.write('libs/data.json', '{"width": 12}')
+        self.write('libs/size.typ', '#let size = json("data.json").width * 1pt')
+        self.write('example/plot.typ', '''
+#import "../libs/size.typ": size
+#set page(width: auto, height: auto, margin: 0pt)
+#rect(width: size, height: 10pt, stroke: none)
+''')
+        self.build()
+        self.write('libs/data.json', '{"width": 31}')
+        self.build()
+        self.assertEqual(self.svg_width('example/plot.svg'), 31)
+        self.write('libs/data.json', '{"width": 42}')
+        run = subprocess.run
+        def fail_compile(command, **kwargs):
+            if 'compile' in command:
+                raise subprocess.CalledProcessError(1, command)
+            return run(command, **kwargs)
+        with patch('build_figures.subprocess.run', side_effect=fail_compile):
+            with self.assertRaises(subprocess.CalledProcessError):
+                self.build()
+        self.assertFalse((self.root / '.build/figure-cache/pdf/example/plot.json').exists())
+        self.build()
+        self.assertEqual(self.svg_width('example/plot.svg'), 42)
+
+    def test_damaged_output_and_cache_are_rebuilt(self):
+        self.write('example/plot.typ', '#set page(width: 12pt, height: 10pt)\nHello')
+        self.build()
+        before = self.output_times()
+        (self.figures / 'example/plot.svg').write_text('incomplete SVG')
+        self.build()
+        self.assertNotEqual(before[0], self.output_times()[0])
+        self.assertEqual(before[1], self.output_times()[1])
+        cache = self.root / '.build/figure-cache/html/example/plot.json'
+        cache.write_text('{broken')
+        self.build()
+        self.assertNotEqual(before[1], self.output_times()[1])
+
+    def test_exporter_change_only_rebuilds_html_variant(self):
+        from build_figures import EXPORTER, fingerprint
+        self.write('example/plot.typ', '#set page(width: 12pt, height: 10pt)\nHello')
+        self.build()
+        before = self.output_times()
+        def changed_exporter(path):
+            return 'updated exporter' if path == EXPORTER.resolve() else fingerprint(path)
+        with patch('build_figures.fingerprint', side_effect=changed_exporter):
+            self.build()
+        self.assertEqual(before[0], self.output_times()[0])
+        self.assertNotEqual(before[1], self.output_times()[1])
 
     def test_creates_missing_svg_and_rebuilds_after_shared_dependency_changes(self):
         self.write('libs/size.typ', '#let size = 12pt')
@@ -62,6 +159,10 @@ class FigureBuildTests(unittest.TestCase):
 ''')
         self.build()
         self.assertEqual(len(list(self.figures.rglob('*.svg'))), 6)
+        with patch('build_figures.subprocess.run', wraps=subprocess.run) as run:
+            self.build()
+        self.assertFalse([call for call in run.call_args_list
+                          if "compile" in call.args[0] or "--figure-svg" in call.args[0]])
         for gate, width in widths.items():
             with self.subTest(gate=gate):
                 self.assertEqual(self.svg_width(f'ppad_completeness/gate_{gate}.svg'), width)
