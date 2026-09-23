@@ -55,7 +55,8 @@ dependencies, compiler inputs, fonts, and rendering tools are unchanged. PDF and
 HTML variants are checked separately, including all six gate variants and resolved
 lecture-section labels. Missing outputs and failed builds are retried. Build
 records live in `.build/figure-cache/`; removing that directory forces a rebuild.
-Use `python3 scripts/build_figures.py --force` to rebuild all figure variants.
+Use `make figures FORCE=1` (or `python3 scripts/build_figures.py --force`) to
+rebuild all figure variants without deleting the records yourself.
 Historical font metrics and
 lecture-level scaling can differ slightly under the current compiler.
 

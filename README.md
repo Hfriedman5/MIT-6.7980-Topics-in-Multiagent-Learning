@@ -149,6 +149,7 @@ requirements and figure workflows. Initial builds download dependencies.
 
 ```sh
 make html       # build the website and PDFs
+make force      # rebuild everything, bypassing incremental caches
 make check      # run tests and validate the built website
 make serve      # serve the result locally; stop with Ctrl+C
 ```
@@ -157,3 +158,5 @@ While the server is running, open [the local preview](http://127.0.0.1:8798/).
 Re-run `make html` and refresh the browser after further edits; the server does
 not rebuild automatically. `make bundle` also creates the downloadable website
 ZIP at `dist/6.7980-notes.zip`.
+Unchanged figures and lecture builds are reused; see the
+[incremental build and force options](docs/building.md#build-pipeline).

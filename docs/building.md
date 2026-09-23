@@ -105,7 +105,7 @@ IDs and supplies the old numbered statement IDs as aliases.
 
 ## Build pipeline
 
-`make html` builds the Rust converter, regenerates every standalone Typst figure,
+`make html` builds the Rust converter, updates stale standalone Typst figures,
 compiles native HTML and PDF bundles, postprocesses the HTML,
 generates the course index and syllabus PDF, and assembles `html/`. The bundle
 target requires Typst 0.15.1 and currently uses its experimental feature flag.
@@ -141,6 +141,27 @@ After the Rust converter has been built, a quicker rebuild is:
 ```sh
 python3 scripts/build_site.py --skip-build --zip
 ```
+
+Builds reuse unchanged figure variants, native lecture bundles, individual
+postprocessed HTML pages, and the syllabus PDF. Dependency records include the
+files actually read by Typst, compiler settings, and output checksums; missing
+or modified outputs are rebuilt. Each lecture's final HTML is checked separately.
+The native PDF and HTML compilations are cached as whole bundles because their
+cross-document references share live labels and counters. A change to any
+dependency of a bundle recompiles that bundle, keeping incoming references correct.
+The index, public attachments, and validation checks still run on every build.
+
+To bypass all build caches:
+
+```sh
+make force               # rebuild figures, lectures, and syllabus; recreate ZIP
+make html FORCE=1        # force a site rebuild without the ZIP
+make figures FORCE=1     # force only the figures
+```
+
+Both Python builders also accept `--force`. Cached lecture products live under
+`.build/native-*`, `.build/lecture-pages/`, and `.build/lecture-cache/`.
+Deleting `.build/` safely forces regeneration on the next build.
 
 Compiler diagnostics are saved under `.build/logs/`. Build products in `.build/`,
 `html/`, `dist/`, and `html-exporter/target/` are not versioned.

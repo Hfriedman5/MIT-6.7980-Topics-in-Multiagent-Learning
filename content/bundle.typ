@@ -3,7 +3,7 @@
 #let format = sys.inputs.at("notes-format", default: "pdf")
 #assert(format in ("html", "pdf"), message: "Expected notes-format=html or pdf.")
 #import "meta/lecture-links.typ": lecture-title
-#for note in json("../.build/html-export.json").notes {
+#for note in json("../.build/note-bundle.json") {
   let name = note.source.split("/").last().trim(".typ", at: end)
   let output = if format == "html" { name + ".html" } else { "pdf/" + name + ".pdf" }
   let source = "../.build/" + format + "-source/" + name + ".typ"
