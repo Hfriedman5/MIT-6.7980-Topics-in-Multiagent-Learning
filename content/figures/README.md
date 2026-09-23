@@ -4,8 +4,8 @@ Every SVG in this directory has an editable Typst source. Usually it has the
 same basename beside the SVG. The six `ppad_completeness/gate_*.svg` files share
 `ppad_completeness/gate.typ` and select their gate with a compiler input.
 
-`make`, `make html`, and `make bundle` regenerate all figure SVGs before
-compiling the notes. Run `make figures` to rebuild just the figures. The builder
+`make`, `make html`, and `make bundle` rebuild stale figure SVGs before
+compiling the notes. Run `make figures` to update just the figures. The builder
 also writes HTML variants under `.build/html-figures/`, using Georgia for body
 labels and Frutiger for bold labels, matching the HTML pages. Georgia must be
 installed or available through `TYPST_FONT_PATHS`. Mathematical notation keeps
@@ -49,8 +49,14 @@ reuse `kernelized/vertices.typ`.
 including those whose SVG has not been generated yet. It excludes `libs/`
 directories and the include-only files listed in `SUPPORT_SOURCES`. New shared
 libraries should go in `libs/`; add other include-only files to that exclusion
-list. Every build recompiles the figures so changes to shared libraries and
-component plots are reflected in the output. Historical font metrics and
+list. The builder records each variant's actual dependencies, including imported
+libraries, included plots, and data files. It skips an output when its contents,
+dependencies, compiler inputs, fonts, and rendering tools are unchanged. PDF and
+HTML variants are checked separately, including all six gate variants and resolved
+lecture-section labels. Missing outputs and failed builds are retried. Build
+records live in `.build/figure-cache/`; removing that directory forces a rebuild.
+Use `python3 scripts/build_figures.py --force` to rebuild all figure variants.
+Historical font metrics and
 lecture-level scaling can differ slightly under the current compiler.
 
 ## Rendering conventions

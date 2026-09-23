@@ -10,12 +10,12 @@ use math::MathMode;
 use options::Config;
 use regex::{Captures, Regex};
 use scraper::{ElementRef, Html, Selector};
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 use std::env;
 use std::fmt::Write as _;
 use std::fs;
 use std::path::{Path, PathBuf};
-use std::sync::OnceLock;
+use std::sync::{Mutex, OnceLock};
 use typst::diag::{FileError, FileResult, SourceDiagnostic};
 use typst::foundations::{Bytes, Datetime, Dict, Duration, IntoValue};
 use typst::syntax::{FileId, RootedPath, Source, VirtualPath, VirtualRoot};
@@ -116,7 +116,14 @@ fn compile_figure_svg(config: &Config) -> Result<(), String> {
     if document.pages().len() != 1 {
         return Err("a standalone SVG figure must contain exactly one page".into());
     }
-    write_output(config, svg_text::render(&document.pages()[0]))
+    write_output(config, svg_text::render(&document.pages()[0]))?;
+    if let Some(path) = &config.figure_deps {
+        let inputs = world.dependencies.lock().unwrap();
+        let json = serde_json::json!({"inputs": *inputs});
+        fs::write(path, json.to_string())
+            .map_err(|err| format!("could not write figure dependencies: {err}"))?;
+    }
+    Ok(())
 }
 
 struct LocalWorld {
@@ -127,6 +134,7 @@ struct LocalWorld {
     files: SystemFiles,
     time: Time,
     html_notes: bool,
+    dependencies: Mutex<BTreeSet<PathBuf>>,
 }
 
 impl LocalWorld {
@@ -196,6 +204,7 @@ impl LocalWorld {
             files,
             time,
             html_notes: figure_inputs.is_none(),
+            dependencies: Mutex::new(BTreeSet::new()),
         })
     }
 
@@ -205,6 +214,7 @@ impl LocalWorld {
 
     fn read_bytes(&self, id: FileId) -> FileResult<Vec<u8>> {
         let path = self.system_path(id)?;
+        self.dependencies.lock().unwrap().insert(path.clone());
         Self::read_path_bytes(&path)
     }
 
@@ -266,6 +276,11 @@ impl World for LocalWorld {
     }
 
     fn font(&self, index: usize) -> Option<Font> {
+        if let Some(source) = self.fonts.source(index) {
+            if let Some(path) = (source as &dyn std::any::Any).downcast_ref::<fonts::FontPath>() {
+                self.dependencies.lock().unwrap().insert(path.path.clone());
+            }
+        }
         self.fonts.font(index)
     }
 
@@ -2058,6 +2073,7 @@ mod tests {
             math_mode: MathMode::Katex,
             figure_svg: false,
             figure_inputs: Vec::new(),
+            figure_deps: None,
         };
         (book, config)
     }
@@ -2138,6 +2154,7 @@ mod tests {
             math_mode: MathMode::Katex,
             figure_svg: false,
             figure_inputs: Vec::new(),
+            figure_deps: None,
         };
         let html = render_document(&config, "Existence proofs", &parts, None);
         assert_eq!(html.matches("Prof. Constantinos Daskalakis").count(), 1);
