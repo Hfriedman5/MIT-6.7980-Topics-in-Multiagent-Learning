@@ -31,7 +31,7 @@ The idea of the CFR algorithm is simple: construct a regret minimizer for the wh
 
 ] <ex:cfr-kuhn>
 
-The local distributions output by the different local regret minimizers is then combined to form a _sequence-form strategy_ that plays according to the local distributions at each decision point.
+The local distributions output by the different local regret minimizers are then combined to form a _sequence-form strategy_ that plays according to the local distributions at each decision point.
 
 == Where the magic happens: Counterfactual utilities
 
@@ -42,12 +42,12 @@ Remember that in the sequence form representation, the dimensionality of the str
 It can be shown that the regret cumulated by the CFR algorithm satisfies the following bound.
 
 #theorem[
-  Let $upright(R e g)_j^(\( T \))$, for $j in cal(J)$, denote the regret cumulated up to time $T$ by each of the regret minimizers $R_j$. Then, the regret $upright(R e g)^(\( T \))$ cumulated by @algo:cfr up to time $T$ satisfies
+  Let $upright("Reg")_j^(\( T \))$, for $j in cal(J)$, denote the regret cumulated up to time $T$ by each of the regret minimizers $R_j$. Then, the regret $upright("Reg")^(\( T \))$ cumulated by @algo:cfr up to time $T$ satisfies
 
-  $ upright(R e g)^(\( T \)) <= sum_(j in cal(J)) max {0 \, upright(R e g)_j^(\( T \))} . $
+  $ upright("Reg")^(\( T \)) <= sum_(j in cal(J)) max {0 \, upright("Reg")_j^(\( T \))} . $
 ]
 
-It is then immediate to see that if each $upright(R e g)_j^(\( T \))$ grows sublinearly in $T$, then so does $upright(R e g)^(\( T \))$.
+It is then immediate to see that if each $upright("Reg")_j^(\( T \))$ grows sublinearly in $T$, then so does $upright("Reg")^(\( T \))$.
 
 In order to formally introduce counterfactual utility, we recall a bit of notation to deal with tree-form decision processes.
 
@@ -59,17 +59,17 @@ In order to formally introduce counterfactual utility, we recall a bit of notati
 - Given a decision point $j in cal(J)$, we denote by $p_j$ its _parent sequence_, defined as the last sequence (that is, decision point-action pair) encountered on the path from the root of the decision process to $j$. If the agent does not act before $j$ (that is, $j$ is the root of the process or only observation points are encountered on the path from the root to $j$), we let $p_j = ∅$.
 
 #example[
-  As an example, consider again the TFDP faced by Player~1 in the game of Kuhn poker~#citep(<Kuhn50:Simplified>), which was also recalled above in @ex:cfr-kuhn. We have that $J = {j_1 \, ... \, j_6}$ and $K = {k_1 \, ... \, k_4}$. We have:
+  As an example, consider again the TFDP faced by Player~1 in the game of Kuhn poker~#citep(<Kuhn50:Simplified>), which was also recalled above in @ex:cfr-kuhn. We have that $cal(J) = {j_1 \, ... \, j_6}$ and $cal(K) = {k_1 \, ... \, k_4}$. We have:
 
   $
-    A_(j_1) = S_(k_4) & = {sans(c h e c k) \, sans(r a i s e)} \, #h(2em) & A_(j_5) & = {sans(f o l d) \, sans(c a l l)} \, #h(2em) & S_(k_1) & = {sans(j a c k) \, sans(q u e e n) \, sans(k i n g)}\
-    p_(j_4) & = (j_1 \, sans(c h e c k)) \, #h(2em) & p_(j_6) & = (j_3 \, sans(c h e c k)) \, #h(2em) & p_(j_1) & = p_(j_2) = p_(j_3) = ∅ .
+    A_(j_1) = S_(k_4) & = {sans("check") \, sans("raise")} \, #h(2em) & A_(j_5) & = {sans("fold") \, sans("call")} \, #h(2em) & S_(k_1) & = {sans("jack") \, sans("queen") \, sans("king")}\
+    p_(j_4) & = (j_1 \, sans("check")) \, #h(2em) & p_(j_6) & = (j_3 \, sans("check")) \, #h(2em) & p_(j_1) & = p_(j_2) = p_(j_3) = ∅ .
   $
 
   Furthermore,
 
   $
-    rho (k_3 \, sans(c h e c k)) & = rho (j_2 \, sans(r a i s e)) = tack.t \, #h(2em) & rho (k_1 \, sans(k i n g)) & = j_3 \, #h(2em) rho (j_2 \, sans(c h e c k)) = k_3 .
+    rho (k_3 \, sans("check")) & = rho (j_2 \, sans("raise")) = tack.t \, #h(2em) & rho (k_1 \, sans("king")) & = j_3 \, #h(2em) rho (j_2 \, sans("check")) = k_3 .
   $
 ]
 
@@ -94,8 +94,8 @@ In order to formally introduce counterfactual utility, we recall a bit of notati
     [$rho$],
     [Transition function:
 
-      - given $j in cal(J)$ and $a in A_j$, $rho \( j \, a \)$ returns the next decision or observation point $v$ in $cal(J) union cal(K)$ in the decision tree that is reached after selecting legal action $a in j$, or $tack.t$ if the decision process ends;
-      - given $k in cal(K)$ and $s in S_k$ , $rho \( k \, s \)$ returns the next decision or observation point $v in cal(J) union K$ in the decision tree that is reached after observing signal $s$ at $k$, or $tack.t$ if the decision process ends
+      - given $j in cal(J)$ and $a in A_j$, $rho \( j \, a \)$ returns the next decision or observation point $v$ in $cal(J) union cal(K)$ in the decision tree that is reached after selecting legal action $a in A_j$, or $tack.t$ if the decision process ends;
+      - given $k in cal(K)$ and $s in S_k$, $rho \( k \, s \)$ returns the next decision or observation point $v in cal(J) union cal(K)$ in the decision tree that is reached after observing signal $s$ at $k$, or $tack.t$ if the decision process ends.
     ],
 
     [$Sigma$], [Set of sequences, defined as $Sigma := { \( j \, a \) : j in cal(J) \, a in A_j }$],
@@ -155,4 +155,5 @@ The CFR algorithm can be used to learn a Nash equilibrium in a two-player zero-s
 
 #changelog[
   - 2025-10-09: Fixed typos (thanks Josh Rountree!).
+  - 2026-09-21: Fixed notation and typos (thanks Hannah Friedman!).
 ]
