@@ -1,4 +1,3 @@
-// Recovered from Costis Gabri monograph/texcontent/figures/L03/color_wheel.typ
 #set page(width: auto, height: auto, fill: none, margin: .1mm)
 #import "../libs/typography.typ": figure-font, figure-style
 #set text(font: figure-font, size: 10pt)

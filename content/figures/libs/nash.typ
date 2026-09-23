@@ -1,4 +1,3 @@
-// Recovered from Costis Gabri monograph/texcontent/figures/libs/nash.typ
 #import "@preview/cetz:0.4.1"
 #import "../../meta/linalg.typ": add, mvp, transpose, vvp
 
