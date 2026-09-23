@@ -33,7 +33,7 @@ The standard representation of an imperfect-information extensive-form game is t
 
 == Histories, actions, and payoffs
 
-The game tree represents the strategic interaction of players as a finite directed tree. The nodes of the game tree are called _histories_. Each history that is not a leaf of the game tree is associated with a unique acting player. In an $n$-player game, the set of valid players is the set $\[ n \] union { c } = {1 \, dots.h \, n \, c}$, where $c$ denotes the chance (or nature) player---a fictitious player that selects actions according to a known fixed probability distribution and models exogenous stochasticity of the environment (say, a roll of the dice, or drawing a card from a deck). The player is free to pick any one of the actions available at the history, which correspond to the outgoing edges at the histories. The players keep acting until a leaf of the game tree---called a _terminal history_---is reached. Terminal histories are not associated with any acting player; the set of terminal histories is denoted $Z$. When a terminal node $z in Z$ is reached, each player $i in \[ n \]$ receives a payoff according to the payoff function $u_i : Z arrow.r bb(R)$.
+The game tree represents the strategic interaction of players as a finite directed tree. The nodes of the game tree are called _histories_. Each history that is not a leaf of the game tree is associated with a unique acting player. In an $n$-player game, the set of valid players is the set $\[ n \] union { c } = {1 \, ... \, n \, c}$, where $c$ denotes the chance (or nature) player---a fictitious player that selects actions according to a known fixed probability distribution and models exogenous stochasticity of the environment (say, a roll of the dice, or drawing a card from a deck). The player is free to pick any one of the actions available at the history, which correspond to the outgoing edges at the histories. The players keep acting until a leaf of the game tree---called a _terminal history_---is reached. Terminal histories are not associated with any acting player; the set of terminal histories is denoted $Z$. When a terminal node $z in Z$ is reached, each player $i in \[ n \]$ receives a payoff according to the payoff function $u_i : Z -> bb(R)$.
 
 == Imperfect information and information sets
 
@@ -148,10 +148,10 @@ Trees always require a bit of notation to be handled properly. We introduce some
 
 #block(sticky: true)[#paragraph-marker() *Sequences:*]
 
-- A pair $(j \, a)$ where $j in cal(J)$ and $a in A_j$ is called a non-empty sequence. The set of all non-empty sequences is denoted as $Sigma_(*) colon.eq {(j \, a) : j in cal(J) \, a in A_j}$. For notational convenience, we will often denote an element $(j \, a)$ in $Sigma$ as $j a$ without using parentheses, especially when used as a subscript.
+- A pair $(j \, a)$ where $j in cal(J)$ and $a in A_j$ is called a non-empty sequence. The set of all non-empty sequences is denoted as $Sigma_(*) := {(j \, a) : j in cal(J) \, a in A_j}$. For notational convenience, we will often denote an element $(j \, a)$ in $Sigma$ as $j a$ without using parentheses, especially when used as a subscript.
 - The symbol $∅$ denotes a special sequence called the empty sequence. The set of all sequences, including the empty one, is denoted $Sigma$.
 - Given a decision node $j in cal(J)$, we denote by $p_j$ its _parent sequence_, defined as the last sequence (that is, decision point-action pair) encountered on the path from the root of the decision process to $j$. If the player does not act before $j$ (that is, $j$ is the root of the process or only observation nodes are encountered on the path from the root to $j$), we let $p_j = ∅$.
-- Given a sequence $sigma in Sigma$, we denote with $C_sigma$ the set of decision nodes j whose parent sequence is $sigma$: $C_sigma colon.eq {j in cal(J) : p_j = sigma}$.
+- Given a sequence $sigma in Sigma$, we denote with $C_sigma$ the set of decision nodes j whose parent sequence is $sigma$: $C_sigma := {j in cal(J) : p_j = sigma}$.
 
 = Strategy representations in extensive-form games
 
@@ -163,7 +163,7 @@ We discuss ways in which one could decide to represent a strategy, and contrast 
 One classical answer is the following. Consider a player, and imagine enumerating all their deterministic strategies for the tree. A mixed strategy is then a probability distribution over these deterministic strategies.
 
 #example[
-  In the small game of @ex:small-efg, a mixed strategy for Player 1 is a probability distribution over the following 7 strategies $pi_1 \, dots.h \, pi_7$.
+  In the small game of @ex:small-efg, a mixed strategy for Player 1 is a probability distribution over the following 7 strategies $pi_1 \, ... \, pi_7$.
 
   #align(center)[
     #image("figures/efg_intro/nf_strategies.svg", width: 100.0%)
@@ -180,7 +180,7 @@ By considering the normal-form game in which each player's strategy space is the
 
 == Behavioral form <sec-behavioral-form>
 
-A different conceptualization of a strategy for a player is as a choice of (independent) distributions over the set of actions $A_j$ at each decision node $j in cal(J)$. This is called a _behavioral strategy_. We can represent it accordingly as a vector $vx in bb(R)_(gt.eq 0)^Sigma$ indexed over sequences. Each entry $x_(j a)$ assigns to action $a$ at decision node $j$ the probability of picking that action at that decision node. The set of all possible behavioral strategies is clearly convex, as it is the Cartesian product of probability simplexes---one per each decision node.
+A different conceptualization of a strategy for a player is as a choice of (independent) distributions over the set of actions $A_j$ at each decision node $j in cal(J)$. This is called a _behavioral strategy_. We can represent it accordingly as a vector $vx in bb(R)_(>= 0)^Sigma$ indexed over sequences. Each entry $x_(j a)$ assigns to action $a$ at decision node $j$ the probability of picking that action at that decision node. The set of all possible behavioral strategies is clearly convex, as it is the Cartesian product of probability simplexes---one per each decision node.
 
 *Cons*  However, this representation has a major drawback: the probability of reaching a particular terminal state in the decision process is the product of all actions on the path from the root to the terminal state. This makes many expressions of interest that depend on the probability of reaching terminal states (including crucially the expected utility in the game) non-convex.
 
@@ -188,7 +188,7 @@ A different conceptualization of a strategy for a player is as a choice of (inde
   Consider the game of Kuhn poker, and let $vx \, vy$ be behavioral strategies for both players. The expected utility function for Player 1 is given by
 
   $
-    u_1 (vx \, vy) & colon.eq (- 1) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, c h k)) + (- 1) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, b e t)) dot.op x_(upsans(D \, f o l d))\
+    u_1 (vx \, vy) & := (- 1) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, c h k)) + (- 1) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, b e t)) dot.op x_(upsans(D \, f o l d))\
     & #h(2em) + (- 2) dot.op x_(upsans(A \, c h k)) dot.op y_(upsans(P \, b e t)) dot.op x_(upsans(D \, c a l l)) + dots.h.c .
   $
 
@@ -203,13 +203,13 @@ A different conceptualization of a strategy for a player is as a choice of (inde
 
 == Sequence form <sec-sequence-form>
 
-The _sequence-form representation_ #citep(<Romanovskii62:Reduction>, <Koller96:Efficient>, <Stengel96:Efficient>) soundly resolves the issue of non-convexity. Like behavioral strategies, in the sequence-form representation a strategy is a vector $vx in bb(R)_(gt.eq 0)^Sigma$ whose entries are indexed by $Sigma$. However, the generic entry $x_(j a)$ contains the _product_ of the probabilities of all actions at all decision nodes on the path from the root of the process to action $a$ at decision node $j$. In order to be a valid sequence-form strategy, the entries in $vx$ must therefore satisfy the following probability-flow-conservation constraints:
+The _sequence-form representation_ #citep(<Romanovskii62:Reduction>, <Koller96:Efficient>, <Stengel96:Efficient>) soundly resolves the issue of non-convexity. Like behavioral strategies, in the sequence-form representation a strategy is a vector $vx in bb(R)_(>= 0)^Sigma$ whose entries are indexed by $Sigma$. However, the generic entry $x_(j a)$ contains the _product_ of the probabilities of all actions at all decision nodes on the path from the root of the process to action $a$ at decision node $j$. In order to be a valid sequence-form strategy, the entries in $vx$ must therefore satisfy the following probability-flow-conservation constraints:
 
 #definition[
   The polytope of sequence-form strategies of a TFDP is the convex polytope
 
   $
-    cal(Q) colon.eq {vx in bb(R)_(gt.eq 0)^Sigma : #h(2em) x_∅ = 1 \, #h(2em) sum_(a in A_j) x_(j a) = x_(p_j) quad forall j in cal(J)} .
+    cal(Q) := {vx in bb(R)_(>= 0)^Sigma : #h(2em) x_∅ = 1 \, #h(2em) sum_(a in A_j) x_(j a) = x_(p_j) quad forall j in cal(J)} .
   $
 ] <def:sf>
 
