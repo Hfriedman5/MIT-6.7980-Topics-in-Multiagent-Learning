@@ -14,7 +14,8 @@
   "slides": {
     "overview": "slides/L00_course_intro.pdf",
     "nash": "slides/L01_nash_equilibrium.pdf",
-    "brouwer": "slides/L02_sperner.pdf"
+    "brouwer": "slides/L02_sperner.pdf",
+    "nash-properties": "slides/L03_nash_properties.pdf"
   },
   "notes": [
     {
