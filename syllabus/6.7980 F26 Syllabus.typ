@@ -29,7 +29,7 @@
   grading: (attendance: 20, material: 30, project: 50),
   // Website metadata only; these readings are not displayed in the syllabus PDF.
   supplementary_readings: (
-    (id: "nash-algorithms", title: "Centralized algorithms for Nash equilibrium computation", after: "nash"),
+    (id: "nash-algorithms", title: "Centralized algorithms for Nash equilibrium computation", after: "brouwer"),
     (id: "minimax", title: "A second look at the minimax theorem", after: "nash-properties"),
     (id: "phi-regret", title: "Phi-regret minimization", after: "learning-foundations"),
     (id: "learning-2", title: "Learning algorithms (II)", after: "learning-algorithms"),
