@@ -127,6 +127,11 @@ KaTeX 0.16.22 renders supported expressions; unsupported expressions
 retain their Typst SVG rendering. No npm installation is needed for the course
 build: the browser runtime and its license are under `html-exporter/assets/katex/`.
 
+Use [Typst's built-in symbol shorthands](https://typst.app/docs/reference/symbols/#shorthands)
+whenever an equivalent exists, such as `<=`, `>=`, `!=`, `~`, `:=`, `->`, `=>`,
+`<=>`, and `...`. Keep named forms for symbols without an exact shorthand and
+where code syntax or function calls require them, such as the accent `tilde(x)`.
+
 When authoring indexed functions, group the index explicitly: `u_(i)(a)` and
 `EE_(t)[x]`. Typst parses `u_i(a)` and `EE_t[x]` with the argument inside the
 subscript. `scripts/test_lecture_math.py` checks the compiled math trees of all
